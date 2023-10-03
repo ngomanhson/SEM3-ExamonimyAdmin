@@ -1,7 +1,11 @@
+import HomeAdmin from "./components/layouts/admin/home";
+import HomeStudent from "./components/layouts/student/home";
+
 function App() {
     return (
         <div className="App">
-            <h1>Hello World</h1>
+            <HomeAdmin />
+            <HomeStudent />
         </div>
     );
 }
