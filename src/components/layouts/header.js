@@ -1,12 +1,13 @@
+import { NavLink } from "react-router-dom";
 function Header() {
     return (
         <>
             <div className="row">
                 <div className="header">
                     <div className="header-left">
-                        <a href="index.html" className="logo">
+                        <NavLink to="/" className="logo">
                             <img src="assets/img/logo.png" alt="Logo" />
-                        </a>
+                        </NavLink>
                         <a href="index.html" className="logo logo-small">
                             <img
                                 src="assets/img/logo-small.png"
