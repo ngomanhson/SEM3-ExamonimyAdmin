@@ -20,5 +20,8 @@ const url = {
         CREATE: "/course",
         DETAIL: "/product/get-by-codeCourse",
     },
+    STAFF: {
+        LIST: "/staff",
+    },
 };
 export default url;

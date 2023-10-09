@@ -273,6 +273,9 @@ function Student_Create() {
                                                 value={formStudent.gender}
                                                 onChange={handleChange}
                                             >
+                                                <option value="">
+                                                    Please select gender
+                                                </option>
                                                 <option>Male</option>
                                                 <option>Female</option>
                                                 <option>Others</option>
@@ -390,9 +393,9 @@ function Student_Create() {
                                                 value={formStudent.class_id}
                                                 onChange={handleChange}
                                             >
-                                                <option>
-                                                    Please Select Class Name
-                                                </option>
+                                                <option value="">
+                                                    Please select class
+                                                </option>{" "}
                                                 {classes.map((classItem) => (
                                                     <option
                                                         key={classItem.id}

@@ -14,6 +14,7 @@ function Classes_Create() {
         teacher_id: "",
     });
 
+    const [teacher, setTeachers] = useState([]);
     const [nameExistsError, setNameExistsError] = useState("");
 
     const validateForm = async () => {
@@ -43,7 +44,7 @@ function Classes_Create() {
         }
 
         if (formClass.teacher_id === "") {
-            newErrors.teacher_id = "Please enter teacher_id";
+            newErrors.teacher_id = "Please enter teacher";
             valid = false;
         }
 
@@ -89,6 +90,18 @@ function Classes_Create() {
         setFormClass({ ...formClass, [name]: value });
         setNameExistsError("");
     };
+
+    //hiển thị select teacher
+    useEffect(() => {
+        const fetchTeachers = async () => {
+            try {
+                const response = await api.get(url.STAFF.LIST);
+                setTeachers(response.data);
+            } catch (error) {}
+        };
+        fetchTeachers();
+    }, []);
+
     return (
         <>
             <div className="page-header">
@@ -171,21 +184,30 @@ function Classes_Create() {
                                                     *
                                                 </span>
                                             </label>
-                                            <input
+                                            <select
                                                 className="form-control select"
                                                 name="teacher_id"
                                                 value={formClass.teacher_id}
                                                 onChange={handleChange}
-                                            />
+                                            >
+                                                <option value="">
+                                                    Please select teacher
+                                                </option>
+                                                {teacher.map((classItem) => (
+                                                    <option
+                                                        key={classItem.id}
+                                                        value={classItem.id}
+                                                    >
+                                                        {classItem.fullname}
+                                                    </option>
+                                                ))}
+                                            </select>
+
                                             {errors.teacher_id && (
                                                 <div className="text-danger">
                                                     {errors.teacher_id}
                                                 </div>
                                             )}
-                                            {/* <option>Will</option>
-                                                <option>Admam</option>
-                                                <option>Eva</option> */}
-                                            {/* </input> */}
                                         </div>
                                     </div>
                                     <div className="col-12">
