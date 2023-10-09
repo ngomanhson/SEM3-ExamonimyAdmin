@@ -16,6 +16,8 @@ import Classes_List from "./components/pages/classes/classes-list";
 import Classes_Create from "./components/pages/classes/classes-create";
 import Blog_List from "./components/pages/blog/blog-list";
 import Blog_Create from "./components/pages/blog/blog-create";
+import Classes_Edit from "./components/pages/classes/classes-edit";
+import Student_Edit from "./components/pages/student/student-edit";
 
 function App() {
     return (
@@ -61,6 +63,10 @@ function App() {
                                 path="/class-create"
                                 element={<Classes_Create />}
                             ></Route>
+                            <Route
+                                path="/classes-edit/:slug"
+                                element={<Classes_Edit />}
+                            ></Route>
                             {/* end route course */}
 
                             {/* start route course */}
@@ -94,6 +100,10 @@ function App() {
                                 path="/student-create"
                                 element={<Student_Create />}
                             ></Route>
+                            <Route
+                                path="/student-edit/:id"
+                                element={<Student_Edit />}
+                            ></Route>
                             {/* end route student */}
 
                             {/* start route blog */}
@@ -108,9 +118,6 @@ function App() {
                             {/* end route blog */}
                         </Routes>
                     </div>
-                    <footer>
-                        <p> Copyright© 2023 T2207A-EXAMONIMY. </p>
-                    </footer>
                 </div>
             </div>
         </div>

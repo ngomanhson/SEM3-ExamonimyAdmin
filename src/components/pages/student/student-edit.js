@@ -1,19 +1,22 @@
-import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import api from "../../services/api";
 import url from "../../services/url";
-function Student_Create() {
-    const [formStudent, setFormStudent] = useState({
-        student_code: "",
-        fullname: "",
-        avatar: "",
-        gender: "",
-        birthday: "",
-        email: "",
-        phone: "",
-        address: "",
-        class_id: "",
-        password: "",
-    });
+function Student_Edit() {
+    const { id } = useParams();
+    const [studentData, setStudentData] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        api.get(`${url.STUDENT.DETAIL}?id=${id}`)
+            .then((response) => {
+                setStudentData(response.data);
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.error("Error fetching student details:", error);
+            });
+    }, [id]);
 
     const [errors, setErrors] = useState({
         student_code: "",
@@ -31,83 +34,82 @@ function Student_Create() {
     const [classes, setClasses] = useState([]);
     const [studentCodeExistsError, setStudentCodeExistsError] = useState("");
 
-    // tạo các validate cho các input
     const validateForm = async () => {
         let valid = true;
         const newErrors = {};
 
-        if (formStudent.student_code === "") {
+        if (studentData.student_code === "") {
             newErrors.student_code = "Please enter student code";
             valid = false;
-        } else if (formStudent.student_code.length < 3) {
+        } else if (studentData.student_code.length < 3) {
             newErrors.student_code =
                 "The student code must be at least 3 characters";
             valid = false;
-        } else if (formStudent.student_code.length > 100) {
+        } else if (studentData.student_code.length > 100) {
             newErrors.student_code =
                 "Student code must be less than 100 characters";
             valid = false;
         }
 
-        if (formStudent.fullname === "") {
+        if (studentData.fullname === "") {
             newErrors.fullname = "Please enter full name";
             valid = false;
-        } else if (formStudent.fullname.length < 3) {
+        } else if (studentData.fullname.length < 3) {
             newErrors.fullname = "The fullname must be at least 3 characters";
             valid = false;
-        } else if (formStudent.fullname.length > 255) {
+        } else if (studentData.fullname.length > 255) {
             newErrors.fullname = "Fullname must be less than 255 characters";
             valid = false;
         }
 
-        if (formStudent.avatar === "") {
+        if (studentData.avatar === "") {
             newErrors.avatar = "Please choose avatar";
             valid = false;
         }
 
-        if (formStudent.birthday === "") {
+        if (studentData.birthday === "") {
             newErrors.birthday = "Please enter birthday";
             valid = false;
         }
 
-        if (formStudent.email === "") {
+        if (studentData.email === "") {
             newErrors.email = "Please enter email address";
             valid = false;
         }
 
-        if (formStudent.phone === "") {
+        if (studentData.phone === "") {
             newErrors.phone = "Please enter phone number";
             valid = false;
-        } else if (formStudent.phone.length < 10) {
+        } else if (studentData.phone.length < 10) {
             newErrors.phone = "Enter at least 10 characters";
             valid = false;
-        } else if (formStudent.phone.length > 12) {
+        } else if (studentData.phone.length > 12) {
             newErrors.phone = "Enter up to 12 characters";
             valid = false;
         }
 
-        if (formStudent.gender === "") {
+        if (studentData.gender === "") {
             newErrors.gender = "Please choose a gender";
             valid = false;
         }
 
-        if (formStudent.address === "") {
+        if (studentData.address === "") {
             newErrors.address = "Please enter address";
             valid = false;
         }
 
-        if (formStudent.class_id === "") {
+        if (studentData.class_id === "") {
             newErrors.class_id = "Please enter class";
             valid = false;
         }
 
-        if (formStudent.password === "") {
+        if (studentData.password === "") {
             newErrors.password = "Please enter password";
             valid = false;
-        } else if (formStudent.password.length < 6) {
+        } else if (studentData.password.length < 6) {
             newErrors.password = "Enter at least 6 characters";
             valid = false;
-        } else if (formStudent.password.length > 255) {
+        } else if (studentData.password.length > 255) {
             newErrors.password = "Enter up to 255 characters";
             valid = false;
         }
@@ -116,7 +118,7 @@ function Student_Create() {
         return valid;
     };
 
-    // hiển thị thông báo thêm sinh viên thành công
+    // hiển thị thông báo suawr sinh viên thành công
     const showNotification = (type, message) => {
         const notificationContainer = document.getElementById(
             "notification-container"
@@ -131,16 +133,13 @@ function Student_Create() {
         }, 5000);
     };
 
-    //xử lý thêm sinh viên
+    //xử lý sửa sinh viên
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
             try {
-                const response = await api.post(
-                    url.STUDENT.CREATE,
-                    formStudent
-                );
-                showNotification("success", "Student created successfully!");
+                const response = await api.put(url.STUDENT.EDIT, studentData);
+                showNotification("success", "Student updated successfully!");
             } catch (error) {
                 if (
                     error.response.status === 400 &&
@@ -152,12 +151,6 @@ function Student_Create() {
                 }
             }
         }
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormStudent({ ...formStudent, [name]: value });
-        setStudentCodeExistsError("");
     };
 
     //hiển thị select lớp học
@@ -182,10 +175,8 @@ function Student_Create() {
         <>
             <div className="page-header">
                 <div className="row align-items-center">
-                    <div className="col-sm-12">
-                        <div className="page-sub-header">
-                            <h3 className="page-title">Add Student</h3>
-                        </div>
+                    <div className="col">
+                        <h3 className="page-title">Edit Student</h3>
                     </div>
                 </div>
             </div>
@@ -219,10 +210,14 @@ function Student_Create() {
                                             <input
                                                 className="form-control"
                                                 type="text"
-                                                name="student_code"
-                                                value={formStudent.student_code}
-                                                onChange={handleChange}
-                                                placeholder="Enter Student Code"
+                                                value={studentData.student_code}
+                                                onChange={(e) =>
+                                                    setStudentData({
+                                                        ...studentData,
+                                                        student_code:
+                                                            e.target.value,
+                                                    })
+                                                }
                                             />
                                             {errors.student_code && (
                                                 <div className="text-danger">
@@ -247,10 +242,14 @@ function Student_Create() {
                                             <input
                                                 className="form-control"
                                                 type="text"
-                                                name="fullname"
-                                                value={formStudent.fullname}
-                                                onChange={handleChange}
-                                                placeholder="Enter Full Name"
+                                                value={studentData.fullname}
+                                                onChange={(e) =>
+                                                    setStudentData({
+                                                        ...studentData,
+                                                        fullname:
+                                                            e.target.value,
+                                                    })
+                                                }
                                             />
                                             {errors.fullname && (
                                                 <div className="text-danger">
@@ -269,9 +268,13 @@ function Student_Create() {
                                             </label>
                                             <select
                                                 className="form-control select"
-                                                name="gender"
-                                                value={formStudent.gender}
-                                                onChange={handleChange}
+                                                value={studentData.gender}
+                                                onChange={(e) =>
+                                                    setStudentData({
+                                                        ...studentData,
+                                                        gender: e.target.value,
+                                                    })
+                                                }
                                             >
                                                 <option>Male</option>
                                                 <option>Female</option>
@@ -295,10 +298,14 @@ function Student_Create() {
                                             <input
                                                 className="form-control"
                                                 type="date"
-                                                name="birthday"
-                                                value={formStudent.birthday}
-                                                onChange={handleChange}
-                                                placeholder="YYY-MM-DD"
+                                                value={studentData.birthday}
+                                                onChange={(e) =>
+                                                    setStudentData({
+                                                        ...studentData,
+                                                        birthday:
+                                                            e.target.value,
+                                                    })
+                                                }
                                             />
                                             {errors.birthday && (
                                                 <div className="text-danger">
@@ -318,10 +325,13 @@ function Student_Create() {
                                             <input
                                                 className="form-control"
                                                 type="email"
-                                                name="email"
-                                                value={formStudent.email}
-                                                onChange={handleChange}
-                                                placeholder="Enter Email Address"
+                                                value={studentData.email}
+                                                onChange={(e) =>
+                                                    setStudentData({
+                                                        ...studentData,
+                                                        email: e.target.value,
+                                                    })
+                                                }
                                             />
                                             {errors.email && (
                                                 <div className="text-danger">
@@ -341,10 +351,13 @@ function Student_Create() {
                                             <input
                                                 className="form-control"
                                                 type="number"
-                                                name="phone"
-                                                value={formStudent.phone}
-                                                onChange={handleChange}
-                                                placeholder="Enter Phone Number"
+                                                value={studentData.phone}
+                                                onChange={(e) =>
+                                                    setStudentData({
+                                                        ...studentData,
+                                                        phone: e.target.value,
+                                                    })
+                                                }
                                             />
                                             {errors.phone && (
                                                 <div className="text-danger">
@@ -364,10 +377,13 @@ function Student_Create() {
                                             <input
                                                 className="form-control"
                                                 type="text"
-                                                name="address"
-                                                value={formStudent.address}
-                                                onChange={handleChange}
-                                                placeholder="Enter Address"
+                                                value={studentData.address}
+                                                onChange={(e) =>
+                                                    setStudentData({
+                                                        ...studentData,
+                                                        address: e.target.value,
+                                                    })
+                                                }
                                             />
                                             {errors.address && (
                                                 <div className="text-danger">
@@ -386,9 +402,14 @@ function Student_Create() {
                                             </label>
                                             <select
                                                 className="form-control select"
-                                                name="class_id"
-                                                value={formStudent.class_id}
-                                                onChange={handleChange}
+                                                value={studentData.class_id}
+                                                onChange={(e) =>
+                                                    setStudentData({
+                                                        ...studentData,
+                                                        class_id:
+                                                            e.target.value,
+                                                    })
+                                                }
                                             >
                                                 <option>
                                                     Please Select Class Name
@@ -419,13 +440,19 @@ function Student_Create() {
                                                     *
                                                 </span>
                                             </label>{" "}
-                                            <input
+                                            {/* <input
                                                 type="file"
                                                 className="form-control"
-                                                name="avatar"
-                                                value={formStudent.avatar}
-                                                onChange={handleChange}
-                                            />{" "}
+                                                value={studentData.avatar}
+                                                onChange={(e) => {
+                                                    const selectedFile =
+                                                        e.target.files[0];
+                                                    setStudentData({
+                                                        ...studentData,
+                                                        avatar: selectedFile,
+                                                    });
+                                                }}
+                                            />{" "} */}
                                             {errors.avatar && (
                                                 <div className="text-danger">
                                                     {errors.avatar}
@@ -454,10 +481,14 @@ function Student_Create() {
                                                 <input
                                                     type={passwordInputType}
                                                     className="form-control"
-                                                    name="password"
-                                                    value={formStudent.password}
-                                                    onChange={handleChange}
-                                                    placeholder="Enter Password"
+                                                    value={studentData.password}
+                                                    onChange={(e) =>
+                                                        setStudentData({
+                                                            ...studentData,
+                                                            password:
+                                                                e.target.value,
+                                                        })
+                                                    }
                                                 />
                                                 <span
                                                     className={`password-toggle-icon ${
@@ -503,4 +534,4 @@ function Student_Create() {
         </>
     );
 }
-export default Student_Create;
+export default Student_Edit;

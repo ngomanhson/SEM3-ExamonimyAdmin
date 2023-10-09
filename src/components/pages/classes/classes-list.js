@@ -1,4 +1,58 @@
+import { useEffect, useState } from "react";
+import api from "../../services/api";
+import url from "../../services/url";
+import { NavLink } from "react-router-dom";
 function Classes_List() {
+    const [classes, setClasses] = useState([]);
+    const [error, setError] = useState(null);
+
+    const loadClasses = async () => {
+        try {
+            const response = await api.get(url.CLASS.LIST);
+            setClasses(response.data);
+        } catch (error) {
+            setError("Failed to load classes.");
+        }
+    };
+
+    const showNotification = (type, message) => {
+        const notificationContainer = document.getElementById(
+            "notification-container"
+        );
+        const notification = document.createElement("div");
+        notification.className = `alert alert-${type}`;
+        notification.textContent = message;
+        notificationContainer.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    };
+
+    const handleDeleteClass = (id) => {
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this class?"
+        );
+        if (confirmed) {
+            deleteClass(id);
+        }
+    };
+
+    const deleteClass = async (id) => {
+        try {
+            await api.delete(`${url.CLASS.DELETE}?id=${id}`);
+            setClasses(classes.filter((c) => c.id !== id));
+        } catch (error) {
+            showNotification(
+                "danger",
+                "The class cannot be deleted because this class currently has students."
+            );
+        }
+    };
+
+    useEffect(() => {
+        loadClasses();
+    }, []);
     return (
         <>
             <div className="page-header">
@@ -34,7 +88,7 @@ function Classes_List() {
                             <input
                                 type="text"
                                 className="form-control"
-                                placeholder="Search by Year ..."
+                                placeholder="Search by Room ..."
                             />
                         </div>
                     </div>
@@ -47,6 +101,7 @@ function Classes_List() {
                     </div>
                 </div>
             </div>
+
             <div className="row">
                 <div className="col-sm-12">
                     <div className="card card-table">
@@ -57,22 +112,17 @@ function Classes_List() {
                                         <h3 className="page-title">Class</h3>
                                     </div>
                                     <div className="col-auto text-end float-end ms-auto download-grp">
-                                        <a
-                                            href="#"
-                                            className="btn btn-outline-primary me-2"
-                                        >
-                                            <i className="fas fa-download"></i>{" "}
-                                            Download
-                                        </a>
-                                        <a
-                                            href="add-department.html"
+                                        <NavLink
+                                            to="/class-create"
                                             className="btn btn-primary"
                                         >
                                             <i className="fas fa-plus"></i>
-                                        </a>
+                                        </NavLink>
                                     </div>
                                 </div>
                             </div>
+
+                            <div id="notification-container"></div>
 
                             <table className="table border-0 star-student table-hover table-center mb-0 datatable table-striped">
                                 <thead className="student-thread">
@@ -88,229 +138,57 @@ function Classes_List() {
                                         </th>
                                         <th>ID</th>
                                         <th>Name</th>
-                                        <th>HOD</th>
-                                        <th>Started Year</th>
-                                        <th>No of Students</th>
+                                        <th>Room</th>
+                                        <th>Teacher</th>
                                         <th className="text-end">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>
-                                            <div className="form-check check-tables">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    value="something"
-                                                />
-                                            </div>
-                                        </td>
-                                        <td>PRE2209</td>
-                                        <td>
-                                            <h2>
-                                                <a>Computer Science Engg</a>
-                                            </h2>
-                                        </td>
-                                        <td>Aaliyah</td>
-                                        <td>1995</td>
-                                        <td>180</td>
-                                        <td className="text-end">
-                                            <div className="actions">
-                                                <a
-                                                    href="javascript:;"
-                                                    className="btn btn-sm bg-success-light me-2"
-                                                >
-                                                    <i className="feather-eye"></i>
-                                                </a>
-                                                <a
-                                                    href="edit-department.html"
-                                                    className="btn btn-sm bg-danger-light"
-                                                >
-                                                    <i className="feather-edit"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div className="form-check check-tables">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    value="something"
-                                                />
-                                            </div>
-                                        </td>
-                                        <td>PRE2213</td>
-                                        <td>
-                                            <h2>
-                                                <a>Mechanical Engg</a>
-                                            </h2>
-                                        </td>
-                                        <td>Malynne</td>
-                                        <td>1999</td>
-                                        <td>240</td>
-                                        <td className="text-end">
-                                            <div className="actions">
-                                                <a
-                                                    href="javascript:;"
-                                                    className="btn btn-sm bg-success-light me-2"
-                                                >
-                                                    <i className="feather-eye"></i>
-                                                </a>
-                                                <a
-                                                    href="edit-department.html"
-                                                    className="btn btn-sm bg-danger-light"
-                                                >
-                                                    <i className="feather-edit"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div className="form-check check-tables">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    value="something"
-                                                />
-                                            </div>
-                                        </td>
-                                        <td>PRE2143</td>
-                                        <td>
-                                            <h2>
-                                                <a>Electrical Engg</a>
-                                            </h2>
-                                        </td>
-                                        <td>Levell Scott</td>
-                                        <td>1994</td>
-                                        <td>163</td>
-                                        <td className="text-end">
-                                            <div className="actions">
-                                                <a
-                                                    href="javascript:;"
-                                                    className="btn btn-sm bg-success-light me-2"
-                                                >
-                                                    <i className="feather-eye"></i>
-                                                </a>
-                                                <a
-                                                    href="edit-department.html"
-                                                    className="btn btn-sm bg-danger-light"
-                                                >
-                                                    <i className="feather-edit"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div className="form-check check-tables">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    value="something"
-                                                />
-                                            </div>
-                                        </td>
-                                        <td>PRE2431</td>
-                                        <td>
-                                            <h2>
-                                                <a>Civil Engg</a>
-                                            </h2>
-                                        </td>
-                                        <td>Minnie</td>
-                                        <td>2000</td>
-                                        <td>195</td>
-                                        <td className="text-end">
-                                            <div className="actions">
-                                                <a
-                                                    href="javascript:;"
-                                                    className="btn btn-sm bg-success-light me-2"
-                                                >
-                                                    <i className="feather-eye"></i>
-                                                </a>
-                                                <a
-                                                    href="edit-department.html"
-                                                    className="btn btn-sm bg-danger-light"
-                                                >
-                                                    <i className="feather-edit"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div className="form-check check-tables">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    value="something"
-                                                />
-                                            </div>
-                                        </td>
-                                        <td>PRE1534</td>
-                                        <td>
-                                            <h2>
-                                                <a>MCA</a>
-                                            </h2>
-                                        </td>
-                                        <td>Lois A</td>
-                                        <td>1992</td>
-                                        <td>200</td>
-                                        <td className="text-end">
-                                            <div className="actions">
-                                                <a
-                                                    href="javascript:;"
-                                                    className="btn btn-sm bg-success-light me-2"
-                                                >
-                                                    <i className="feather-eye"></i>
-                                                </a>
-                                                <a
-                                                    href="edit-department.html"
-                                                    className="btn btn-sm bg-danger-light"
-                                                >
-                                                    <i className="feather-edit"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div className="form-check check-tables">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    value="something"
-                                                />
-                                            </div>
-                                        </td>
-                                        <td>PRE2153</td>
-                                        <td>
-                                            <h2>
-                                                <a>BCA</a>
-                                            </h2>
-                                        </td>
-                                        <td>Calvin</td>
-                                        <td>1992</td>
-                                        <td>152</td>
-                                        <td className="text-end">
-                                            <div className="actions">
-                                                <a
-                                                    href="javascript:;"
-                                                    className="btn btn-sm bg-success-light me-2"
-                                                >
-                                                    <i className="feather-eye"></i>
-                                                </a>
-                                                <a
-                                                    href="edit-department.html"
-                                                    className="btn btn-sm bg-danger-light"
-                                                >
-                                                    <i className="feather-edit"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                    {classes.map((item, index) => {
+                                        return (
+                                            <tr>
+                                                <td>
+                                                    <div className="form-check check-tables">
+                                                        <input
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            value="something"
+                                                        />
+                                                    </div>
+                                                </td>
+                                                <td>{index + 1}</td>
+                                                <td>{item.name}</td>
+                                                <td>{item.room}</td>
+                                                <td>{item.teacher_id}</td>
+                                                <td className="text-end">
+                                                    <div className="actions">
+                                                        <a
+                                                            href="javascript:;"
+                                                            className="btn btn-sm bg-success-light me-2"
+                                                        >
+                                                            <i className="feather-eye"></i>
+                                                        </a>
+                                                        <NavLink
+                                                            to={`/classes-edit/${item.slug}`}
+                                                            className="btn btn-sm bg-danger-light"
+                                                        >
+                                                            <i className="feather-edit"></i>
+                                                        </NavLink>
+                                                        <NavLink
+                                                            onClick={() =>
+                                                                handleDeleteClass(
+                                                                    item.id
+                                                                )
+                                                            }
+                                                            className="btn btn-sm bg-danger-light"
+                                                        >
+                                                            <i className="feather-trash"></i>
+                                                        </NavLink>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>

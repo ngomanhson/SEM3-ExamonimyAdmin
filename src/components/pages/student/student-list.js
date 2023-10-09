@@ -1,4 +1,39 @@
+import { useEffect, useState } from "react";
+import api from "../../services/api";
+import url from "../../services/url";
+import { format } from "date-fns";
+import { NavLink } from "react-router-dom";
 function Student_List() {
+    const [students, setStudents] = useState([]);
+    const [classNames, setClassNames] = useState({});
+    const [error, setError] = useState(null);
+
+    const loadStudents = async () => {
+        try {
+            const response = await api.get(url.STUDENT.LIST);
+            setStudents(response.data);
+        } catch (error) {
+            setError("Failed to load students.");
+        }
+    };
+
+    const fetchClassNames = async () => {
+        try {
+            const response = await api.get(url.CLASS.LIST);
+            const classData = response.data.reduce((acc, curr) => {
+                acc[curr.id] = curr.name;
+                return acc;
+            }, {});
+            setClassNames(classData);
+        } catch (error) {
+            setError("Failed to load class names.");
+        }
+    };
+
+    useEffect(() => {
+        loadStudents();
+        fetchClassNames();
+    }, []);
     return (
         <>
             <div className="page-header">
@@ -109,582 +144,86 @@ function Student_List() {
                                                     />
                                                 </div>
                                             </th>
-                                            <th>ID</th>
-                                            <th>Name</th>
-                                            <th>className</th>
-                                            <th>DOB</th>
-                                            <th>Parent Name</th>
-                                            <th>Mobile Number</th>
+                                            <th>Student Code</th>
+                                            <th>Full Name</th>
+                                            <th>Birth Day</th>
+                                            <th>Email</th>
+                                            <th>Phone Number</th>
+                                            <th>Gender</th>
                                             <th>Address</th>
+                                            <th>Class</th>
                                             <th className="text-end">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE2209</td>
-                                            <td>
-                                                <h2 className="table-avatar">
-                                                    <a
-                                                        href="student-details.html"
-                                                        className="avatar avatar-sm me-2"
-                                                    >
-                                                        <img
-                                                            className="avatar-img rounded-circle"
-                                                            src="assets/img/profiles/avatar-01.jpg"
-                                                            alt="User Image"
-                                                        />
-                                                    </a>
-                                                    <a href="student-details.html">
-                                                        Aaliyah
-                                                    </a>
-                                                </h2>
-                                            </td>
-                                            <td>10 A</td>
-                                            <td>2 Feb 2002</td>
-                                            <td>Jeffrey Wong</td>
-                                            <td>097 3584 5870</td>
-                                            <td>911 Deer Ridge Drive,USA</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-student.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE2213</td>
-                                            <td>
-                                                <h2 className="table-avatar">
-                                                    <a
-                                                        href="student-details.html"
-                                                        className="avatar avatar-sm me-2"
-                                                    >
-                                                        <img
-                                                            className="avatar-img rounded-circle"
-                                                            src="assets/img/profiles/avatar-03.jpg"
-                                                            alt="User Image"
-                                                        />
-                                                    </a>
-                                                    <a href="student-details.html">
-                                                        Malynne
-                                                    </a>
-                                                </h2>
-                                            </td>
-                                            <td>8 A</td>
-                                            <td>3 June 2010</td>
-                                            <td>Fields Malynne</td>
-                                            <td>242 362 3100</td>
-                                            <td>
-                                                Bacardi Rd P.O. Box N-4880, New
-                                                Providence
-                                            </td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-student.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE2143</td>
-                                            <td>
-                                                <h2 className="table-avatar">
-                                                    <a
-                                                        href="student-details.html"
-                                                        className="avatar avatar-sm me-2"
-                                                    >
-                                                        <img
-                                                            className="avatar-img rounded-circle"
-                                                            src="assets/img/profiles/avatar-02.jpg"
-                                                            alt="User Image"
-                                                        />
-                                                    </a>
-                                                    <a href="student-details.html">
-                                                        Levell Scott
-                                                    </a>
-                                                </h2>
-                                            </td>
-                                            <td>10 A</td>
-                                            <td>12 Apr 2002</td>
-                                            <td>Jeffrey Scott</td>
-                                            <td>026 7318 4366</td>
-                                            <td>P.O. Box: 41, Gaborone</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-student.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE2431</td>
-                                            <td>
-                                                <h2 className="table-avatar">
-                                                    <a
-                                                        href="student-details.html"
-                                                        className="avatar avatar-sm me-2"
-                                                    >
-                                                        <img
-                                                            className="avatar-img rounded-circle"
-                                                            src="assets/img/profiles/avatar-03.jpg"
-                                                            alt="User Image"
-                                                        />
-                                                    </a>
-                                                    <a href="student-details.html">
-                                                        Minnie
-                                                    </a>
-                                                </h2>
-                                            </td>
-                                            <td>11 C</td>
-                                            <td>24 Feb 2000</td>
-                                            <td>J Shaffer</td>
-                                            <td>952 512 4909</td>
-                                            <td>
-                                                4771 Oral Lake Road, Golden
-                                                Valley
-                                            </td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-student.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE1534</td>
-                                            <td>
-                                                <h2 className="table-avatar">
-                                                    <a
-                                                        href="student-details.html"
-                                                        className="avatar avatar-sm me-2"
-                                                    >
-                                                        <img
-                                                            className="avatar-img rounded-circle"
-                                                            src="assets/img/profiles/avatar-04.jpg"
-                                                            alt="User Image"
-                                                        />
-                                                    </a>
-                                                    <a href="student-details.html">
-                                                        Lois A
-                                                    </a>
-                                                </h2>
-                                            </td>
-                                            <td>10 A</td>
-                                            <td>22 Jul 2006</td>
-                                            <td>Cleary Wong</td>
-                                            <td>413 289 1314</td>
-                                            <td>
-                                                2844 Leverton Cove Road, Palmer
-                                            </td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-student.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE2153</td>
-                                            <td>
-                                                <h2 className="table-avatar">
-                                                    <a
-                                                        href="student-details.html"
-                                                        className="avatar avatar-sm me-2"
-                                                    >
-                                                        <img
-                                                            className="avatar-img rounded-circle"
-                                                            src="assets/img/profiles/avatar-05.jpg"
-                                                            alt="User Image"
-                                                        />
-                                                    </a>
-                                                    <a href="student-details.html">
-                                                        Calvin
-                                                    </a>
-                                                </h2>
-                                            </td>
-                                            <td>9 B</td>
-                                            <td>8 Dec 2003</td>
-                                            <td>Minnie J Shaffer</td>
-                                            <td>701 753 3810</td>
-                                            <td>
-                                                1900 Hidden Meadow Drive, Crete
-                                            </td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-student.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE1252</td>
-                                            <td>
-                                                <h2 className="table-avatar">
-                                                    <a
-                                                        href="student-details.html"
-                                                        className="avatar avatar-sm me-2"
-                                                    >
-                                                        <img
-                                                            className="avatar-img rounded-circle"
-                                                            src="assets/img/profiles/avatar-06.jpg"
-                                                            alt="User Image"
-                                                        />
-                                                    </a>
-                                                    <a href="student-details.html">
-                                                        Joe Kelley
-                                                    </a>
-                                                </h2>
-                                            </td>
-                                            <td>11 C</td>
-                                            <td>7 Oct 2000</td>
-                                            <td>Vincent Howard</td>
-                                            <td>402 221 7523</td>
-                                            <td>3979 Ashwood Drive, Omaha</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-student.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE1434</td>
-                                            <td>
-                                                <h2 className="table-avatar">
-                                                    <a
-                                                        href="student-details.html"
-                                                        className="avatar avatar-sm me-2"
-                                                    >
-                                                        <img
-                                                            className="avatar-img rounded-circle"
-                                                            src="assets/img/profiles/avatar-07.jpg"
-                                                            alt="User Image"
-                                                        />
-                                                    </a>
-                                                    <a href="student-details.html">
-                                                        Vincent
-                                                    </a>
-                                                </h2>
-                                            </td>
-                                            <td>10 A</td>
-                                            <td>4 Jan 2002</td>
-                                            <td>Kelley Joe</td>
-                                            <td>402 221 7523</td>
-                                            <td>3979 Ashwood Drive, Omaha</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-student.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE2345</td>
-                                            <td>
-                                                <h2 className="table-avatar">
-                                                    <a
-                                                        href="student-details.html"
-                                                        className="avatar avatar-sm me-2"
-                                                    >
-                                                        <img
-                                                            className="avatar-img rounded-circle"
-                                                            src="assets/img/profiles/avatar-08.jpg"
-                                                            alt="User Image"
-                                                        />
-                                                    </a>
-                                                    <a href="student-details.html">
-                                                        Kozma Tatari
-                                                    </a>
-                                                </h2>
-                                            </td>
-                                            <td>9 A</td>
-                                            <td>1 Feb 2006</td>
-                                            <td>Lombardi</td>
-                                            <td>04 2239 968</td>
-                                            <td>
-                                                Rruga E Kavajes, Condor Center,
-                                                Tirana
-                                            </td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-student.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE2365</td>
-                                            <td>
-                                                <h2 className="table-avatar">
-                                                    <a
-                                                        href="student-details.html"
-                                                        className="avatar avatar-sm me-2"
-                                                    >
-                                                        <img
-                                                            className="avatar-img rounded-circle"
-                                                            src="assets/img/profiles/avatar-09.jpg"
-                                                            alt="User Image"
-                                                        />
-                                                    </a>
-                                                    <a href="student-details.html">
-                                                        John Chambers
-                                                    </a>
-                                                </h2>
-                                            </td>
-                                            <td>11 B</td>
-                                            <td>13 Sept 2003</td>
-                                            <td>Wong Jeffrey</td>
-                                            <td>870 663 2334</td>
-                                            <td>
-                                                4667 Sunset Drive, Pine Bluff
-                                            </td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-student.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE1234</td>
-                                            <td>
-                                                <h2 className="table-avatar">
-                                                    <a
-                                                        href="student-details.html"
-                                                        className="avatar avatar-sm me-2"
-                                                    >
-                                                        <img
-                                                            className="avatar-img rounded-circle"
-                                                            src="assets/img/profiles/avatar-10.jpg"
-                                                            alt="User Image"
-                                                        />
-                                                    </a>
-                                                    <a href="student-details.html">
-                                                        Nathan Humphries
-                                                    </a>
-                                                </h2>
-                                            </td>
-                                            <td>10 B</td>
-                                            <td>26 Apr 1994</td>
-                                            <td>Stephen Marley</td>
-                                            <td>077 3499 9959</td>
-                                            <td>86 Lamphey Road, Thelnetham</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-student.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        {students.map((item, index) => {
+                                            return (
+                                                <tr>
+                                                    <td>
+                                                        <div className="form-check check-tables">
+                                                            <input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                value="something"
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                    <td>{item.student_code}</td>
+                                                    <td>
+                                                        <h2 className="table-avatar">
+                                                            <a
+                                                                href="student-details.html"
+                                                                className="avatar avatar-sm me-2"
+                                                            >
+                                                                <img
+                                                                    className="avatar-img rounded-circle"
+                                                                    src="assets/img/profiles/avatar-01.jpg"
+                                                                    alt="User Image"
+                                                                />
+                                                            </a>
+                                                            <a href="student-details.html">
+                                                                {item.fullname}
+                                                            </a>
+                                                        </h2>
+                                                    </td>
+                                                    <td>
+                                                        {format(
+                                                            new Date(
+                                                                item.birthday
+                                                            ),
+                                                            "yyyy-MM-dd"
+                                                        )}
+                                                    </td>
+                                                    <td>{item.email}</td>
+                                                    <td>{item.phone}</td>
+                                                    <td>{item.gender}</td>
+                                                    <td>{item.address}</td>
+                                                    <td>
+                                                        {
+                                                            classNames[
+                                                                item.class_id
+                                                            ]
+                                                        }
+                                                    </td>
+                                                    <td className="text-end">
+                                                        <div className="actions">
+                                                            <a
+                                                                href="javascript:;"
+                                                                className="btn btn-sm bg-success-light me-2"
+                                                            >
+                                                                <i className="feather-eye"></i>
+                                                            </a>
+                                                            <NavLink
+                                                                to={`/student-edit/${item.id}`}
+                                                                className="btn btn-sm bg-danger-light"
+                                                            >
+                                                                <i className="feather-edit"></i>
+                                                            </NavLink>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>

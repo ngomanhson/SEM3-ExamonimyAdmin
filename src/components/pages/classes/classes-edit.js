@@ -1,12 +1,22 @@
-import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import api from "../../services/api";
 import url from "../../services/url";
-function Classes_Create() {
-    const [formClass, setFormClass] = useState({
-        name: "",
-        room: "",
-        teacher_id: "",
-    });
+function Classes_Edit() {
+    const { slug } = useParams();
+    const [classData, setClassData] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        api.get(`${url.CLASS.DETAIL}?slug=${slug}`)
+            .then((response) => {
+                setClassData(response.data);
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.error("Error fetching class details:", error);
+            });
+    }, [slug]);
 
     const [errors, setErrors] = useState({
         name: "",
@@ -20,29 +30,29 @@ function Classes_Create() {
         let valid = true;
         const newErrors = {};
 
-        if (formClass.name === "") {
+        if (classData.name === "") {
             newErrors.name = "Please enter class name";
             valid = false;
-        } else if (formClass.name.length < 3) {
+        } else if (classData.name.length < 3) {
             newErrors.name = "The class name must be at least 3 characters";
             valid = false;
-        } else if (formClass.name.length > 50) {
+        } else if (classData.name.length > 50) {
             newErrors.name = "Class name must be less than 50 characters";
             valid = false;
         }
 
-        if (formClass.room === "") {
+        if (classData.room === "") {
             newErrors.room = "Please enter room name";
             valid = false;
-        } else if (formClass.room.length < 3) {
+        } else if (classData.room.length < 3) {
             newErrors.room = "Room name must have at least 3 characters";
             valid = false;
-        } else if (formClass.room.length > 50) {
+        } else if (classData.room.length > 50) {
             newErrors.room = "Room name must be less than 50 characters";
             valid = false;
         }
 
-        if (formClass.teacher_id === "") {
+        if (classData.teacher_id === "") {
             newErrors.teacher_id = "Please enter teacher_id";
             valid = false;
         }
@@ -69,8 +79,11 @@ function Classes_Create() {
         e.preventDefault();
         if (validateForm()) {
             try {
-                const rs = await api.post(url.CLASS.CREATE, formClass);
-                showNotification("success", "Class created successfully!");
+                const rs = await api.put(
+                    `${url.CLASS.EDIT}?id=${classData.id}`,
+                    classData
+                );
+                showNotification("success", "Class updated successfully!");
             } catch (error) {
                 if (
                     error.response.status === 400 &&
@@ -78,23 +91,17 @@ function Classes_Create() {
                 ) {
                     setNameExistsError("The class name already exists");
                 } else {
-                    // showNotification("danger", "Failed to create class.");
                 }
             }
         }
     };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormClass({ ...formClass, [name]: value });
-        setNameExistsError("");
-    };
     return (
         <>
             <div className="page-header">
                 <div className="row align-items-center">
                     <div className="col">
-                        <h3 className="page-title">Add Class</h3>
+                        <h3 className="page-title">Edit Class</h3>
                     </div>
                 </div>
             </div>
@@ -123,9 +130,13 @@ function Classes_Create() {
                                             <input
                                                 type="text"
                                                 className="form-control"
-                                                name="name"
-                                                value={formClass.name}
-                                                onChange={handleChange}
+                                                value={classData.name}
+                                                onChange={(e) =>
+                                                    setClassData({
+                                                        ...classData,
+                                                        name: e.target.value,
+                                                    })
+                                                }
                                             />
                                             {errors.name && (
                                                 <div className="text-danger">
@@ -151,9 +162,13 @@ function Classes_Create() {
                                             <input
                                                 type="text"
                                                 className="form-control"
-                                                name="room"
-                                                value={formClass.room}
-                                                onChange={handleChange}
+                                                value={classData.room}
+                                                onChange={(e) =>
+                                                    setClassData({
+                                                        ...classData,
+                                                        room: e.target.value,
+                                                    })
+                                                }
                                             />
                                             {errors.room && (
                                                 <div className="text-danger">
@@ -172,10 +187,17 @@ function Classes_Create() {
                                                 </span>
                                             </label>
                                             <input
-                                                className="form-control select"
-                                                name="teacher_id"
-                                                value={formClass.teacher_id}
-                                                onChange={handleChange}
+                                                type="text"
+                                                className="form-control"
+                                                value={classData.teacher_id} // Display class name
+                                                // Add an onChange handler to update the classData.name
+                                                onChange={(e) =>
+                                                    setClassData({
+                                                        ...classData,
+                                                        teacher_id:
+                                                            e.target.value,
+                                                    })
+                                                }
                                             />
                                             {errors.teacher_id && (
                                                 <div className="text-danger">
@@ -188,13 +210,14 @@ function Classes_Create() {
                                             {/* </input> */}
                                         </div>
                                     </div>
+
                                     <div className="col-12">
                                         <div className="student-submit">
                                             <button
                                                 type="submit"
                                                 className="btn btn-primary"
                                             >
-                                                Submit
+                                                Update
                                             </button>
                                         </div>
                                     </div>
@@ -207,4 +230,4 @@ function Classes_Create() {
         </>
     );
 }
-export default Classes_Create;
+export default Classes_Edit;

@@ -1,12 +1,16 @@
 import React from "react";
 import "@mobiscroll/react/dist/css/mobiscroll.min.css";
-import { Select, Page, setOptions } from "@mobiscroll/react";
+import { Select, Page, setOptions, Datepicker, Input } from "@mobiscroll/react";
 import { NavLink } from "react-router-dom";
 function Exam_Create() {
     setOptions({
         theme: "ios",
         themeVariant: "light",
     });
+
+    const now = new Date();
+    const min = now;
+    const max = new Date(now.getFullYear(), now.getMonth() + 6, now.getDate());
 
     const myData = [
         {
@@ -64,40 +68,30 @@ function Exam_Create() {
                         <div class="card-body">
                             <form action="#">
                                 <div className="form-group">
-                                    <label>Course </label>
-                                    <select className="form-control select">
-                                        <option>ASP</option>
-                                        <option>React</option>
-                                        <option>Laravel</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Exam Title</label>
-                                    <input type="text" class="form-control" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Exam start time</label>
-                                    <input
-                                        class="form-control"
-                                        type="datetime-local"
+                                    <Select
+                                        data={myData}
+                                        label="Course"
+                                        inputStyle="outline"
+                                        labelStyle="stacked"
+                                        placeholder="Please select course ..."
                                     />
                                 </div>
                                 <div class="form-group">
-                                    <label>Exam end time</label>
-                                    <input
-                                        className="form-control"
-                                        type="datetime-local"
+                                    <Input
+                                        label="Exam Title"
+                                        inputStyle="outline"
+                                        labelStyle="stacked"
+                                        placeholder="Please Enter Exam Title ..."
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>
-                                        The class receives exam questions{" "}
-                                    </label>
-                                    <select className="form-control select">
-                                        <option>T2207A</option>
-                                        <option>T2207B</option>
-                                        <option>T2207C</option>
-                                    </select>
+                                    <Select
+                                        data={myData}
+                                        label="Class receive exams"
+                                        inputStyle="outline"
+                                        labelStyle="stacked"
+                                        placeholder="Please select class ..."
+                                    />
                                 </div>
                                 <div className="form-group">
                                     <Select
@@ -107,6 +101,20 @@ function Exam_Create() {
                                         inputStyle="outline"
                                         labelStyle="stacked"
                                         placeholder="Please select student ..."
+                                    />
+                                </div>
+                                <div class="form-group">
+                                    <Datepicker
+                                        controls={["datetime"]}
+                                        select="range"
+                                        inputProps={{
+                                            label: "Test Start And End Date And Time",
+                                            labelStyle: "stacked",
+                                            inputStyle: "outline",
+                                            placeholder: "Please Select...",
+                                        }}
+                                        min={min}
+                                        max={max}
                                     />
                                 </div>
                                 <div className="text-end">
