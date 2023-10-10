@@ -1,24 +1,28 @@
+import { NavLink, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 import url from "../../services/url";
 import { format } from "date-fns";
-import { NavLink } from "react-router-dom";
-function Student_List() {
+function Student_Of_Class_List() {
+    const { id } = useParams();
     const [students, setStudents] = useState([]);
     const [classNames, setClassNames] = useState({});
+    const [className, setClassName] = useState("");
     const [error, setError] = useState(null);
 
-    //hiển thị danh sách sinh viên
-    const loadStudents = async () => {
+    //in ra danh sách sinh viên theo lớp
+    const loadStudentsForClass = async (classId) => {
         try {
-            const response = await api.get(url.STUDENT.LIST);
+            const response = await api.get(
+                `${url.STUDENT.CLASS_ID}?classId=${classId}`
+            );
             setStudents(response.data);
         } catch (error) {
-            setError("Failed to load students.");
+            setError("Failed to load students for this class.");
         }
     };
 
-    //hiển thị tên lớp học
+    // hiển thị tên lớp học
     const fetchClassNames = async () => {
         try {
             const response = await api.get(url.CLASS.LIST);
@@ -27,12 +31,15 @@ function Student_List() {
                 return acc;
             }, {});
             setClassNames(classData);
+            if (classData[id]) {
+                setClassName(classData[id]);
+            }
         } catch (error) {
             setError("Failed to load class names.");
         }
     };
 
-    //xử lý xoá sinh viên
+    // xử lý xoá sinh viên
     const handleDeleteStudent = async (id) => {
         const confirmed = window.confirm(
             "Are you sure you want to delete this student?"
@@ -50,9 +57,9 @@ function Student_List() {
     };
 
     useEffect(() => {
-        loadStudents();
+        loadStudentsForClass(id);
         fetchClassNames();
-    }, []);
+    }, [id]);
     return (
         <>
             <div className="page-header">
@@ -110,7 +117,9 @@ function Student_List() {
                             <div className="page-header">
                                 <div className="row align-items-center">
                                     <div className="col">
-                                        <h3 className="page-title">Students</h3>
+                                        <h3 className="page-title">
+                                            Student list of class {className}
+                                        </h3>
                                     </div>
                                     <div className="col-auto text-end float-end ms-auto download-grp">
                                         <a
@@ -255,4 +264,4 @@ function Student_List() {
         </>
     );
 }
-export default Student_List;
+export default Student_Of_Class_List;

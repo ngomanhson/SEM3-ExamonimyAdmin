@@ -4,8 +4,10 @@ import url from "../../services/url";
 import { NavLink } from "react-router-dom";
 function Classes_List() {
     const [classes, setClasses] = useState([]);
+    const [teacherNames, setTeacherNames] = useState({});
     const [error, setError] = useState(null);
 
+    //hiển thị danh sách lớp
     const loadClasses = async () => {
         try {
             const response = await api.get(url.CLASS.LIST);
@@ -15,6 +17,7 @@ function Classes_List() {
         }
     };
 
+    //thông báo
     const showNotification = (type, message) => {
         const notificationContainer = document.getElementById(
             "notification-container"
@@ -29,6 +32,7 @@ function Classes_List() {
         }, 5000);
     };
 
+    //xử lý xoá lớp học
     const handleDeleteClass = (id) => {
         const confirmed = window.confirm(
             "Are you sure you want to delete this class?"
@@ -50,8 +54,23 @@ function Classes_List() {
         }
     };
 
+    //hiển thị tên giáo viên
+    const fetchTeacherNames = async () => {
+        try {
+            const response = await api.get(url.STAFF.LIST);
+            const teacherNameMap = {};
+            response.data.forEach((teacher) => {
+                teacherNameMap[teacher.id] = teacher.fullname;
+            });
+            setTeacherNames(teacherNameMap);
+        } catch (error) {
+            setError("Failed to fetch teacher names.");
+        }
+    };
+
     useEffect(() => {
         loadClasses();
+        fetchTeacherNames();
     }, []);
     return (
         <>
@@ -159,15 +178,21 @@ function Classes_List() {
                                                 <td>{index + 1}</td>
                                                 <td>{item.name}</td>
                                                 <td>{item.room}</td>
-                                                <td>{item.teacher_id}</td>
+                                                <td>
+                                                    {
+                                                        teacherNames[
+                                                            item.teacher_id
+                                                        ]
+                                                    }
+                                                </td>
                                                 <td className="text-end">
                                                     <div className="actions">
-                                                        <a
-                                                            href="javascript:;"
+                                                        <NavLink
+                                                            to={`/student-of-class-list/${item.id}`}
                                                             className="btn btn-sm bg-success-light me-2"
                                                         >
                                                             <i className="feather-eye"></i>
-                                                        </a>
+                                                        </NavLink>
                                                         <NavLink
                                                             to={`/classes-edit/${item.slug}`}
                                                             className="btn btn-sm bg-danger-light"

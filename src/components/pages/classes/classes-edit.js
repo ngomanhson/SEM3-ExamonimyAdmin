@@ -6,6 +6,7 @@ function Classes_Edit() {
     const { slug } = useParams();
     const [classData, setClassData] = useState({});
     const [isLoading, setIsLoading] = useState(true);
+    const [teacher, setTeachers] = useState([]);
 
     useEffect(() => {
         api.get(`${url.CLASS.DETAIL}?slug=${slug}`)
@@ -95,6 +96,17 @@ function Classes_Edit() {
             }
         }
     };
+
+    //hiển thị select teacher
+    useEffect(() => {
+        const fetchTeachers = async () => {
+            try {
+                const response = await api.get(url.STAFF.LIST);
+                setTeachers(response.data);
+            } catch (error) {}
+        };
+        fetchTeachers();
+    }, []);
 
     return (
         <>
@@ -186,11 +198,10 @@ function Classes_Edit() {
                                                     *
                                                 </span>
                                             </label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                value={classData.teacher_id} // Display class name
-                                                // Add an onChange handler to update the classData.name
+                                            <select
+                                                className="form-control select"
+                                                name="teacher_id"
+                                                value={classData.teacher_id}
                                                 onChange={(e) =>
                                                     setClassData({
                                                         ...classData,
@@ -198,16 +209,24 @@ function Classes_Edit() {
                                                             e.target.value,
                                                     })
                                                 }
-                                            />
+                                            >
+                                                <option value="">
+                                                    Please select teacher
+                                                </option>
+                                                {teacher.map((classItem) => (
+                                                    <option
+                                                        key={classItem.id}
+                                                        value={classItem.id}
+                                                    >
+                                                        {classItem.fullname}
+                                                    </option>
+                                                ))}
+                                            </select>
                                             {errors.teacher_id && (
                                                 <div className="text-danger">
                                                     {errors.teacher_id}
                                                 </div>
                                             )}
-                                            {/* <option>Will</option>
-                                                <option>Admam</option>
-                                                <option>Eva</option> */}
-                                            {/* </input> */}
                                         </div>
                                     </div>
 
