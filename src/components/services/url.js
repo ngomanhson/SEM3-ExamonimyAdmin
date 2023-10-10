@@ -22,6 +22,7 @@ const url = {
     },
     STAFF: {
         LIST: "/staff",
+        DELETE: "/staff",
     },
 };
 export default url;
