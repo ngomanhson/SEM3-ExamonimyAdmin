@@ -2,6 +2,8 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import api from "../../services/api";
 import url from "../../services/url";
+import { format } from "date-fns";
+
 function Student_Edit() {
     const { id } = useParams();
     const [studentData, setStudentData] = useState({});
@@ -10,7 +12,15 @@ function Student_Edit() {
     useEffect(() => {
         api.get(`${url.STUDENT.DETAIL}?id=${id}`)
             .then((response) => {
-                setStudentData(response.data);
+                const initialStudentData = {
+                    ...response.data,
+                    // Format the 'birthday' property if it's not already in 'yyyy-MM-dd' format
+                    birthday: format(
+                        new Date(response.data.birthday),
+                        "yyyy-MM-dd"
+                    ),
+                };
+                setStudentData(initialStudentData);
                 setIsLoading(false);
             })
             .catch((error) => {
@@ -411,9 +421,6 @@ function Student_Edit() {
                                                     })
                                                 }
                                             >
-                                                <option>
-                                                    Please Select Class Name
-                                                </option>
                                                 {classes.map((classItem) => (
                                                     <option
                                                         key={classItem.id}
@@ -440,19 +447,16 @@ function Student_Edit() {
                                                     *
                                                 </span>
                                             </label>{" "}
-                                            {/* <input
+                                            <input
                                                 type="file"
                                                 className="form-control"
-                                                value={studentData.avatar}
                                                 onChange={(e) => {
-                                                    const selectedFile =
-                                                        e.target.files[0];
                                                     setStudentData({
                                                         ...studentData,
-                                                        avatar: selectedFile,
+                                                        avatar: e.target.value,
                                                     });
                                                 }}
-                                            />{" "} */}
+                                            />{" "}
                                             {errors.avatar && (
                                                 <div className="text-danger">
                                                     {errors.avatar}
@@ -464,7 +468,7 @@ function Student_Edit() {
                                     <div className="col-12">
                                         <h5 className="form-title">
                                             <span>
-                                                Create login accounts for
+                                                Updated login accounts for
                                                 students
                                             </span>
                                         </h5>
@@ -481,7 +485,6 @@ function Student_Edit() {
                                                 <input
                                                     type={passwordInputType}
                                                     className="form-control"
-                                                    value={studentData.password}
                                                     onChange={(e) =>
                                                         setStudentData({
                                                             ...studentData,

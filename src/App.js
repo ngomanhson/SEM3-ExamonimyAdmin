@@ -18,6 +18,7 @@ import Blog_List from "./components/pages/blog/blog-list";
 import Blog_Create from "./components/pages/blog/blog-create";
 import Classes_Edit from "./components/pages/classes/classes-edit";
 import Student_Edit from "./components/pages/student/student-edit";
+import Student_Of_Class_List from "./components/pages/classes/student-of-class-list";
 
 function App() {
     return (
@@ -66,6 +67,10 @@ function App() {
                             <Route
                                 path="/classes-edit/:slug"
                                 element={<Classes_Edit />}
+                            ></Route>
+                            <Route
+                                path="/student-of-class-list/:id"
+                                element={<Student_Of_Class_List />}
                             ></Route>
                             {/* end route course */}
 
