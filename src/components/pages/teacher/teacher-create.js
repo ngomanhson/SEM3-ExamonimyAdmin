@@ -1,4 +1,169 @@
+import { useEffect, useState } from "react";
+import api from "../../services/api";
+import url from "../../services/url";
 function Teacher_Create() {
+    const [formTeacher,setFormTeacher]=useState({
+        staff_code: "",
+        fullname: "",
+        avatar: "",
+        gender: "",
+        birthday: "",
+        email: "",
+        phone: "",
+        address: "",
+        password: "",
+        role: 1,
+    });
+    const [errors,setErrors]=useState({
+        staff_code: "",
+    fullname: "",
+    avatar: "",
+    gender: "",
+    birthday: "",
+    email: "",
+    phone: "",
+    address: "",
+    password: "",
+    role: 1,
+    });
+    const [teacherCodeExistsError, setTeacherCodeExistsError] = useState("");
+    // tạo các validate cho các input
+    const validateForm = async () => {
+        let valid = true;
+        const newErrors = {};
+
+        if (formTeacher.staff_code === "") {
+            newErrors.staff_code = "Please enter student code";
+            valid = false;
+        } else if (formTeacher.staff_code.length < 3) {
+            newErrors.staff_code =
+                "The student code must be at least 3 characters";
+            valid = false;
+        } else if (formTeacher.staff_code.length > 100) {
+            newErrors.staff_code =
+                "Student code must be less than 100 characters";
+            valid = false;
+        }
+
+        if (formTeacher.fullname === "") {
+            newErrors.fullname = "Please enter full name";
+            valid = false;
+        } else if (formTeacher.fullname.length < 3) {
+            newErrors.fullname = "The fullname must be at least 3 characters";
+            valid = false;
+        } else if (formTeacher.fullname.length > 255) {
+            newErrors.fullname = "Fullname must be less than 255 characters";
+            valid = false;
+        }
+
+        if (formTeacher.avatar === "") {
+            newErrors.avatar = "Please choose avatar";
+            valid = false;
+        }
+
+        if (formTeacher.birthday === "") {
+            newErrors.birthday = "Please enter birthday";
+            valid = false;
+        }
+
+        if (formTeacher.email === "") {
+            newErrors.email = "Please enter email address";
+            valid = false;
+        }
+
+        if (formTeacher.phone === "") {
+            newErrors.phone = "Please enter phone number";
+            valid = false;
+        } else if (formTeacher.phone.length < 10) {
+            newErrors.phone = "Enter at least 10 characters";
+            valid = false;
+        } else if (formTeacher.phone.length > 12) {
+            newErrors.phone = "Enter up to 12 characters";
+            valid = false;
+        }
+
+        if (formTeacher.gender === "") {
+            newErrors.gender = "Please choose a gender";
+            valid = false;
+        }
+
+        if (formTeacher.address === "") {
+            newErrors.address = "Please enter address";
+            valid = false;
+        }
+
+        if (formTeacher.class_id === "") {
+            newErrors.class_id = "Please enter class";
+            valid = false;
+        }
+
+        if (formTeacher.password === "") {
+            newErrors.password = "Please enter password";
+            valid = false;
+        } else if (formTeacher.password.length < 6) {
+            newErrors.password = "Enter at least 6 characters";
+            valid = false;
+        } else if (formTeacher.password.length > 255) {
+            newErrors.password = "Enter up to 255 characters";
+            valid = false;
+        }
+
+        setErrors(newErrors);
+        return valid;
+    };
+    // hiển thị thông báo thêm sinh viên thành công
+    const showNotification = (type, message) => {
+        const notificationContainer = document.getElementById(
+            "notification-container"
+        );
+        const notification = document.createElement("div");
+        notification.className = `alert alert-${type}`;
+        notification.textContent = message;
+        notificationContainer.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    };
+    //xử lý thêm sinh viên
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (validateForm()) {
+            try {
+                const response = await api.post(
+                    url.STAFF.CREATE,
+                    formTeacher
+                );
+            
+                if (response && response.data) {
+                    // Access the data property here
+                    console.log(response.data);
+                    showNotification("success", "Teacher created successfully!");
+                } else {
+                    // Handle the case where response or response.data is undefined
+                    console.error("Response or response.data is undefined.");
+                }
+            } catch (error) {
+                if (error.response && error.response.data === "Code student already exists") {
+                    setTeacherCodeExistsError("Student code already exists");
+                } else {
+                    // Handle other errors as needed
+                    console.error("An error occurred:", error);
+                }
+            }
+        }
+    };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormTeacher({ ...formTeacher, [name]: value });
+        setTeacherCodeExistsError("");
+    };
+    //con mắt hiển thị password
+    const [showPassword, setShowPassword] = useState(false);
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+    const passwordInputType = showPassword ? "text" : "password";
     return (
         <>
             <div className="page-header">
@@ -21,11 +186,11 @@ function Teacher_Create() {
                 <div className="col-sm-12">
                     <div className="card">
                         <div className="card-body">
-                            <form>
+                            <form onSubmit={handleSubmit}>
                                 <div className="row">
                                     <div className="col-12">
                                         <h5 className="form-title">
-                                            <span>Basic Details</span>
+                                            <span>Teacher Information</span>
                                         </h5>
                                     </div>
                                     <div className="col-12 col-sm-4">
@@ -39,14 +204,27 @@ function Teacher_Create() {
                                             <input
                                                 type="text"
                                                 className="form-control"
+                                                name="staff_code"
+                                                value={formTeacher.staff_code}
+                                                onChange={handleChange}
                                                 placeholder="Teacher ID"
                                             />
+                                            {errors.staff_code && (
+                                                <div className="text-danger">
+                                                    {errors.staff_code}
+                                                </div>
+                                            )}
+                                            {teacherCodeExistsError && (
+                                                <div className="text-danger">
+                                                    {teacherCodeExistsError}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-4">
                                         <div className="form-group local-forms">
                                             <label>
-                                                Name{" "}
+                                                Full Name{" "}
                                                 <span className="login-danger">
                                                     *
                                                 </span>
@@ -54,8 +232,16 @@ function Teacher_Create() {
                                             <input
                                                 type="text"
                                                 className="form-control"
+                                                name="fullname"
+                                                value={formTeacher.fullName}
+                                                onChange={handleChange}
                                                 placeholder="Enter Name"
                                             />
+                                            {errors.fullname && (
+                                                <div className="text-danger">
+                                                    {errors.fullname}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-4">
@@ -66,15 +252,26 @@ function Teacher_Create() {
                                                     *
                                                 </span>
                                             </label>
-                                            <select className="form-control select">
+                                            <select className="form-control select"
+                                            name="gender"
+                                            value={formTeacher.gender}
+                                            onChange={handleChange}>
+                                                <option value="">
+                                                    Please select gender
+                                                </option>
                                                 <option>Male</option>
                                                 <option>Female</option>
                                                 <option>Others</option>
                                             </select>
+                                            {errors.gender && (
+                                                <div className="text-danger">
+                                                    {errors.gender}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms calendar-icon">
+                                        <div className="form-group local-forms ">
                                             <label>
                                                 Date Of Birth{" "}
                                                 <span className="login-danger">
@@ -82,16 +279,47 @@ function Teacher_Create() {
                                                 </span>
                                             </label>
                                             <input
-                                                className="form-control datetimepicker"
-                                                type="text"
-                                                placeholder="DD-MM-YYYY"
+                                                className="form-control "
+                                                type="date"
+                                                name="birthday"
+                                                value={formTeacher.birthday}
+                                                onChange={handleChange}
+                                                placeholder="YYY-MM-DD"
                                             />
+                                             {errors.birthday && (
+                                                <div className="text-danger">
+                                                    {errors.birthday}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-4">
                                         <div className="form-group local-forms">
                                             <label>
-                                                Mobile{" "}
+                                                Email{" "}
+                                                <span className="login-danger">
+                                                    *
+                                                </span>
+                                            </label>
+                                            <input
+                                                className="form-control"
+                                                type="email"
+                                                name="email"
+                                                value={formTeacher.email}
+                                                onChange={handleChange}
+                                                placeholder="Enter Email Address"
+                                            />
+                                            {errors.email && (
+                                                <div className="text-danger">
+                                                    {errors.email}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-sm-4">
+                                        <div className="form-group local-forms">
+                                            <label>
+                                            Phone Number{" "}
                                                 <span className="login-danger">
                                                     *
                                                 </span>
@@ -99,126 +327,19 @@ function Teacher_Create() {
                                             <input
                                                 type="text"
                                                 className="form-control"
+                                                name="phone"
+                                                value={formTeacher.phone}
+                                                onChange={handleChange}
                                                 placeholder="Enter Phone"
                                             />
+                                             {errors.phone && (
+                                                <div className="text-danger">
+                                                    {errors.phone}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms calendar-icon">
-                                            <label>
-                                                Joining Date{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                className="form-control datetimepicker"
-                                                type="text"
-                                                placeholder="DD-MM-YYYY"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4 local-forms">
-                                        <div className="form-group">
-                                            <label>
-                                                Qualification{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                className="form-control"
-                                                type="text"
-                                                placeholder="Enter Joining Date"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Experience{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                className="form-control"
-                                                type="text"
-                                                placeholder="Enter Experience"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-12">
-                                        <h5 className="form-title">
-                                            <span>Login Details</span>
-                                        </h5>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Username{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Enter Username"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Email ID{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                type="email"
-                                                className="form-control"
-                                                placeholder="Enter Mail Id"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Password{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Enter Password"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Repeat Password{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Repeat Password"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-12">
-                                        <h5 className="form-title">
-                                            <span>Address</span>
-                                        </h5>
-                                    </div>
-                                    <div className="col-12">
                                         <div className="form-group local-forms">
                                             <label>
                                                 Address{" "}
@@ -227,72 +348,106 @@ function Teacher_Create() {
                                                 </span>
                                             </label>
                                             <input
-                                                type="text"
                                                 className="form-control"
-                                                placeholder="Enter address"
+                                                type="text"
+                                                name="address"
+                                                value={formTeacher.address}
+                                                onChange={handleChange}
+                                                placeholder="Enter Address"
+                                                   
                                             />
+                                             {errors.address && (
+                                                <div className="text-danger">
+                                                    {errors.address}
+                                                </div>
+                                            )}
+
                                         </div>
+                                        
                                     </div>
                                     <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
+                                        <div className="form-group students-up-files">
                                             <label>
-                                                City{" "}
+                                                Upload Student Photo (150px X
+                                                150px){" "}
+                                                <span className="login-danger">
+                                                    *
+                                                </span>
+                                            </label>{" "}
+                                            <input
+                                                type="file"
+                                                className="form-control"
+                                                name="avatar"
+                                                value={formTeacher.avatar}
+                                                onChange={handleChange}
+                                               
+                                            />{" "}
+                                            {errors.avatar && (
+                                                <div className="text-danger">
+                                                    {errors.avatar}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="col-12">
+                                        <h5 className="form-title">
+                                            <span>
+                                                Create login accounts for
+                                                teacher
+                                            </span>
+                                        </h5>
+                                    </div>
+                                    <div className="col-12 col-sm-4">
+                                        <div className="form-group local-forms password-input-container">
+                                            <label>
+                                                Password{" "}
                                                 <span className="login-danger">
                                                     *
                                                 </span>
                                             </label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Enter City"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                State{" "}
-                                                <span className="login-danger">
-                                                    *
+                                            <div className="password-input">
+                                                <input
+                                                    type={passwordInputType}
+                                                    className="form-control"
+                                                    name="password"
+                                                    value={formTeacher.password}
+                                                    onChange={handleChange}
+                                                    placeholder="Enter Password"
+                                                />
+                                               <span
+                                                    className={`password-toggle-icon ${
+                                                        showPassword
+                                                            ? "show"
+                                                            : "hide"
+                                                    }`}
+                                                    onClick={
+                                                        togglePasswordVisibility
+                                                    }
+                                                >
+                                                    {showPassword ? (
+                                                        <i className="fa fa-eye-slash"></i>
+                                                    ) : (
+                                                        <i className="fa fa-eye"></i>
+                                                    )}
                                                 </span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Enter State"
-                                            />
+                                            </div>
+                                            {errors.password && (
+                                                <div className="text-danger">
+                                                    {errors.password}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Zip Code{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Enter Zip"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Country{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                placeholder="Enter Country"
-                                            />
-                                        </div>
-                                    </div>
+                                   
+                                   
+                                   
+                                    
+                                   
+                                   
+                                    
+                                   
+                                    
+                                  
                                     <div className="col-12">
                                         <div className="student-submit">
                                             <button
