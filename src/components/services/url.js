@@ -22,6 +22,7 @@ const url = {
     },
     STAFF: {
         LIST: "/staff",
+        CREATE:"/staff",
         DELETE: "/staff",
     },
 };
