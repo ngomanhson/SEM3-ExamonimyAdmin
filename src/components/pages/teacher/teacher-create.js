@@ -15,7 +15,7 @@ function Teacher_Create() {
         role: 1,
     });
     const [errors,setErrors]=useState({
-        staff_code: "",
+    staff_code: "",
     fullname: "",
     avatar: "",
     gender: "",
@@ -125,7 +125,7 @@ function Teacher_Create() {
             notification.remove();
         }, 5000);
     };
-    //xử lý thêm sinh viên
+    //xử lý thêm 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
@@ -188,11 +188,17 @@ function Teacher_Create() {
                         <div className="card-body">
                             <form onSubmit={handleSubmit}>
                                 <div className="row">
-                                    <div className="col-12">
-                                        <h5 className="form-title">
-                                            <span>Teacher Information</span>
+                                <div className="col-12">
+                                        <h5 className="form-title ">
+                                            Teacher Information
+                                            <span>
+                                                <a href="javascript:;">
+                                                    <i className="feather-more-vertical"></i>
+                                                </a>
+                                            </span>
                                         </h5>
                                     </div>
+                                    <div id="notification-container"></div>
                                     <div className="col-12 col-sm-4">
                                         <div className="form-group local-forms">
                                             <label>

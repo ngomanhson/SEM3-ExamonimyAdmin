@@ -188,7 +188,7 @@ function Student_List() {
                                                             >
                                                                 <img
                                                                     className="avatar-img rounded-circle"
-                                                                    src="assets/img/profiles/avatar-01.jpg"
+                                                                    src={item.avatar}
                                                                     alt="User Image"
                                                                 />
                                                             </a>
