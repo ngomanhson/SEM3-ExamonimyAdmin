@@ -5,7 +5,7 @@ function Student_Create() {
     const [formStudent, setFormStudent] = useState({
         student_code: "",
         fullname: "",
-        avatar: "",
+        avatar: null,
         gender: "",
         birthday: "",
         email: "",
@@ -16,27 +16,18 @@ function Student_Create() {
     });
 
     const [errors, setErrors] = useState({
-        student_code: "",
-        fullname: "",
-        avatar: "",
-        gender: "",
-        birthday: "",
-        email: "",
-        phone: "",
-        address: "",
-        class_id: "",
-        password: "",
+       
     });
 
     const [classes, setClasses] = useState([]);
     const [studentCodeExistsError, setStudentCodeExistsError] = useState("");
 
     // tạo các validate cho các input
-    const validateForm = async () => {
+    const validateForm = () => {
         let valid = true;
         const newErrors = {};
-
-        if (formStudent.student_code === "") {
+    
+        if (formStudent.student_code.trim() === "") {
             newErrors.student_code = "Please enter student code";
             valid = false;
         } else if (formStudent.student_code.length < 3) {
@@ -48,8 +39,8 @@ function Student_Create() {
                 "Student code must be less than 100 characters";
             valid = false;
         }
-
-        if (formStudent.fullname === "") {
+    
+        if (formStudent.fullname.trim() === "") {
             newErrors.fullname = "Please enter full name";
             valid = false;
         } else if (formStudent.fullname.length < 3) {
@@ -59,59 +50,53 @@ function Student_Create() {
             newErrors.fullname = "Fullname must be less than 255 characters";
             valid = false;
         }
-
-        if (formStudent.avatar === "") {
+    
+        if (!formStudent.avatar) {
             newErrors.avatar = "Please choose avatar";
             valid = false;
         }
-
-        if (formStudent.birthday === "") {
+    
+        if (formStudent.birthday.trim() === "") {
             newErrors.birthday = "Please enter birthday";
             valid = false;
         }
-
-        if (formStudent.email === "") {
+    
+        if (formStudent.email.trim() === "") {
             newErrors.email = "Please enter email address";
             valid = false;
         }
-
-        if (formStudent.phone === "") {
+    
+        if (formStudent.phone.trim() === "") {
             newErrors.phone = "Please enter phone number";
             valid = false;
-        } else if (formStudent.phone.length < 10) {
-            newErrors.phone = "Enter at least 10 characters";
-            valid = false;
-        } else if (formStudent.phone.length > 12) {
-            newErrors.phone = "Enter up to 12 characters";
+        } else if (formStudent.phone.length < 10 || formStudent.phone.length > 12) {
+            newErrors.phone = "Phone number should be between 10 and 12 characters";
             valid = false;
         }
-
-        if (formStudent.gender === "") {
+    
+        if (formStudent.gender.trim() === "") {
             newErrors.gender = "Please choose a gender";
             valid = false;
         }
-
-        if (formStudent.address === "") {
+    
+        if (formStudent.address.trim() === "") {
             newErrors.address = "Please enter address";
             valid = false;
         }
-
-        if (formStudent.class_id === "") {
+    
+        if (formStudent.class_id.trim() === "") {
             newErrors.class_id = "Please enter class";
             valid = false;
         }
-
-        if (formStudent.password === "") {
+    
+        if (formStudent.password.trim() === "") {
             newErrors.password = "Please enter password";
             valid = false;
-        } else if (formStudent.password.length < 6) {
-            newErrors.password = "Enter at least 6 characters";
-            valid = false;
-        } else if (formStudent.password.length > 255) {
-            newErrors.password = "Enter up to 255 characters";
+        } else if (formStudent.password.length < 6 || formStudent.password.length > 255) {
+            newErrors.password = "Password should be between 6 and 255 characters";
             valid = false;
         }
-
+    
         setErrors(newErrors);
         return valid;
     };
@@ -134,31 +119,52 @@ function Student_Create() {
     //xử lý thêm sinh viên
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validateForm()) {
+    
+        // Validate the form
+        const isFormValid = validateForm();
+    
+        if (isFormValid) {
             try {
-                const response = await api.post(
-                    url.STUDENT.CREATE,
-                    formStudent
-                );
-                showNotification("success", "Student created successfully!");
-            } catch (error) {
-                if (
-                    error.response.status === 400 &&
-                    error.response.data === "Code student already exists" //kiểm tra trùng mã sinh viên
-                ) {
-                    setStudentCodeExistsError("Student code already exists");
+                const response = await api.post(url.STUDENT.CREATE, formStudent, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+    
+                // Show a success notification
+                if (response && response.data) {
+                    // Access the data property here
+                    console.log(response.data);
+                    showNotification("success", "Student created successfully!");
                 } else {
-                    // showNotification("danger", "Failed to create student.");
+                    // Handle the case where response or response.data is undefined
+                    console.error("Response or response.data is undefined.");
                 }
+            } catch (error) {
+                if (error.response) {
+                    const { status, data } = error.response;
+                    if (status === 400) {
+                      if (data === "Student code already exists") {
+                        setStudentCodeExistsError("Student code already exists");
+                      } else {
+                        setErrors(data); // Update errors state with validation errors
+                      }
+                    } else {
+                      console.error("Failed to create student:", error);
+                    }
+                  }
             }
         }
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormStudent({ ...formStudent, [name]: value });
+        const { name, value, files } = e.target;
+        setFormStudent({
+          ...formStudent,
+          [name]: name === "avatar" ? files[0] : value,
+        });
         setStudentCodeExistsError("");
-    };
+      };
+   
+      
 
     //hiển thị select lớp học
     useEffect(() => {
@@ -426,8 +432,9 @@ function Student_Create() {
                                                 type="file"
                                                 className="form-control"
                                                 name="avatar"
-                                                value={formStudent.avatar}
+                                                
                                                 onChange={handleChange}
+                                                accept="image/*"
                                             />{" "}
                                             {errors.avatar && (
                                                 <div className="text-danger">
