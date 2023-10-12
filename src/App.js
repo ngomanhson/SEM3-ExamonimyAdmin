@@ -106,7 +106,7 @@ function App() {
                                 element={<Student_Create />}
                             ></Route>
                             <Route
-                                path="/student-edit/:id"
+                                path="/student-edit/:student_code"
                                 element={<Student_Edit />}
                             ></Route>
                             {/* end route student */}

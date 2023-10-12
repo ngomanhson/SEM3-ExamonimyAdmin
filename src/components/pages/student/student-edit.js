@@ -5,16 +5,15 @@ import url from "../../services/url";
 import { format } from "date-fns";
 
 function Student_Edit() {
-    const { id } = useParams();
+    const { student_code } = useParams();
     const [studentData, setStudentData] = useState({});
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        api.get(`${url.STUDENT.DETAIL}?id=${id}`)
+        api.get(`${url.STUDENT.DETAIL}?code_student=${student_code}`)
             .then((response) => {
                 const initialStudentData = {
                     ...response.data,
-                    // Format the 'birthday' property if it's not already in 'yyyy-MM-dd' format
                     birthday: format(
                         new Date(response.data.birthday),
                         "yyyy-MM-dd"
@@ -26,20 +25,9 @@ function Student_Edit() {
             .catch((error) => {
                 console.error("Error fetching student details:", error);
             });
-    }, [id]);
+    }, [student_code]);
 
-    const [errors, setErrors] = useState({
-        student_code: "",
-        fullname: "",
-        avatar: "",
-        gender: "",
-        birthday: "",
-        email: "",
-        phone: "",
-        address: "",
-        class_id: "",
-        password: "",
-    });
+    const [errors, setErrors] = useState({});
 
     const [classes, setClasses] = useState([]);
     const [studentCodeExistsError, setStudentCodeExistsError] = useState("");
@@ -48,7 +36,7 @@ function Student_Edit() {
         let valid = true;
         const newErrors = {};
 
-        if (studentData.student_code === "") {
+        if (studentData.student_code.trim() === "") {
             newErrors.student_code = "Please enter student code";
             valid = false;
         } else if (studentData.student_code.length < 3) {
@@ -61,7 +49,7 @@ function Student_Edit() {
             valid = false;
         }
 
-        if (studentData.fullname === "") {
+        if (studentData.fullname.trim() === "") {
             newErrors.fullname = "Please enter full name";
             valid = false;
         } else if (studentData.fullname.length < 3) {
@@ -77,17 +65,17 @@ function Student_Edit() {
             valid = false;
         }
 
-        if (studentData.birthday === "") {
+        if (studentData.birthday.trim() === "") {
             newErrors.birthday = "Please enter birthday";
             valid = false;
         }
 
-        if (studentData.email === "") {
+        if (studentData.email.trim() === "") {
             newErrors.email = "Please enter email address";
             valid = false;
         }
 
-        if (studentData.phone === "") {
+        if (studentData.phone.trim() === "") {
             newErrors.phone = "Please enter phone number";
             valid = false;
         } else if (studentData.phone.length < 10) {
@@ -98,22 +86,25 @@ function Student_Edit() {
             valid = false;
         }
 
-        if (studentData.gender === "") {
+        if (studentData.gender.trim() === "") {
             newErrors.gender = "Please choose a gender";
             valid = false;
         }
 
-        if (studentData.address === "") {
+        if (studentData.address.trim() === "") {
             newErrors.address = "Please enter address";
             valid = false;
         }
 
-        if (studentData.class_id === "") {
+        if (
+            typeof studentData.class_id === "string" &&
+            studentData.class_id.trim() === ""
+        ) {
             newErrors.class_id = "Please enter class";
             valid = false;
         }
 
-        if (studentData.password === "") {
+        if (studentData.password.trim() === "") {
             newErrors.password = "Please enter password";
             valid = false;
         } else if (studentData.password.length < 6) {
@@ -146,19 +137,43 @@ function Student_Edit() {
     //xử lý sửa sinh viên
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const isFormValid = validateForm();
         if (validateForm()) {
             try {
-                const response = await api.put(url.STUDENT.EDIT, studentData);
-                showNotification("success", "Student updated successfully!");
-            } catch (error) {
-                if (
-                    error.response.status === 400 &&
-                    error.response.data === "Code student already exists" //kiểm tra trùng mã sinh viên
-                ) {
-                    setStudentCodeExistsError("Student code already exists");
-                } else {
-                    // showNotification("danger", "Failed to create student.");
+                const formData = new FormData();
+                // Add student data to the FormData object
+                for (const key in studentData) {
+                    formData.append(key, studentData[key]);
                 }
+
+                const response = await api.put(
+                    url.STUDENT.EDIT,
+                    formData, // Use the FormData object to send data
+                    {
+                        headers: { "Content-Type": "multipart/form-data" },
+                    }
+                );
+
+                showNotification("success", "Student edit successfully!");
+            } catch (error) {
+                if (error.response) {
+                    const { status, data } = error.response;
+                    if (status === 400) {
+                        if (data === "Student code already exists") {
+                            setStudentCodeExistsError(
+                                "Student code already exists"
+                            ); //kiem tra ma sinh vien
+                        } else {
+                            setErrors(data);
+                        }
+                    } else {
+                        console.error("Failed to edit student:", error);
+                    }
+                }
+                showNotification(
+                    "danger",
+                    "Unable to edit student, please review the information. This student code may overlap with another student code or the information you entered is incorrect."
+                );
             }
         }
     };
@@ -441,22 +456,24 @@ function Student_Edit() {
                                     <div className="col-12 col-sm-4">
                                         <div className="form-group students-up-files">
                                             <label>
-                                                Upload Student Photo (150px X
-                                                150px){" "}
+                                                Update Student Photo (150px X
+                                                150px)
                                                 <span className="login-danger">
                                                     *
                                                 </span>
-                                            </label>{" "}
+                                            </label>
                                             <input
                                                 type="file"
                                                 className="form-control"
                                                 onChange={(e) => {
+                                                    const file =
+                                                        e.target.files[0];
                                                     setStudentData({
                                                         ...studentData,
-                                                        avatar: e.target.value,
+                                                        avatar: file, // Update the avatar with the selected file
                                                     });
                                                 }}
-                                            />{" "}
+                                            />
                                             {errors.avatar && (
                                                 <div className="text-danger">
                                                     {errors.avatar}

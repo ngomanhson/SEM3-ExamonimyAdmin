@@ -7,7 +7,8 @@ function Student_List() {
     const [students, setStudents] = useState([]);
     const [classNames, setClassNames] = useState({});
     const [error, setError] = useState(null);
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const [studentsPerPage] = useState(20);
     //hiển thị danh sách sinh viên
     const loadStudents = async () => {
         try {
@@ -48,6 +49,16 @@ function Student_List() {
             }
         }
     };
+
+    //paginate
+    const indexOfLastStudent = currentPage * studentsPerPage;
+    const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+    const currentStudents = students.slice(
+        indexOfFirstStudent,
+        indexOfLastStudent
+    );
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     useEffect(() => {
         loadStudents();
@@ -167,7 +178,7 @@ function Student_List() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {students.map((item, index) => {
+                                        {currentStudents.map((item, index) => {
                                             return (
                                                 <tr>
                                                     <td>
@@ -188,7 +199,9 @@ function Student_List() {
                                                             >
                                                                 <img
                                                                     className="avatar-img rounded-circle"
-                                                                    src={item.avatar}
+                                                                    src={
+                                                                        item.avatar
+                                                                    }
                                                                     alt="User Image"
                                                                 />
                                                             </a>
@@ -225,7 +238,7 @@ function Student_List() {
                                                                 <i className="feather-eye"></i>
                                                             </a>
                                                             <NavLink
-                                                                to={`/student-edit/${item.id}`}
+                                                                to={`/student-edit/${item.student_code}`}
                                                                 className="btn btn-sm bg-danger-light"
                                                             >
                                                                 <i className="feather-edit"></i>
@@ -250,6 +263,57 @@ function Student_List() {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div className="row">
+                <div className="col">
+                    <ul className="pagination mb-4">
+                        <li className="page-item">
+                            <button
+                                className="page-link"
+                                onClick={() => paginate(currentPage - 1)}
+                                disabled={currentPage === 1}
+                            >
+                                Previous
+                            </button>
+                        </li>
+
+                        {Array.from(
+                            {
+                                length: Math.ceil(
+                                    students.length / studentsPerPage
+                                ),
+                            },
+                            (_, i) => (
+                                <li
+                                    key={i}
+                                    className={`page-item ${
+                                        i + 1 === currentPage ? "active" : ""
+                                    }`}
+                                >
+                                    <button
+                                        className="page-link"
+                                        onClick={() => paginate(i + 1)}
+                                    >
+                                        {i + 1}
+                                    </button>
+                                </li>
+                            )
+                        )}
+                        <li className="page-item">
+                            <button
+                                className="page-link"
+                                onClick={() => paginate(currentPage + 1)}
+                                disabled={
+                                    currentPage ===
+                                    Math.ceil(students.length / studentsPerPage)
+                                }
+                            >
+                                Next
+                            </button>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </>
