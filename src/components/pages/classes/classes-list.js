@@ -6,6 +6,8 @@ function Classes_List() {
     const [classes, setClasses] = useState([]);
     const [teacherNames, setTeacherNames] = useState({});
     const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [classesPerPage] = useState(10);
 
     //hiển thị danh sách lớp
     const loadClasses = async () => {
@@ -67,6 +69,12 @@ function Classes_List() {
             setError("Failed to fetch teacher names.");
         }
     };
+
+    //paginate
+    const indexOfLastClass = currentPage * classesPerPage;
+    const indexOfFirstClass = indexOfLastClass - classesPerPage;
+    const currentClasses = classes.slice(indexOfFirstClass, indexOfLastClass);
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     useEffect(() => {
         loadClasses();
@@ -163,7 +171,7 @@ function Classes_List() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {classes.map((item, index) => {
+                                    {currentClasses.map((item, index) => {
                                         return (
                                             <tr>
                                                 <td>
@@ -218,6 +226,57 @@ function Classes_List() {
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div className="row">
+                <div className="col">
+                    <ul className="pagination mb-4">
+                        <li className="page-item">
+                            <button
+                                className="page-link"
+                                onClick={() => paginate(currentPage - 1)}
+                                disabled={currentPage === 1}
+                            >
+                                Previous
+                            </button>
+                        </li>
+
+                        {Array.from(
+                            {
+                                length: Math.ceil(
+                                    classes.length / classesPerPage
+                                ),
+                            },
+                            (_, i) => (
+                                <li
+                                    key={i}
+                                    className={`page-item ${
+                                        i + 1 === currentPage ? "active" : ""
+                                    }`}
+                                >
+                                    <button
+                                        className="page-link"
+                                        onClick={() => paginate(i + 1)}
+                                    >
+                                        {i + 1}
+                                    </button>
+                                </li>
+                            )
+                        )}
+                        <li className="page-item">
+                            <button
+                                className="page-link"
+                                onClick={() => paginate(currentPage + 1)}
+                                disabled={
+                                    currentPage ===
+                                    Math.ceil(classes.length / classesPerPage)
+                                }
+                            >
+                                Next
+                            </button>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </>
