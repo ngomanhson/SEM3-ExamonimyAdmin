@@ -5,7 +5,7 @@ function Teacher_Create() {
     const [formTeacher,setFormTeacher]=useState({
         staff_code: "",
         fullname: "",
-        avatar: "",
+        avatar: null,
         gender: "",
         birthday: "",
         email: "",
@@ -15,37 +15,28 @@ function Teacher_Create() {
         role: 1,
     });
     const [errors,setErrors]=useState({
-    staff_code: "",
-    fullname: "",
-    avatar: "",
-    gender: "",
-    birthday: "",
-    email: "",
-    phone: "",
-    address: "",
-    password: "",
-    role: 1,
+   
     });
     const [teacherCodeExistsError, setTeacherCodeExistsError] = useState("");
     // tạo các validate cho các input
-    const validateForm = async () => {
+    const validateForm =  () => {
         let valid = true;
         const newErrors = {};
 
-        if (formTeacher.staff_code === "") {
-            newErrors.staff_code = "Please enter student code";
+        if (formTeacher.staff_code.trim() === "") {
+            newErrors.staff_code = "Please enter Teacher code";
             valid = false;
         } else if (formTeacher.staff_code.length < 3) {
             newErrors.staff_code =
-                "The student code must be at least 3 characters";
+                "The Teacher code must be at least 3 characters";
             valid = false;
         } else if (formTeacher.staff_code.length > 100) {
             newErrors.staff_code =
-                "Student code must be less than 100 characters";
+                "Teacher code must be less than 100 characters";
             valid = false;
         }
 
-        if (formTeacher.fullname === "") {
+        if (formTeacher.fullname.trim() === "") {
             newErrors.fullname = "Please enter full name";
             valid = false;
         } else if (formTeacher.fullname.length < 3) {
@@ -56,22 +47,22 @@ function Teacher_Create() {
             valid = false;
         }
 
-        if (formTeacher.avatar === "") {
+        if (!formTeacher.avatar) {
             newErrors.avatar = "Please choose avatar";
             valid = false;
         }
 
-        if (formTeacher.birthday === "") {
+        if (formTeacher.birthday.trim() === "") {
             newErrors.birthday = "Please enter birthday";
             valid = false;
         }
 
-        if (formTeacher.email === "") {
+        if (formTeacher.email.trim() === "") {
             newErrors.email = "Please enter email address";
             valid = false;
         }
 
-        if (formTeacher.phone === "") {
+        if (formTeacher.phone.trim() === "") {
             newErrors.phone = "Please enter phone number";
             valid = false;
         } else if (formTeacher.phone.length < 10) {
@@ -82,22 +73,19 @@ function Teacher_Create() {
             valid = false;
         }
 
-        if (formTeacher.gender === "") {
+        if (formTeacher.gender.trim() === "") {
             newErrors.gender = "Please choose a gender";
             valid = false;
         }
 
-        if (formTeacher.address === "") {
+        if (formTeacher.address.trim() === "") {
             newErrors.address = "Please enter address";
             valid = false;
         }
 
-        if (formTeacher.class_id === "") {
-            newErrors.class_id = "Please enter class";
-            valid = false;
-        }
+        
 
-        if (formTeacher.password === "") {
+        if (formTeacher.password.trim() === "") {
             newErrors.password = "Please enter password";
             valid = false;
         } else if (formTeacher.password.length < 6) {
@@ -126,15 +114,46 @@ function Teacher_Create() {
         }, 5000);
     };
     //xử lý thêm 
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     if (validateForm()) {
+    //         try {
+    //             const response = await api.post(
+    //                 url.STAFF.CREATE,
+    //                 formTeacher
+    //             );
+            
+    //             if (response && response.data) {
+    //                 // Access the data property here
+    //                 console.log(response.data);
+    //                 showNotification("success", "Teacher created successfully!");
+    //             } else {
+    //                 // Handle the case where response or response.data is undefined
+    //                 console.error("Response or response.data is undefined.");
+    //             }
+    //         } catch (error) {
+    //             if (error.response && error.response.data === "Code student already exists") {
+    //                 setTeacherCodeExistsError("Student code already exists");
+    //             } else {
+    //                 // Handle other errors as needed
+    //                 console.error("An error occurred:", error);
+    //             }
+    //         }
+    //     }
+    // };
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validateForm()) {
+    
+        // Validate the form
+        const isFormValid = validateForm();
+    
+        if (isFormValid) {
             try {
-                const response = await api.post(
-                    url.STAFF.CREATE,
-                    formTeacher
-                );
-            
+                const response = await api.post(url.STAFF.CREATE, formTeacher, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+    
+                // Show a success notification
                 if (response && response.data) {
                     // Access the data property here
                     console.log(response.data);
@@ -144,20 +163,29 @@ function Teacher_Create() {
                     console.error("Response or response.data is undefined.");
                 }
             } catch (error) {
-                if (error.response && error.response.data === "Code student already exists") {
-                    setTeacherCodeExistsError("Student code already exists");
-                } else {
-                    // Handle other errors as needed
-                    console.error("An error occurred:", error);
-                }
+                if (error.response) {
+                    const { status, data } = error.response;
+                    if (status === 400) {
+                      if (data === "Student code already exists") {
+                        setTeacherCodeExistsError("Student code already exists");
+                      } else {
+                        setErrors(data); // Update errors state with validation errors
+                      }
+                    } else {
+                      console.error("Failed to create student:", error);
+                    }
+                  }
             }
         }
     };
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormTeacher({ ...formTeacher, [name]: value });
+        const { name, value, files } = e.target;
+        setFormTeacher({
+          ...formTeacher,
+          [name]: name === "avatar" ? files[0] : value,
+        });
         setTeacherCodeExistsError("");
-    };
+      };
     //con mắt hiển thị password
     const [showPassword, setShowPassword] = useState(false);
     const togglePasswordVisibility = () => {
@@ -384,7 +412,7 @@ function Teacher_Create() {
                                                 type="file"
                                                 className="form-control"
                                                 name="avatar"
-                                                value={formTeacher.avatar}
+                                                accept="image/*"
                                                 onChange={handleChange}
                                                
                                             />{" "}
