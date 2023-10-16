@@ -199,7 +199,7 @@ function Sidebar() {
                                             </NavLink>
                                         </li>
                                         <li>
-                                            <NavLink to="/student-deleted">
+                                            <NavLink to="/student-deleteat">
                                                 Student List Delete
                                             </NavLink>
                                         </li>

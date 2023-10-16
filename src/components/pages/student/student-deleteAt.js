@@ -3,7 +3,7 @@ import api from "../../services/api";
 import url from "../../services/url";
 import { format } from "date-fns";
 import { NavLink } from "react-router-dom";
-function Student_List() {
+function Student_DeleteAt() {
     const [students, setStudents] = useState([]);
     const [classNames, setClassNames] = useState({});
     const [error, setError] = useState(null);
@@ -14,7 +14,7 @@ function Student_List() {
         try {
             const response = await api.get(url.STUDENT.LIST);
             // Filter out students with deleteAt not equal to null
-            const filteredStudents = response.data.filter((student) => student.deleteAt === null);
+            const filteredStudents = response.data.filter((student) => student.deleteAt !== null);
             setStudents(filteredStudents);
         } catch (error) {
             setError("Failed to load students.");
@@ -38,11 +38,11 @@ function Student_List() {
     //xử lý xoá sinh viên
     const handleDeleteStudent = async (id) => {
         const confirmed = window.confirm(
-            "Are you sure you want to delete this student?"
+            "Are you sure you want to permanently delete this student?"
         );
         if (confirmed) {
             try {
-                await api.delete(`${url.STUDENT.DELETE}?id=${id}`);
+                await api.delete(`${url.STUDENT.DELETE_FOREVER}/${id}`);
                 setStudents((prevStudents) =>
                     prevStudents.filter((student) => student.id !== id)
                 );
@@ -123,7 +123,7 @@ function Student_List() {
                             <div className="page-header">
                                 <div className="row align-items-center">
                                     <div className="col">
-                                        <h3 className="page-title">Students</h3>
+                                        <h3 className="page-title">Students history</h3>
                                     </div>
                                     <div className="col-auto text-end float-end ms-auto download-grp">
                                         <a
@@ -321,4 +321,4 @@ function Student_List() {
         </>
     );
 }
-export default Student_List;
+export default Student_DeleteAt;
