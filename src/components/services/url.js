@@ -12,6 +12,7 @@ const url = {
         CREATE: "/student",
         EDIT: "/student",
         DELETE: "/student",
+        DELETE_FOREVER: "/student/permanently-delete",
         DETAIL: "/student/get-by-codeStudent",
         CLASS_ID: "/student/get-by-classId",
     },

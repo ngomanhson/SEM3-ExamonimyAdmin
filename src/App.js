@@ -18,6 +18,7 @@ import Blog_List from "./components/pages/blog/blog-list";
 import Blog_Create from "./components/pages/blog/blog-create";
 import Classes_Edit from "./components/pages/classes/classes-edit";
 import Student_Edit from "./components/pages/student/student-edit";
+import Student_DeleteAt from "./components/pages/student/student-deleteAt";
 import Student_Of_Class_List from "./components/pages/classes/student-of-class-list";
 
 function App() {
@@ -108,6 +109,10 @@ function App() {
                             <Route
                                 path="/student-edit/:student_code"
                                 element={<Student_Edit />}
+                            ></Route>
+                             <Route
+                                path="/student-deleteat"
+                                element={<Student_DeleteAt />}
                             ></Route>
                             {/* end route student */}
 
