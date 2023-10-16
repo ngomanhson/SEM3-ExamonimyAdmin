@@ -183,7 +183,27 @@ function Student_Create() {
         setShowPassword(!showPassword);
     };
     const passwordInputType = showPassword ? "text" : "password";
-
+    // hien thi avata sinh vien
+    const renderStudentImage = () => {
+        if (formStudent.avatar instanceof Blob) {
+          return (
+            <img
+              src={URL.createObjectURL(formStudent.avatar)}
+              alt="Student Avatar"
+              width="150"
+              height="150"
+            />
+          );
+        } else if (formStudent.avatar) {
+          // Nếu formStudent.avatar không phải là Blob, bạn có thể xử lý theo cách khác, ví dụ: 
+          // Trường hợp này, bạn có thể hiển thị thông báo hoặc hiện tượng khác để báo hiệu lỗi.
+          return (
+            <p className="text-danger">Invalid avatar data</p>
+          );
+        } else {
+          return null;
+        }
+      };
     return (
         <>
             <div className="page-header">
@@ -428,6 +448,7 @@ function Student_Create() {
                                                     *
                                                 </span>
                                             </label>{" "}
+                                            {renderStudentImage()}
                                             <input
                                                 type="file"
                                                 className="form-control"
