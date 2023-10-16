@@ -198,6 +198,11 @@ function Sidebar() {
                                                 Student Add
                                             </NavLink>
                                         </li>
+                                        <li>
+                                            <NavLink to="/student-deleted">
+                                                Student List Delete
+                                            </NavLink>
+                                        </li>
                                     </ul>
                                 </li>
                                 <li className="menu-title">
