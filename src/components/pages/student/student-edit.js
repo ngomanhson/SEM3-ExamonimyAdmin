@@ -195,7 +195,20 @@ function Student_Edit() {
         setShowPassword(!showPassword);
     };
     const passwordInputType = showPassword ? "text" : "password";
-
+    const renderStudentImage = () => {
+        return (
+          <img
+            src={studentData.avatar instanceof Blob
+              ? URL.createObjectURL(studentData.avatar)
+              : studentData.avatar
+            } // Hiển thị tệp mới nếu có, hoặc URL hình ảnh đã có sẵn
+            alt="Student Avatar"
+            width="150"
+            height="150"
+          />
+        );
+      };
+      
     return (
         <>
             <div className="page-header">
@@ -462,6 +475,7 @@ function Student_Edit() {
                                                     *
                                                 </span>
                                             </label>
+                                            {renderStudentImage()}
                                             <input
                                                 type="file"
                                                 className="form-control"
