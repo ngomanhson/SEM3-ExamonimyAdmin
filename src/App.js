@@ -8,7 +8,6 @@ import Student_Create from "./components/pages/student/student-create";
 import Teacher_List from "./components/pages/teacher/teacher-list";
 import Teacher_Create from "./components/pages/teacher/teacher-create";
 import Exam_Create from "./components/pages/exam/exam-create";
-import Exam_Create_Essay from "./components/pages/exam/exam-create-essay";
 import Exam_List from "./components/pages/exam/exam-list";
 import Course_List from "./components/pages/course/course-list";
 import Course_Create from "./components/pages/course/course-create";
@@ -20,7 +19,9 @@ import Classes_Edit from "./components/pages/classes/classes-edit";
 import Student_Edit from "./components/pages/student/student-edit";
 import Student_DeleteAt from "./components/pages/student/student-deleteAt";
 import Student_Of_Class_List from "./components/pages/classes/student-of-class-list";
-
+import Exam_Edit from "./components/pages/exam/exam-edit";
+import Test_Of_Exam_List from "./components/pages/exam/test/test-of-exam-list";
+import Test_Create from "./components/pages/exam/test/test-create";
 function App() {
     return (
         <div className="App">
@@ -51,8 +52,16 @@ function App() {
                                 element={<Exam_Create />}
                             ></Route>
                             <Route
-                                path="/exam-create-essay"
-                                element={<Exam_Create_Essay />}
+                                path="/exam-edit/:slug"
+                                element={<Exam_Edit />}
+                            ></Route>
+                            <Route
+                                path="/test-of-exam-list/:id"
+                                element={<Test_Of_Exam_List />}
+                            ></Route>
+                            <Route
+                                path="/test-submit"
+                                element={<Test_Create />}
                             ></Route>
                             {/* end route exam */}
 
@@ -110,7 +119,7 @@ function App() {
                                 path="/student-edit/:student_code"
                                 element={<Student_Edit />}
                             ></Route>
-                             <Route
+                            <Route
                                 path="/student-deleteat"
                                 element={<Student_DeleteAt />}
                             ></Route>

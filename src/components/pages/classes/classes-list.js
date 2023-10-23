@@ -163,7 +163,7 @@ function Classes_List() {
                                                 />
                                             </div>
                                         </th>
-                                        <th>ID</th>
+                                        <th>Ordinal</th>
                                         <th>Name</th>
                                         <th>Room</th>
                                         <th>Teacher</th>
