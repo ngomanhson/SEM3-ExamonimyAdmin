@@ -1,57 +1,53 @@
-import { NavLink } from "react-router-dom";
-import Select from "react-select";
+import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import api from "../../services/api";
 import url from "../../services/url";
-import { useEffect, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-function Exam_Create() {
+import Select from "react-select";
+import { format } from "date-fns";
+
+function Exam_Edit() {
+    const { slug } = useParams();
     const [isSearchable, setIsSearchable] = useState(true);
     const [isClearable, setIsClearable] = useState(true);
-    const [course, setCourses] = useState([]);
+    const [examData, setExamData] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+    const [courses, setCourses] = useState([]);
     const [creator, setCreator] = useState([]);
     const [nameExistsError, setNameExistsError] = useState("");
     const today = new Date().toISOString().split("T")[0];
-    const [formExam, setFormExam] = useState({
-        name: "",
-        start_date: "",
-        course_id: "",
-        created_by: "",
-    });
+
     const [errors, setErrors] = useState({
         name: "",
-        start_date: "",
-        course_id: "",
-        created_by: "",
+        room: "",
+        teacher_id: "",
     });
 
-    //validate
     const validateForm = async () => {
         let valid = true;
         const newErrors = {};
 
-        if (formExam.name === "") {
-            newErrors.name = "Please enter name";
+        if (examData.name === "") {
+            newErrors.name = "Please enter exam name";
             valid = false;
-        } else if (formExam.name.length < 3) {
+        } else if (examData.name.length < 3) {
             newErrors.name = "Enter at least 3 characters";
             valid = false;
-        } else if (formExam.name.length > 255) {
+        } else if (examData.name.length > 255) {
             newErrors.name = "Enter up to 255 characters";
             valid = false;
         }
 
-        if (formExam.course_id === "") {
+        if (examData.course_id === "") {
             newErrors.course_id = "Please enter course";
             valid = false;
         }
 
-        if (formExam.start_date === "") {
+        if (examData.start_date === "") {
             newErrors.start_date = "Please enter start date";
             valid = false;
         }
 
-        if (formExam.created_by === "") {
+        if (examData.created_by === "") {
             newErrors.created_by = "Please enter creator";
             valid = false;
         }
@@ -60,15 +56,46 @@ function Exam_Create() {
         return valid;
     };
 
+    const showNotification = (type, message) => {
+        const notificationContainer = document.getElementById(
+            "notification-container"
+        );
+        const notification = document.createElement("div");
+        notification.className = `alert alert-${type}`;
+        notification.textContent = message;
+        notificationContainer.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    };
+
+    useEffect(() => {
+        api.get(`${url.EXAM.DETAIL}?slug=${slug}`)
+            .then((response) => {
+                const initialExamData = {
+                    ...response.data,
+                    start_date: format(
+                        new Date(response.data.start_date),
+                        "yyyy-MM-dd"
+                    ),
+                };
+                setExamData(initialExamData);
+                setIsLoading(false);
+            })
+            .catch((error) => {});
+    }, [slug]);
+
+    //xử lý sửa kì thi
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
             try {
-                const rs = await api.post(url.EXAM.CREATE, formExam);
-                toast.success("Create Exam Successfully", {
-                    position: toast.POSITION.TOP_RIGHT,
-                    autoClose: 3000,
-                });
+                const rs = await api.put(
+                    `${url.EXAM.EDIT}?id=${examData.id}`,
+                    examData
+                );
+                showNotification("success", "Exam updated successfully!");
             } catch (error) {
                 if (
                     error.response.status === 400 &&
@@ -76,7 +103,6 @@ function Exam_Create() {
                 ) {
                     setNameExistsError("This exam name already exists");
                 } else {
-                    // showNotification("danger", "Failed to create exam.");
                 }
             }
         }
@@ -87,18 +113,18 @@ function Exam_Create() {
         const fetchCourses = async () => {
             try {
                 const response = await api.get(url.COURSE.LIST);
-                const courseData = response.data.map((course) => ({
-                    value: course.id,
-                    label: course.name,
+                const courseData = response.data.map((courses) => ({
+                    value: courses.id,
+                    label: courses.name,
                 }));
                 setCourses(courseData);
             } catch (error) {}
         };
         fetchCourses();
     }, []);
-    const optionsCourse = course;
+    const optionsCourse = courses;
     const handleChangeCourse = (selectedOption) => {
-        setFormExam({ ...formExam, course_id: selectedOption.value });
+        setExamData({ ...examData, course_id: selectedOption.value });
     };
 
     //hiển thị select creator
@@ -117,20 +143,14 @@ function Exam_Create() {
     }, []);
     const optionsCreator = creator;
     const handleChangeCreator = (selectedOption) => {
-        setFormExam({ ...formExam, created_by: selectedOption.value });
-    };
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormExam({ ...formExam, [name]: value });
-        setNameExistsError("");
+        setExamData({ ...examData, created_by: selectedOption.value });
     };
     return (
         <>
             <div className="page-header">
                 <div className="row">
                     <div className="col">
-                        <h3 className="page-title">Create Exam</h3>
+                        <h3 className="page-title">Edit Exam</h3>
                     </div>
                 </div>
             </div>
@@ -143,6 +163,8 @@ function Exam_Create() {
                         </div>
                         <div class="card-body">
                             <form onSubmit={handleSubmit}>
+                                <div id="notification-container"></div>
+
                                 <div className="form-group">
                                     <label>
                                         Exam Name
@@ -151,10 +173,13 @@ function Exam_Create() {
                                     <input
                                         className="form-control"
                                         type="text"
-                                        name="name"
-                                        value={formExam.name}
-                                        onChange={handleChange}
-                                        placeholder="Enter Exam Name"
+                                        value={examData.name}
+                                        onChange={(e) =>
+                                            setExamData({
+                                                ...examData,
+                                                name: e.target.value,
+                                            })
+                                        }
                                     />
                                     {errors.name && (
                                         <div className="text-danger">
@@ -175,9 +200,13 @@ function Exam_Create() {
                                     <input
                                         className="form-control"
                                         type="date"
-                                        name="start_date"
-                                        value={formExam.start_date}
-                                        onChange={handleChange}
+                                        value={examData.start_date}
+                                        onChange={(e) =>
+                                            setExamData({
+                                                ...examData,
+                                                start_date: e.target.value,
+                                            })
+                                        }
                                         min={today}
                                     />
                                     {errors.start_date && (
@@ -195,14 +224,12 @@ function Exam_Create() {
                                         options={optionsCourse}
                                         isSearchable={isSearchable}
                                         isClearable={isClearable}
-                                        name="course_id"
                                         value={optionsCourse.find(
                                             (option) =>
                                                 option.value ===
-                                                formExam.course_id
+                                                examData.course_id
                                         )}
                                         onChange={handleChangeCourse}
-                                        placeholder="Select Course"
                                     />
                                     {errors.course_id && (
                                         <div className="text-danger">
@@ -219,11 +246,10 @@ function Exam_Create() {
                                         options={optionsCreator}
                                         isSearchable={isSearchable}
                                         isClearable={isClearable}
-                                        name="created_by"
                                         value={optionsCreator.find(
                                             (option) =>
                                                 option.value ===
-                                                formExam.created_by
+                                                examData.created_by
                                         )}
                                         onChange={handleChangeCreator}
                                         placeholder="Select Creator"
@@ -240,7 +266,7 @@ function Exam_Create() {
                                         type="submit"
                                         className="btn btn-primary"
                                     >
-                                        Create
+                                        Update
                                     </button>
                                 </div>
                             </form>
@@ -248,8 +274,7 @@ function Exam_Create() {
                     </div>
                 </div>
             </div>
-            <ToastContainer />
         </>
     );
 }
-export default Exam_Create;
+export default Exam_Edit;

@@ -1,4 +1,77 @@
+import { useEffect, useState } from "react";
+import api from "../../services/api";
+import url from "../../services/url";
+import { format } from "date-fns";
+import { NavLink } from "react-router-dom";
 function Exam_List() {
+    const [exams, setExams] = useState([]);
+    const [courseNames, setCourseNames] = useState({});
+    const [error, setError] = useState(null);
+
+    //hiển thị danh sách các kỳ thi
+    const loadExams = async () => {
+        try {
+            const response = await api.get(url.EXAM.LIST);
+            setExams(response.data);
+        } catch (error) {
+            setError("Failed to load classes.");
+        }
+    };
+
+    //hiển thị tên khoá học
+    const fetchCourseNames = async () => {
+        try {
+            const response = await api.get(url.COURSE.LIST);
+            const courseNameMap = {};
+            response.data.forEach((course) => {
+                courseNameMap[course.id] = course.name;
+            });
+            setCourseNames(courseNameMap);
+        } catch (error) {
+            setError("Failed to fetch course names.");
+        }
+    };
+
+    //thông báo
+    const showNotification = (type, message) => {
+        const notificationContainer = document.getElementById(
+            "notification-container"
+        );
+        const notification = document.createElement("div");
+        notification.className = `alert alert-${type}`;
+        notification.textContent = message;
+        notificationContainer.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    };
+
+    //xử lý xoá kì thi
+    const handleDeleteExam = (id) => {
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this exam?"
+        );
+        if (confirmed) {
+            deleteExam(id);
+        }
+    };
+    const deleteExam = async (id) => {
+        try {
+            await api.delete(`${url.EXAM.DELETE}?id=${id}`);
+            setExams(exams.filter((c) => c.id !== id));
+        } catch (error) {
+            showNotification(
+                "danger",
+                "The exam cannot be deleted because this exam has existing tests."
+            );
+        }
+    };
+
+    useEffect(() => {
+        loadExams();
+        fetchCourseNames();
+    }, []);
     return (
         <>
             <div className="page-header">
@@ -13,6 +86,8 @@ function Exam_List() {
                 <div className="col-sm-12">
                     <div className="card card-table">
                         <div className="card-body">
+                            <div id="notification-container"></div>
+
                             <div className="page-header">
                                 <div className="row align-items-center">
                                     <div className="col">
@@ -26,12 +101,12 @@ function Exam_List() {
                                             <i className="fas fa-download"></i>{" "}
                                             Download
                                         </a>
-                                        <a
-                                            href="add-exam.html"
+                                        <NavLink
+                                            to="/exam-create"
                                             className="btn btn-primary"
                                         >
                                             <i className="fas fa-plus"></i>
-                                        </a>
+                                        </NavLink>
                                     </div>
                                 </div>
                             </div>
@@ -40,240 +115,63 @@ function Exam_List() {
                                 <table className="table border-0 star-student table-hover table-center mb-0 datatable table-striped">
                                     <thead className="student-thread">
                                         <tr>
-                                            <th>Exam Name</th>
-                                            <th>Classes</th>
+                                            <th>Ordinal</th>
+                                            <th>Name Exam</th>
                                             <th>Course</th>
-                                            <th>Start Time</th>
-                                            <th>End Time</th>
                                             <th>Date</th>
                                             <th className="text-end">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>
-                                                <h2>
-                                                    <a>className Test</a>
-                                                </h2>
-                                            </td>
-                                            <td>10</td>
-                                            <td>English</td>
-                                            <td>10:00 AM</td>
-                                            <td>01:00 PM</td>
-                                            <td>23 Apr 2020</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-exam.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h2>
-                                                    <a>Half Yearly</a>
-                                                </h2>
-                                            </td>
-                                            <td>1</td>
-                                            <td>Botony</td>
-                                            <td>10:00 AM</td>
-                                            <td>01:00 PM</td>
-                                            <td>23 Apr 2020</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-exam.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h2>
-                                                    <a>Quaterly</a>
-                                                </h2>
-                                            </td>
-                                            <td>9</td>
-                                            <td>Biology</td>
-                                            <td>01:00 PM</td>
-                                            <td>04:00 PM</td>
-                                            <td>26 Nov 2020</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-exam.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h2>
-                                                    <a>className Test</a>
-                                                </h2>
-                                            </td>
-                                            <td>8</td>
-                                            <td>Science</td>
-                                            <td>01:00 PM</td>
-                                            <td>04:00 PM</td>
-                                            <td>18 Sep 2020</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-exam.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h2>
-                                                    <a>Quaterly</a>
-                                                </h2>
-                                            </td>
-                                            <td>7</td>
-                                            <td>History</td>
-                                            <td>01:00 PM</td>
-                                            <td>04:00 PM</td>
-                                            <td>23 Jul 2020</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-exam.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h2>
-                                                    <a>className Test</a>
-                                                </h2>
-                                            </td>
-                                            <td>2</td>
-                                            <td>Biology</td>
-                                            <td>10:00 AM</td>
-                                            <td>01:00 PM</td>
-                                            <td>15 Oct 2020</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-exam.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h2>
-                                                    <a>Half Yearly</a>
-                                                </h2>
-                                            </td>
-                                            <td>6</td>
-                                            <td>Botony</td>
-                                            <td>10:00 AM</td>
-                                            <td>01:00 PM</td>
-                                            <td>02 Jun 2020</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-exam.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <h2>
-                                                    <a>className Test</a>
-                                                </h2>
-                                            </td>
-                                            <td>12</td>
-                                            <td>Mathematics</td>
-                                            <td>10:00 AM</td>
-                                            <td>01:00 PM</td>
-                                            <td>23 Apr 2020</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-exam.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        {exams.map((item, index) => {
+                                            return (
+                                                <tr>
+                                                    <td>{index + 1}</td>
+                                                    <td>{item.name}</td>
+                                                    <td>
+                                                        {
+                                                            courseNames[
+                                                                item.course_id
+                                                            ]
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        {format(
+                                                            new Date(
+                                                                item.start_date
+                                                            ),
+                                                            "yyyy-MM-dd"
+                                                        )}
+                                                    </td>
+                                                    <td className="text-end">
+                                                        <div className="actions">
+                                                            <NavLink
+                                                                to={`/test-of-exam-list/${item.id}`}
+                                                                className="btn btn-sm bg-success-light me-2"
+                                                            >
+                                                                <i className="feather-eye"></i>
+                                                            </NavLink>
+                                                            <NavLink
+                                                                to={`/exam-edit/${item.slug}`}
+                                                                className="btn btn-sm bg-danger-light"
+                                                            >
+                                                                <i className="feather-edit"></i>
+                                                            </NavLink>
+                                                            <NavLink
+                                                                onClick={() =>
+                                                                    handleDeleteExam(
+                                                                        item.id
+                                                                    )
+                                                                }
+                                                                className="btn btn-sm bg-danger-light"
+                                                            >
+                                                                <i className="feather-trash"></i>
+                                                            </NavLink>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>

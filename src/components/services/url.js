@@ -23,8 +23,23 @@ const url = {
     },
     STAFF: {
         LIST: "/staff",
-        CREATE:"/staff",
+        CREATE: "/staff",
         DELETE: "/staff",
+    },
+    EXAM: {
+        LIST: "/exam",
+        CREATE: "/exam",
+        EDIT: "/exam",
+        DELETE: "/exam",
+        DETAIL: "/exam/get-by-slug",
+    },
+    TEST: {
+        LIST: "/test",
+        CREATE_MULTIPLE: "/test/multiple-choice",
+        EDIT: "/test",
+        DELETE: "/test",
+        DETAIL: "/test/get-by-slug",
+        EXAM_ID: "/test/get-by-examId",
     },
 };
 export default url;

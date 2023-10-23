@@ -118,9 +118,6 @@ function Sidebar() {
                                             <NavLink to="/exam-create">
                                                 Exam Add
                                             </NavLink>
-                                            <NavLink to="/exam-create-essay">
-                                                Exam Add Essay Test
-                                            </NavLink>
                                         </li>
                                     </ul>
                                 </li>
