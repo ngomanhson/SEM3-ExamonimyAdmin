@@ -14,7 +14,9 @@ function Student_List() {
         try {
             const response = await api.get(url.STUDENT.LIST);
             // Filter out students with deleteAt not equal to null
-            const filteredStudents = response.data.filter((student) => student.deleteAt === null);
+            const filteredStudents = response.data.filter(
+                (student) => student.deleteAt === null
+            );
             setStudents(filteredStudents);
         } catch (error) {
             setError("Failed to load students.");

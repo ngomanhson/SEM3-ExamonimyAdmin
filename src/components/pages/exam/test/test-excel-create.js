@@ -1,24 +1,21 @@
 import { NavLink } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import Select from "react-select";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+import makeAnimated from "react-select/animated";
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
 import url from "../../../services/url";
-import Select from "react-select";
-import makeAnimated from "react-select/animated";
-import Question_Create from "./question-create";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
-function Test_Create() {
+function Test_Excel_Create() {
     const animatedComponents = makeAnimated();
     const [isClearable, setIsClearable] = useState(true);
     const [isSearchable, setIsSearchable] = useState(true);
-    const [exam, setExams] = useState([]);
     const [selectedClass, setSelectedClass] = useState(null);
     const [selectedStudents, setSelectedStudents] = useState([]);
+    const [exam, setExams] = useState([]);
     const [classes, setClasses] = useState([]);
     const [students, setStudents] = useState([]);
-    const [isQuestionsAdded, setIsQuestionsAdded] = useState(false);
-    const [questionCount, setQuestionCount] = useState(0);
     const today = new Date();
     const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, "0");
@@ -40,8 +37,8 @@ function Test_Create() {
         past_marks: "",
         total_marks: 100,
         studentTds: [],
-        questions: [],
         created_by: 1,
+        excelFile: null,
     });
     const clearForm = () => {
         setFormTest({
@@ -52,34 +49,10 @@ function Test_Create() {
             past_marks: "",
             total_marks: 100,
             studentTds: [],
-            questions: [],
             created_by: 1,
         });
         setSelectedStudents([]);
     };
-    const clearQuestionsInLocalStorage = () => {
-        //xoá câu hỏi trong localStorage khi thêm bài thi thành công
-        localStorage.removeItem("questions");
-    };
-    //XỬ LÝ XOÁ CÂU HỎI KHI NGƯỜI DÙNG LOAD LẠI TRANG HOẶC CHUYỂN SANG COMPONENT KHÁC
-    useEffect(() => {
-        window.addEventListener("beforeunload", handlePageUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handlePageUnload);
-            if (isQuestionsAdded) {
-                clearQuestionsInLocalStorage();
-            }
-        };
-    }, [isQuestionsAdded]);
-    const handlePageUnload = () => {
-        localStorage.removeItem("questions");
-    };
-    const updateFormTestWithQuestions = (updatedQuestions) => {
-        setFormTest({ ...formTest, questions: updatedQuestions });
-        setQuestionCount(updatedQuestions.length);
-        setIsQuestionsAdded(true);
-    };
-
     const [errors, setErrors] = useState({});
     const validateForm = () => {
         //validate cho thông tin bài test
@@ -93,6 +66,10 @@ function Test_Create() {
             valid = false;
         } else if (formTest.name.length > 255) {
             newErrors.name = "Enter up to 255 characters";
+            valid = false;
+        }
+        if (!formTest.excelFile) {
+            newErrors.excelFile = "Please choose a file";
             valid = false;
         }
         if (formTest.exam_id === "") {
@@ -130,7 +107,6 @@ function Test_Create() {
         setErrors(newErrors);
         return valid;
     };
-
     //hiển thị select exam
     useEffect(() => {
         const fetchExams = async () => {
@@ -149,7 +125,6 @@ function Test_Create() {
     const handleChangeExam = (selectedOption) => {
         setFormTest({ ...formTest, exam_id: selectedOption.value });
     };
-
     //hiển thị danh sách lớp học
     useEffect(() => {
         const fetchClasses = async () => {
@@ -215,22 +190,6 @@ function Test_Create() {
             );
             return;
         }
-        if (!isQuestionsAdded) {
-            //kiểm tra nếu chưa thêm câu hỏi nào
-            toast.error("You must add questions before creating a test", {
-                position: toast.POSITION.TOP_RIGHT,
-                autoClose: 3000,
-            });
-            return;
-        }
-        if (questionCount < 16) {
-            //kiểm tra phải thêm đủ 16 câu hỏi
-            toast.error("You need to add at least 16 questions", {
-                position: toast.POSITION.TOP_RIGHT,
-                autoClose: 3000,
-            });
-            return;
-        }
         try {
             const data = {
                 name: formTest.name,
@@ -241,12 +200,15 @@ function Test_Create() {
                 total_marks: formTest.total_marks,
                 created_by: formTest.created_by,
                 studentIds: selectedStudents.map((student) => student.value),
-                questions: formTest.questions,
+                excelFile: formTest.excelFile,
             };
-            const rs = await api.post(url.TEST.CREATE_MULTIPLE, data);
+            const rs = await api.post(url.TEST.CREATE_MULTIPLE_EXCEL, data, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
             const createdExamId = rs.data.exam_id;
             clearForm();
-            clearQuestionsInLocalStorage();
             toast.success("Create Test Successfully", {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 3000,
@@ -264,6 +226,14 @@ function Test_Create() {
             }
             // console.error("Error creating test:", error);
             // console.error("Response data:", error.response.data);
+        }
+    };
+
+    const handleFileUpload = (e) => {
+        //xu ly upload file excel
+        const file = e.target.files[0];
+        if (file) {
+            setFormTest({ ...formTest, excelFile: file });
         }
     };
 
@@ -287,11 +257,13 @@ function Test_Create() {
             <div className="row">
                 <div class="col-md-9">
                     <ul class="list-links mb-4">
-                        <li class="active">
-                            <NavLink to="">Create your own questions</NavLink>
-                        </li>
                         <li>
-                            <NavLink to="/test-excel">With excel files</NavLink>
+                            <NavLink to="/test-create">
+                                Create your own questions
+                            </NavLink>
+                        </li>
+                        <li class="active">
+                            <NavLink to="">With excel files</NavLink>
                         </li>
                         <li>
                             <NavLink to="/test-available">
@@ -302,9 +274,9 @@ function Test_Create() {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit}>
-                <div class="row">
-                    <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-12">
+                    <form onSubmit={handleSubmit}>
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="card-title">Test Information</h5>
@@ -328,6 +300,21 @@ function Test_Create() {
                                     {nameExistsError && (
                                         <div className="text-danger">
                                             {nameExistsError}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="form-group">
+                                    <label>Upload Excel File</label>
+                                    <input
+                                        type="file"
+                                        name="excelFile"
+                                        accept=".xlsx"
+                                        onChange={handleFileUpload}
+                                        className="form-control"
+                                    />
+                                    {errors.excelFile && (
+                                        <div className="text-danger">
+                                            {errors.excelFile}
                                         </div>
                                     )}
                                 </div>
@@ -463,15 +450,11 @@ function Test_Create() {
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <Question_Create
-                        onQuestionAdded={updateFormTestWithQuestions}
-                    />
-                    <ToastContainer />
+                    </form>
                 </div>
-            </form>
+                <ToastContainer />
+            </div>
         </>
     );
 }
-export default Test_Create;
+export default Test_Excel_Create;

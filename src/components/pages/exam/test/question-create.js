@@ -1,10 +1,14 @@
 import { useState, useRef } from "react";
-function Question_Create({ onQuestionAdded }) {
+function Question_Create({ onQuestionAdded, onQuestionRemoved }) {
     const [questions, setQuestions] = useState([]);
     const [isQuestionAdded, setIsQuestionAdded] = useState(false);
     const [isEmpty, setIsEmpty] = useState(true);
     const questionModalRef = useRef(null);
     const questionTitleRef = useRef(null);
+    const [questionCount, setQuestionCount] = useState(0);
+    const [easyCount, setEasyCount] = useState(0);
+    const [mediumCount, setMediumCount] = useState(0);
+    const [difficultCount, setDifficultCount] = useState(0);
     const levelRef = useRef(null);
     const answerARef = useRef(null);
     const answerBRef = useRef(null);
@@ -80,12 +84,15 @@ function Question_Create({ onQuestionAdded }) {
             const answerD = answerDRef.current.value;
             const correctAnswer = correctAnswerRef.current.value;
             let score = 0; //TÍNH TOÁN ĐIỂM CÂU HỎI THEO ĐỘ KHÓ
-            if (level === "1") {
-                score = 50;
-            } else if (level === "2") {
-                score = 75;
-            } else if (level === "3") {
-                score = 100;
+            if (level === "1" && easyCount < 6) {
+                setEasyCount(easyCount + 1);
+                score = 3.85;
+            } else if (level === "2" && mediumCount < 5) {
+                setMediumCount(mediumCount + 1);
+                score = 6.41;
+            } else if (level === "3" && difficultCount < 5) {
+                setDifficultCount(difficultCount + 1);
+                score = 8.97;
             }
             const question = {
                 title: questionTitle,
@@ -111,16 +118,51 @@ function Question_Create({ onQuestionAdded }) {
             answerCRef.current.value = "";
             answerDRef.current.value = "";
             correctAnswerRef.current.value = "";
+
+            if (questionCount < 16) {
+                setQuestionCount(questionCount + 1);
+            }
+
+            // an nut them cau hoi khi du 16 cau
+            if (questionCount === 15) {
+                const addQuestionButton = document.querySelector(
+                    ".btn.btn-primary.float-sm-end.m-l-10"
+                );
+                if (addQuestionButton) {
+                    addQuestionButton.style.display = "none";
+                }
+            }
         }
     };
     const removeQuestion = (index) => {
         // Xoá câu hỏi
         const updatedQuestions = [...questions];
+        const removedQuestion = updatedQuestions[index];
         updatedQuestions.splice(index, 1);
         setQuestions(updatedQuestions);
         localStorage.setItem("questions", JSON.stringify(updatedQuestions));
+        setQuestionCount(questionCount - 1);
+        const level = removedQuestion.level;
+        if (level === "1") {
+            setEasyCount(easyCount - 1);
+        } else if (level === "2") {
+            setMediumCount(mediumCount - 1);
+        } else if (level === "3") {
+            setDifficultCount(difficultCount - 1);
+        }
+        if (questionCount < 17) {
+            const addQuestionButton = document.querySelector(
+                ".btn.btn-primary.float-sm-end.m-l-10"
+            );
+            if (addQuestionButton) {
+                addQuestionButton.style.display = "block";
+            }
+        }
         if (updatedQuestions.length === 0) {
             setIsEmpty(true);
+        }
+        if (typeof onQuestionRemoved === "function") {
+            onQuestionRemoved(updatedQuestions);
         }
     };
 
@@ -130,7 +172,7 @@ function Question_Create({ onQuestionAdded }) {
                 <div className="card bg-white">
                     <div class="card-header">
                         <h5 class="card-title">
-                            Test Question{" "}
+                            Test Question
                             <button
                                 type="button"
                                 className="btn btn-primary float-sm-end m-l-10"
@@ -268,13 +310,21 @@ function Question_Create({ onQuestionAdded }) {
                                                 <option value="">
                                                     Select level question...
                                                 </option>
-                                                <option value="1">Easy</option>
-                                                <option value="2">
-                                                    Medium
-                                                </option>
-                                                <option value="3">
-                                                    Difficult
-                                                </option>
+                                                {easyCount < 6 && (
+                                                    <option value="1">
+                                                        Easy
+                                                    </option>
+                                                )}
+                                                {mediumCount < 5 && (
+                                                    <option value="2">
+                                                        Medium
+                                                    </option>
+                                                )}
+                                                {difficultCount < 5 && (
+                                                    <option value="3">
+                                                        Difficult
+                                                    </option>
+                                                )}
                                             </select>
                                             {questionErrors.level && (
                                                 <div className="text-danger">
@@ -309,7 +359,18 @@ function Question_Create({ onQuestionAdded }) {
                     <div className="card-body">
                         <div class="row">
                             <div class="col-md-10">
-                                <h5>Question</h5>
+                                <h5>
+                                    {questionCount}/16 Question{" "}
+                                    <span
+                                        style={{
+                                            fontSize: "13px",
+                                            color: "#8F9BBA",
+                                        }}
+                                    >
+                                        ({easyCount}/6 easy, {mediumCount}/5
+                                        medium, {difficultCount}/5 difficult)
+                                    </span>
+                                </h5>
                             </div>
                             <div class="col-md-2">
                                 <h5>Action</h5>

@@ -1,24 +1,21 @@
-import { NavLink } from "react-router-dom";
-import { useEffect, useState } from "react";
-import api from "../../../services/api";
-import url from "../../../services/url";
 import Select from "react-select";
-import makeAnimated from "react-select/animated";
-import Question_Create from "./question-create";
+import { NavLink } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-function Test_Create() {
+import makeAnimated from "react-select/animated";
+import { useEffect, useState } from "react";
+import api from "../../../services/api";
+import url from "../../../services/url";
+function Test_Avaliable() {
     const animatedComponents = makeAnimated();
     const [isClearable, setIsClearable] = useState(true);
     const [isSearchable, setIsSearchable] = useState(true);
-    const [exam, setExams] = useState([]);
     const [selectedClass, setSelectedClass] = useState(null);
     const [selectedStudents, setSelectedStudents] = useState([]);
+    const [exam, setExams] = useState([]);
     const [classes, setClasses] = useState([]);
     const [students, setStudents] = useState([]);
-    const [isQuestionsAdded, setIsQuestionsAdded] = useState(false);
-    const [questionCount, setQuestionCount] = useState(0);
     const today = new Date();
     const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, "0");
@@ -40,7 +37,6 @@ function Test_Create() {
         past_marks: "",
         total_marks: 100,
         studentTds: [],
-        questions: [],
         created_by: 1,
     });
     const clearForm = () => {
@@ -52,34 +48,10 @@ function Test_Create() {
             past_marks: "",
             total_marks: 100,
             studentTds: [],
-            questions: [],
             created_by: 1,
         });
         setSelectedStudents([]);
     };
-    const clearQuestionsInLocalStorage = () => {
-        //xoá câu hỏi trong localStorage khi thêm bài thi thành công
-        localStorage.removeItem("questions");
-    };
-    //XỬ LÝ XOÁ CÂU HỎI KHI NGƯỜI DÙNG LOAD LẠI TRANG HOẶC CHUYỂN SANG COMPONENT KHÁC
-    useEffect(() => {
-        window.addEventListener("beforeunload", handlePageUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handlePageUnload);
-            if (isQuestionsAdded) {
-                clearQuestionsInLocalStorage();
-            }
-        };
-    }, [isQuestionsAdded]);
-    const handlePageUnload = () => {
-        localStorage.removeItem("questions");
-    };
-    const updateFormTestWithQuestions = (updatedQuestions) => {
-        setFormTest({ ...formTest, questions: updatedQuestions });
-        setQuestionCount(updatedQuestions.length);
-        setIsQuestionsAdded(true);
-    };
-
     const [errors, setErrors] = useState({});
     const validateForm = () => {
         //validate cho thông tin bài test
@@ -130,7 +102,6 @@ function Test_Create() {
         setErrors(newErrors);
         return valid;
     };
-
     //hiển thị select exam
     useEffect(() => {
         const fetchExams = async () => {
@@ -149,7 +120,6 @@ function Test_Create() {
     const handleChangeExam = (selectedOption) => {
         setFormTest({ ...formTest, exam_id: selectedOption.value });
     };
-
     //hiển thị danh sách lớp học
     useEffect(() => {
         const fetchClasses = async () => {
@@ -215,22 +185,6 @@ function Test_Create() {
             );
             return;
         }
-        if (!isQuestionsAdded) {
-            //kiểm tra nếu chưa thêm câu hỏi nào
-            toast.error("You must add questions before creating a test", {
-                position: toast.POSITION.TOP_RIGHT,
-                autoClose: 3000,
-            });
-            return;
-        }
-        if (questionCount < 16) {
-            //kiểm tra phải thêm đủ 16 câu hỏi
-            toast.error("You need to add at least 16 questions", {
-                position: toast.POSITION.TOP_RIGHT,
-                autoClose: 3000,
-            });
-            return;
-        }
         try {
             const data = {
                 name: formTest.name,
@@ -241,12 +195,10 @@ function Test_Create() {
                 total_marks: formTest.total_marks,
                 created_by: formTest.created_by,
                 studentIds: selectedStudents.map((student) => student.value),
-                questions: formTest.questions,
             };
-            const rs = await api.post(url.TEST.CREATE_MULTIPLE, data);
+            const rs = await api.post(url.TEST.CREATE_MULTIPLE_AUTO, data);
             const createdExamId = rs.data.exam_id;
             clearForm();
-            clearQuestionsInLocalStorage();
             toast.success("Create Test Successfully", {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 3000,
@@ -262,8 +214,6 @@ function Test_Create() {
                 setNameExistsError("This test name already exists");
             } else {
             }
-            // console.error("Error creating test:", error);
-            // console.error("Response data:", error.response.data);
         }
     };
 
@@ -287,24 +237,24 @@ function Test_Create() {
             <div className="row">
                 <div class="col-md-9">
                     <ul class="list-links mb-4">
-                        <li class="active">
-                            <NavLink to="">Create your own questions</NavLink>
+                        <li>
+                            <NavLink to="/test-create">
+                                Create your own questions
+                            </NavLink>
                         </li>
                         <li>
                             <NavLink to="/test-excel">With excel files</NavLink>
                         </li>
-                        <li>
-                            <NavLink to="/test-available">
-                                With questions available
-                            </NavLink>
+                        <li class="active">
+                            <NavLink to="">With questions available</NavLink>
                         </li>
                     </ul>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit}>
-                <div class="row">
-                    <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-6">
+                    <form onSubmit={handleSubmit}>
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="card-title">Test Information</h5>
@@ -463,15 +413,82 @@ function Test_Create() {
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <Question_Create
-                        onQuestionAdded={updateFormTestWithQuestions}
-                    />
-                    <ToastContainer />
+                    </form>
                 </div>
-            </form>
+                <div className="col-xl-6">
+                    <div className="card bg-white">
+                        <div class="card-header">
+                            <h5 class="card-title">Test Question</h5>
+                        </div>
+                        <div className="card-body">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <h5>Question</h5>
+                                </div>
+                                <div class="col-md-2"></div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="vertical-scroll scroll-demo">
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            height: "100%",
+                                        }}
+                                    >
+                                        <p
+                                            style={{
+                                                fontSize: "20px",
+                                                color: "#8F9BBA",
+                                            }}
+                                        >
+                                            Questions will be added randomly
+                                            from the system !!!
+                                        </p>
+                                    </div>
+                                    {/* <div className="row">
+                                        <div className="col-md-10">
+                                            <div className="invoice-terms">
+                                                <h6>
+                                                    1.
+                                                    <span>
+                                                        Ten cua cau hoi
+                                                    </span>{" "}
+                                                    <span
+                                                        style={{
+                                                            fontSize: "15px",
+                                                            color: "#8F9BBA",
+                                                        }}
+                                                    >
+                                                        (Easy, 4.5 score)
+                                                    </span>
+                                                </h6>
+                                                <p className="mb-1">
+                                                    A - <span>dap an a</span>
+                                                </p>
+                                                <p className="mb-1 text-primary">
+                                                    B - <span>dap an b</span>
+                                                    <i className="fa fa-check"></i>
+                                                </p>
+                                                <p className="mb-1">
+                                                    C - <span>dap an c</span>
+                                                </p>
+                                                <p className="mb-1">
+                                                    D - <span>dap an d</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-2"></div>
+                                    </div> */}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <ToastContainer />
+            </div>
         </>
     );
 }
-export default Test_Create;
+export default Test_Avaliable;

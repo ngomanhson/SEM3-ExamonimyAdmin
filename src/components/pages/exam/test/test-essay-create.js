@@ -1,14 +1,15 @@
-import { NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import Select from "react-select";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import api from "../../../services/api";
 import url from "../../../services/url";
-import Select from "react-select";
 import makeAnimated from "react-select/animated";
-import Question_Create from "./question-create";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-function Test_Create() {
+function Test_Essay_Create() {
     const animatedComponents = makeAnimated();
     const [isClearable, setIsClearable] = useState(true);
     const [isSearchable, setIsSearchable] = useState(true);
@@ -17,8 +18,8 @@ function Test_Create() {
     const [selectedStudents, setSelectedStudents] = useState([]);
     const [classes, setClasses] = useState([]);
     const [students, setStudents] = useState([]);
-    const [isQuestionsAdded, setIsQuestionsAdded] = useState(false);
-    const [questionCount, setQuestionCount] = useState(0);
+    const [essayQuestion, setEssayQuestion] = useState("");
+    const [editorError, setEditorError] = useState("");
     const today = new Date();
     const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, "0");
@@ -26,6 +27,7 @@ function Test_Create() {
     const currentTime = "00:00";
     const todayDateTimeLocal = `${year}-${month}-${day}T${currentTime}`; //chỉ cho người dùng chọn từ ngay hôm nay trở đi
     const navigate = useNavigate();
+    const [errors, setErrors] = useState({});
     const [nameExistsError, setNameExistsError] = useState("");
     const selectAllOption = {
         value: "select_all",
@@ -57,30 +59,6 @@ function Test_Create() {
         });
         setSelectedStudents([]);
     };
-    const clearQuestionsInLocalStorage = () => {
-        //xoá câu hỏi trong localStorage khi thêm bài thi thành công
-        localStorage.removeItem("questions");
-    };
-    //XỬ LÝ XOÁ CÂU HỎI KHI NGƯỜI DÙNG LOAD LẠI TRANG HOẶC CHUYỂN SANG COMPONENT KHÁC
-    useEffect(() => {
-        window.addEventListener("beforeunload", handlePageUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handlePageUnload);
-            if (isQuestionsAdded) {
-                clearQuestionsInLocalStorage();
-            }
-        };
-    }, [isQuestionsAdded]);
-    const handlePageUnload = () => {
-        localStorage.removeItem("questions");
-    };
-    const updateFormTestWithQuestions = (updatedQuestions) => {
-        setFormTest({ ...formTest, questions: updatedQuestions });
-        setQuestionCount(updatedQuestions.length);
-        setIsQuestionsAdded(true);
-    };
-
-    const [errors, setErrors] = useState({});
     const validateForm = () => {
         //validate cho thông tin bài test
         let valid = true;
@@ -127,6 +105,7 @@ function Test_Create() {
             newErrors.past_marks = "Please choose past marks";
             valid = false;
         }
+
         setErrors(newErrors);
         return valid;
     };
@@ -201,72 +180,94 @@ function Test_Create() {
         setFormTest({ ...formTest, studentTds: selectedOption.value });
     };
 
-    //xử lý tạo bài thi
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const formValidationResult = validateForm();
-        if (!formValidationResult) {
-            toast.error(
-                "You have not completely filled in the Test information",
-                {
+        if (validateEditorContent(essayQuestion)) {
+            const formValidationResult = validateForm();
+            if (!formValidationResult) {
+                toast.error(
+                    "You have not completely filled in the Test information",
+                    {
+                        position: toast.POSITION.TOP_RIGHT,
+                        autoClose: 3000,
+                    }
+                );
+                return;
+            }
+
+            if (formTest.questions.length === 0) {
+                toast.error("Please add at least one question", {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 3000,
-                }
-            );
-            return;
-        }
-        if (!isQuestionsAdded) {
-            //kiểm tra nếu chưa thêm câu hỏi nào
-            toast.error("You must add questions before creating a test", {
-                position: toast.POSITION.TOP_RIGHT,
-                autoClose: 3000,
-            });
-            return;
-        }
-        if (questionCount < 16) {
-            //kiểm tra phải thêm đủ 16 câu hỏi
-            toast.error("You need to add at least 16 questions", {
-                position: toast.POSITION.TOP_RIGHT,
-                autoClose: 3000,
-            });
-            return;
-        }
-        try {
-            const data = {
-                name: formTest.name,
-                exam_id: formTest.exam_id,
-                startDate: formTest.startDate,
-                endDate: formTest.endDate,
-                past_marks: formTest.past_marks,
-                total_marks: formTest.total_marks,
-                created_by: formTest.created_by,
-                studentIds: selectedStudents.map((student) => student.value),
-                questions: formTest.questions,
-            };
-            const rs = await api.post(url.TEST.CREATE_MULTIPLE, data);
-            const createdExamId = rs.data.exam_id;
-            clearForm();
-            clearQuestionsInLocalStorage();
-            toast.success("Create Test Successfully", {
-                position: toast.POSITION.TOP_RIGHT,
-                autoClose: 3000,
-            });
-            setTimeout(() => {
-                navigate(`/test-of-exam-list/${createdExamId}`); //chuyển đến trang test-list
-            }, 3000);
-        } catch (error) {
-            if (
-                error.response.status === 400 &&
-                error.response.data === "Class name already exists"
-            ) {
-                setNameExistsError("This test name already exists");
-            } else {
+                });
+                return;
             }
-            // console.error("Error creating test:", error);
-            // console.error("Response data:", error.response.data);
+
+            try {
+                const data = {
+                    name: formTest.name,
+                    exam_id: formTest.exam_id,
+                    startDate: formTest.startDate,
+                    endDate: formTest.endDate,
+                    past_marks: formTest.past_marks,
+                    total_marks: formTest.total_marks,
+                    created_by: formTest.created_by,
+                    studentIds: selectedStudents.map(
+                        (student) => student.value
+                    ),
+                    questions: formTest.questions,
+                };
+                const rs = await api.post(url.TEST.CREATE_ESSAY, data);
+                const createdExamId = rs.data.exam_id;
+                clearForm();
+                toast.success("Create Test Successfully", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
+                setTimeout(() => {
+                    navigate(`/test-of-exam-list/${createdExamId}`); //chuyển đến trang test-list
+                }, 3000);
+            } catch (error) {
+                if (
+                    error.response.status === 400 &&
+                    error.response.data === "Class name already exists"
+                ) {
+                    setNameExistsError("This test name already exists");
+                } else {
+                }
+                console.error("Error creating test:", error);
+                console.error("Response data:", error.response.data);
+            }
+        } else {
+            // Hiển thị thông báo lỗi
+            console.log("Editor content is invalid.");
         }
     };
 
+    // Hàm kiểm tra độ dài của nội dung editor
+    const validateEditorContent = (content) => {
+        if (content.length < 3) {
+            setEditorError("Content must be at least 3 characters.");
+            return false;
+        } else if (content.length > 255) {
+            setEditorError("Content must be at most 255 characters.");
+            return false;
+        } else {
+            setEditorError("");
+            return true;
+        }
+    };
+    const handleChangeEditor = (value) => {
+        setEssayQuestion(value);
+        const newEssayQuestion = {
+            title: value,
+        };
+        setFormTest((prevFormTest) => ({
+            ...prevFormTest,
+            questions: [newEssayQuestion],
+        }));
+        validateEditorContent(value);
+    };
     const handleChange = (e, selectedOption) => {
         const { name, value } = e.target;
         setFormTest({ ...formTest, [name]: value });
@@ -277,9 +278,7 @@ function Test_Create() {
             <div className="page-header">
                 <div className="row">
                     <div className="col">
-                        <h3 className="page-title">
-                            Create Test Multiple Choice
-                        </h3>
+                        <h3 className="page-title">Create An Essay Test</h3>
                     </div>
                 </div>
             </div>
@@ -291,12 +290,7 @@ function Test_Create() {
                             <NavLink to="">Create your own questions</NavLink>
                         </li>
                         <li>
-                            <NavLink to="/test-excel">With excel files</NavLink>
-                        </li>
-                        <li>
-                            <NavLink to="/test-available">
-                                With questions available
-                            </NavLink>
+                            <NavLink to="">With questions available</NavLink>
                         </li>
                     </ul>
                 </div>
@@ -305,6 +299,7 @@ function Test_Create() {
             <form onSubmit={handleSubmit}>
                 <div class="row">
                     <div class="col-md-6">
+                        {" "}
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="card-title">Test Information</h5>
@@ -465,13 +460,76 @@ function Test_Create() {
                         </div>
                     </div>
 
-                    <Question_Create
-                        onQuestionAdded={updateFormTestWithQuestions}
-                    />
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Content Question</h5>
+                            </div>
+                            <div class="card-body">
+                                <div className="row">
+                                    <div className="col-md-12">
+                                        <div className="card">
+                                            <div className="card-body">
+                                                {editorError && (
+                                                    <div className="text-danger">
+                                                        {editorError}
+                                                    </div>
+                                                )}
+                                                <ReactQuill
+                                                    value={essayQuestion}
+                                                    onChange={
+                                                        handleChangeEditor
+                                                    }
+                                                    modules={{
+                                                        toolbar: [
+                                                            [
+                                                                { header: "1" },
+                                                                { header: "2" },
+                                                                { font: [] },
+                                                            ],
+                                                            [
+                                                                "bold",
+                                                                "italic",
+                                                                "underline",
+                                                                "strike",
+                                                                "blockquote",
+                                                            ],
+                                                            [
+                                                                "link",
+                                                                // "image",
+                                                                "video",
+                                                            ],
+                                                            [
+                                                                {
+                                                                    list: "ordered",
+                                                                },
+                                                                {
+                                                                    list: "bullet",
+                                                                },
+                                                                {
+                                                                    indent: "-1",
+                                                                },
+                                                                {
+                                                                    indent: "+1",
+                                                                },
+                                                            ],
+                                                        ],
+                                                    }}
+                                                    style={{
+                                                        height: "300px",
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <ToastContainer />
                 </div>
             </form>
         </>
     );
 }
-export default Test_Create;
+export default Test_Essay_Create;

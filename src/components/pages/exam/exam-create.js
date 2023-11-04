@@ -8,20 +8,20 @@ import "react-toastify/dist/ReactToastify.css";
 function Exam_Create() {
     const [isSearchable, setIsSearchable] = useState(true);
     const [isClearable, setIsClearable] = useState(true);
-    const [course, setCourses] = useState([]);
+    const [courses, setCourses] = useState([]);
     const [creator, setCreator] = useState([]);
     const [nameExistsError, setNameExistsError] = useState("");
     const today = new Date().toISOString().split("T")[0];
     const [formExam, setFormExam] = useState({
         name: "",
         start_date: "",
-        course_id: "",
+        courseClass_id: "",
         created_by: "",
     });
     const [errors, setErrors] = useState({
         name: "",
         start_date: "",
-        course_id: "",
+        courseClass_id: "",
         created_by: "",
     });
 
@@ -41,8 +41,8 @@ function Exam_Create() {
             valid = false;
         }
 
-        if (formExam.course_id === "") {
-            newErrors.course_id = "Please enter course";
+        if (formExam.courseClass_id === "") {
+            newErrors.courseClass_id = "Please enter course";
             valid = false;
         }
 
@@ -86,20 +86,16 @@ function Exam_Create() {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const response = await api.get(url.COURSE.LIST);
-                const courseData = response.data.map((course) => ({
+                const response = await api.get(url.ClassCourse.LIST);
+                const courseData = response.data.data.map((course) => ({
                     value: course.id,
-                    label: course.name,
+                    label: course.courseName,
                 }));
                 setCourses(courseData);
             } catch (error) {}
         };
         fetchCourses();
     }, []);
-    const optionsCourse = course;
-    const handleChangeCourse = (selectedOption) => {
-        setFormExam({ ...formExam, course_id: selectedOption.value });
-    };
 
     //hiển thị select creator
     useEffect(() => {
@@ -192,21 +188,27 @@ function Exam_Create() {
                                         <span className="login-danger">*</span>
                                     </label>
                                     <Select
-                                        options={optionsCourse}
+                                        options={courses}
                                         isSearchable={isSearchable}
                                         isClearable={isClearable}
-                                        name="course_id"
-                                        value={optionsCourse.find(
+                                        name="courseClass_id"
+                                        value={courses.find(
                                             (option) =>
                                                 option.value ===
-                                                formExam.course_id
+                                                formExam.courseClass_id
                                         )}
-                                        onChange={handleChangeCourse}
+                                        onChange={(selectedOption) => {
+                                            setFormExam({
+                                                ...formExam,
+                                                courseClass_id:
+                                                    selectedOption.value,
+                                            });
+                                        }}
                                         placeholder="Select Course"
                                     />
-                                    {errors.course_id && (
+                                    {errors.courseClass_id && (
                                         <div className="text-danger">
-                                            {errors.course_id}
+                                            {errors.courseClass_id}
                                         </div>
                                     )}
                                 </div>

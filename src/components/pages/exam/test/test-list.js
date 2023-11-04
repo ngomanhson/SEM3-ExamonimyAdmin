@@ -3,61 +3,47 @@ import { useEffect, useState } from "react";
 import api from "../../../services/api";
 import url from "../../../services/url";
 import { format } from "date-fns";
-function Test_Of_Exam_List() {
-    const { id } = useParams();
+function Test_List() {
     const [tests, setTests] = useState([]);
-    const [examNames, setExamNames] = useState({});
     const [studentNames, setStudentNames] = useState({});
-    const [examName, setExamName] = useState("");
+    const [exams, setExams] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [testsPerPage] = useState(15);
     //in ra danh sách bài thi theo kì thi
-    const loadTestForExam = async (examId) => {
+    const loadTestList = async (examId) => {
         try {
-            const response = await api.get(
-                `${url.TEST.EXAM_ID}?examId=${examId}`
-            );
+            const response = await api.get(url.TEST.LIST);
             setTests(response.data);
         } catch (error) {}
     };
 
-    // hiển thị tên kì thi
-    const fetchExamNames = async () => {
-        try {
-            const response = await api.get(url.EXAM.LIST);
-            const examData = response.data.reduce((acc, curr) => {
-                acc[curr.id] = curr.name;
-                return acc;
-            }, {});
-            setExamNames(examData);
-            if (examData[id]) {
-                setExamName(examData[id]);
+    useEffect(() => {
+        const fetchTestList = async () => {
+            try {
+                const response = await api.get(url.TEST.LIST);
+                setTests(response.data);
+                const examResponse = await api.get(url.EXAM.LIST);
+                setExams(examResponse.data);
+            } catch (error) {
+                console.error("Error loading data: ", error);
             }
-        } catch (error) {}
-    };
+        };
+        fetchTestList();
+    }, []);
 
-    // hiển thị tên học sinh
-    const fetchStudentNames = async () => {
-        try {
-            const response = await api.get(url.STUDENT.LIST);
-            const studentData = response.data.reduce((acc, curr) => {
-                acc[curr.id] = curr.fullname;
-                return acc;
-            }, {});
-            setStudentNames(studentData);
-        } catch (error) {}
+    const getExamName = (examId) => {
+        //hien thi ten exam
+        const exam = exams.find((exam) => exam.id === examId);
+        return exam ? exam.name : "";
     };
-
     const indexOfLastTest = currentPage * testsPerPage;
     const indexOfFirstTest = indexOfLastTest - testsPerPage;
     const currentTests = tests.slice(indexOfFirstTest, indexOfLastTest);
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     useEffect(() => {
-        loadTestForExam(id);
-        fetchExamNames();
-        fetchStudentNames();
-    }, [id]);
+        loadTestList();
+    });
     return (
         <>
             <div className="page-header">
@@ -77,7 +63,7 @@ function Test_Of_Exam_List() {
                             <div className="page-header">
                                 <div className="row align-items-center">
                                     <h5 class="card-title">
-                                        Test of exam {examName}
+                                        Test List
                                         <NavLink
                                             to={`/test-create`}
                                             data-bs-toggle="modal"
@@ -102,6 +88,7 @@ function Test_Of_Exam_List() {
                                             <th>End Date Time</th>
                                             <th>Past Marks</th>
                                             <th>Total Marks</th>
+                                            <th>Status</th>
                                             <th className="text-end">Action</th>
                                         </tr>
                                     </thead>
@@ -112,11 +99,9 @@ function Test_Of_Exam_List() {
                                                     <td>{index + 1}</td>
                                                     <td>{item.name}</td>
                                                     <td>
-                                                        {
-                                                            examNames[
-                                                                item.exam_id
-                                                            ]
-                                                        }
+                                                        {getExamName(
+                                                            item.exam_id
+                                                        )}
                                                     </td>
                                                     <td>
                                                         {
@@ -141,9 +126,13 @@ function Test_Of_Exam_List() {
                                                             "yyyy-MM-dd HH:mm"
                                                         )}
                                                     </td>
-
                                                     <td>{item.past_marks}</td>
                                                     <td>{item.total_marks}</td>
+                                                    <td>
+                                                        {item.status === 0
+                                                            ? "It's not time yet"
+                                                            : "Test time is over"}
+                                                    </td>
                                                     <td className="text-end">
                                                         <div className="actions">
                                                             <a
@@ -286,4 +275,4 @@ function Test_Of_Exam_List() {
         </>
     );
 }
-export default Test_Of_Exam_List;
+export default Test_List;
