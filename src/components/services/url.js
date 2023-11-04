@@ -21,6 +21,9 @@ const url = {
         CREATE: "/course",
         DETAIL: "/product/get-by-codeCourse",
     },
+    ClassCourse: {
+        LIST: "/ClassCourse",
+    },
     STAFF: {
         LIST: "/staff",
         CREATE: "/staff",
@@ -35,11 +38,17 @@ const url = {
     },
     TEST: {
         LIST: "/test",
-        CREATE_MULTIPLE: "/test/multiple-choice",
+        CREATE_MULTIPLE: "/test/multiple-choice-by-hand",
+        CREATE_MULTIPLE_EXCEL: "/test/multiple-choice-by-excel-file",
+        CREATE_MULTIPLE_AUTO: "/test/multiple-choice-by-auto",
+        CREATE_ESSAY: "/test/essay-by-hand",
         EDIT: "/test",
         DELETE: "/test",
         DETAIL: "/test/get-by-slug",
         EXAM_ID: "/test/get-by-examId",
+    },
+    TESTQUESTION: {
+        LIST: "/TestQuestion/{testId}",
     },
 };
 export default url;

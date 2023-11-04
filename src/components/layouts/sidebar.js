@@ -119,6 +119,20 @@ function Sidebar() {
                                                 Exam Add
                                             </NavLink>
                                         </li>
+                                        <li>
+                                            <NavLink to="/test-list">
+                                                Test List
+                                            </NavLink>
+                                        </li>
+                                        <li>
+                                            <NavLink
+                                                to="/test-create"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#signup-modal"
+                                            >
+                                                Test Add
+                                            </NavLink>
+                                        </li>
                                     </ul>
                                 </li>
                                 <li className="submenu">
@@ -231,6 +245,72 @@ function Sidebar() {
                                     </a>
                                 </li>
                             </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                id="signup-modal"
+                class="modal fade"
+                tabindex="-1"
+                role="dialog"
+                aria-hidden="true"
+            >
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="text-center mt-2 mb-4">
+                                <div class="auth-logo">
+                                    <a href="index.html" class="logo logo-dark">
+                                        <span class="logo-lg">
+                                            <img
+                                                src="assets/img/logo.png"
+                                                alt
+                                                height="42"
+                                            />
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="text-center mt-2 mb-4">
+                                <h6>
+                                    Do you want to create a multiple choice or
+                                    essay test?
+                                </h6>
+                            </div>
+                            <div class="text-center mt-2 mb-4">
+                                <NavLink
+                                    to="/test-create"
+                                    style={{
+                                        color: "white",
+                                    }}
+                                >
+                                    <button
+                                        class="btn btn-primary"
+                                        data-bs-dismiss="modal"
+                                    >
+                                        Multiple choice
+                                    </button>
+                                </NavLink>
+                                <NavLink
+                                    to="/test-essay-create"
+                                    style={{
+                                        color: "white",
+                                    }}
+                                >
+                                    {" "}
+                                    <button
+                                        class="btn btn-primary"
+                                        data-bs-dismiss="modal"
+                                        style={{
+                                            color: "white",
+                                            marginLeft: "10px",
+                                        }}
+                                    >
+                                        Essay test
+                                    </button>
+                                </NavLink>
+                            </div>
                         </div>
                     </div>
                 </div>

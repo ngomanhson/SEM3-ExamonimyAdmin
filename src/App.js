@@ -22,6 +22,10 @@ import Student_Of_Class_List from "./components/pages/classes/student-of-class-l
 import Exam_Edit from "./components/pages/exam/exam-edit";
 import Test_Of_Exam_List from "./components/pages/exam/test/test-of-exam-list";
 import Test_Create from "./components/pages/exam/test/test-create";
+import Test_Avaliable from "./components/pages/exam/test/test-available";
+import Test_List from "./components/pages/exam/test/test-list";
+import Test_Essay_Create from "./components/pages/exam/test/test-essay-create";
+import Test_Excel_Create from "./components/pages/exam/test/test-excel-create";
 function App() {
     return (
         <div className="App">
@@ -60,8 +64,24 @@ function App() {
                                 element={<Test_Of_Exam_List />}
                             ></Route>
                             <Route
-                                path="/test-submit"
+                                path="/test-list"
+                                element={<Test_List />}
+                            ></Route>
+                            <Route
+                                path="/test-create"
                                 element={<Test_Create />}
+                            ></Route>
+                            <Route
+                                path="/test-excel"
+                                element={<Test_Excel_Create />}
+                            ></Route>
+                            <Route
+                                path="/test-available"
+                                element={<Test_Avaliable />}
+                            ></Route>
+                            <Route
+                                path="/test-essay-create"
+                                element={<Test_Essay_Create />}
                             ></Route>
                             {/* end route exam */}
 
