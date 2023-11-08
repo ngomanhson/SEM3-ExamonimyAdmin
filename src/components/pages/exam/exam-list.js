@@ -21,15 +21,13 @@ function Exam_List() {
     //hiển thị tên khoá học
     const fetchCourseNames = async () => {
         try {
-            const response = await api.get(url.COURSE.LIST);
+            const response = await api.get(url.ClassCourse.LIST);
             const courseNameMap = {};
-            response.data.forEach((course) => {
-                courseNameMap[course.id] = course.name;
+            response.data.data.forEach((course) => {
+                courseNameMap[course.id] = course.courseName;
             });
             setCourseNames(courseNameMap);
-        } catch (error) {
-            setError("Failed to fetch course names.");
-        }
+        } catch (error) {}
     };
 
     //thông báo
@@ -131,7 +129,8 @@ function Exam_List() {
                                                     <td>
                                                         {
                                                             courseNames[
-                                                                item.course_id
+                                                                item
+                                                                    .courseClass_id
                                                             ]
                                                         }
                                                     </td>

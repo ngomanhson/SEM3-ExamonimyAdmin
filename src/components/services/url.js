@@ -15,6 +15,7 @@ const url = {
         DELETE_FOREVER: "/student/permanently-delete",
         DETAIL: "/student/get-by-codeStudent",
         CLASS_ID: "/student/get-by-classId",
+        TEST_SLUG: "/student/student-test/{}",
     },
     COURSE: {
         LIST: "/course",
@@ -23,6 +24,7 @@ const url = {
     },
     ClassCourse: {
         LIST: "/ClassCourse",
+        CREATE: "/ClassCourse",
     },
     STAFF: {
         LIST: "/staff",

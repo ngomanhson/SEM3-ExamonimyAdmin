@@ -26,6 +26,8 @@ import Test_Avaliable from "./components/pages/exam/test/test-available";
 import Test_List from "./components/pages/exam/test/test-list";
 import Test_Essay_Create from "./components/pages/exam/test/test-essay-create";
 import Test_Excel_Create from "./components/pages/exam/test/test-excel-create";
+import Test_Edit from "./components/pages/exam/test/test-edit";
+import Course_Class_Create from "./components/pages/course/course-class-create";
 function App() {
     return (
         <div className="App">
@@ -72,6 +74,10 @@ function App() {
                                 element={<Test_Create />}
                             ></Route>
                             <Route
+                                path="/test-edit/:slug"
+                                element={<Test_Edit />}
+                            ></Route>
+                            <Route
                                 path="/test-excel"
                                 element={<Test_Excel_Create />}
                             ></Route>
@@ -112,6 +118,10 @@ function App() {
                             <Route
                                 path="/course-create"
                                 element={<Course_Create />}
+                            ></Route>
+                            <Route
+                                path="/course-class-create"
+                                element={<Course_Class_Create />}
                             ></Route>
                             {/* end route course */}
 
