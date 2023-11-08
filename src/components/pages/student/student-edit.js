@@ -146,23 +146,23 @@ function Student_Edit() {
                     }
                 );
     
-                showNotification("success", "Sửa thông tin học sinh thành công!");
+                showNotification("success", "Successfully edited student information!");
             } catch (error) {
                 if (error.response) {
                     const { status, data } = error.response;
                     if (status === 400) {
                         if (data === "Student code already exists") {
-                            setStudentCodeExistsError("Mã sinh viên đã tồn tại"); // Kiểm tra mã sinh viên
+                            setStudentCodeExistsError("Student code already exists"); // Kiểm tra mã sinh viên
                         } else {
                             setErrors(data);
                         }
                     } else {
-                        console.error("Không thể sửa thông tin học sinh:", error);
+                        console.error("Student information cannot be edited:", error);
                     }
                 }
                 showNotification(
                     "danger",
-                    "Không thể sửa thông tin học sinh, vui lòng kiểm tra lại thông tin. Mã sinh viên này có thể trùng với mã sinh viên khác hoặc thông tin bạn nhập không chính xác."
+                    "Student information cannot be edited, please check the information again. This student code may overlap with another student code or the information you entered is incorrect."
                 );
             }
         }
