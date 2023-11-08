@@ -194,7 +194,7 @@ function Student_Edit() {
           />
         );
       };
-      
+    
     return (
         <>
             <div className="page-header">
