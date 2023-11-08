@@ -104,17 +104,7 @@ function Student_Edit() {
             valid = false;
         }
 
-        if (studentData.password.trim() === "") {
-            newErrors.password = "Please enter password";
-            valid = false;
-        } else if (studentData.password.length < 6) {
-            newErrors.password = "Enter at least 6 characters";
-            valid = false;
-        } else if (studentData.password.length > 255) {
-            newErrors.password = "Enter up to 255 characters";
-            valid = false;
-        }
-
+    
         setErrors(newErrors);
         return valid;
     };
@@ -135,48 +125,49 @@ function Student_Edit() {
     };
 
     //xử lý sửa sinh viên
+    //xử lý sửa sinh viên
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const isFormValid = validateForm();
-        if (validateForm()) {
+        const isFormValid = await validateForm(); // Chờ hàm validateForm hoàn thành
+    
+        if (isFormValid) {
             try {
                 const formData = new FormData();
-                // Add student data to the FormData object
+                // Thêm dữ liệu sinh viên vào đối tượng FormData
                 for (const key in studentData) {
                     formData.append(key, studentData[key]);
                 }
-
+    
                 const response = await api.put(
                     url.STUDENT.EDIT,
-                    formData, // Use the FormData object to send data
+                    formData, // Sử dụng đối tượng FormData để gửi dữ liệu
                     {
                         headers: { "Content-Type": "multipart/form-data" },
                     }
                 );
-
-                showNotification("success", "Student edit successfully!");
+    
+                showNotification("success", "Sửa thông tin học sinh thành công!");
             } catch (error) {
                 if (error.response) {
                     const { status, data } = error.response;
                     if (status === 400) {
                         if (data === "Student code already exists") {
-                            setStudentCodeExistsError(
-                                "Student code already exists"
-                            ); //kiem tra ma sinh vien
+                            setStudentCodeExistsError("Mã sinh viên đã tồn tại"); // Kiểm tra mã sinh viên
                         } else {
                             setErrors(data);
                         }
                     } else {
-                        console.error("Failed to edit student:", error);
+                        console.error("Không thể sửa thông tin học sinh:", error);
                     }
                 }
                 showNotification(
                     "danger",
-                    "Unable to edit student, please review the information. This student code may overlap with another student code or the information you entered is incorrect."
+                    "Không thể sửa thông tin học sinh, vui lòng kiểm tra lại thông tin. Mã sinh viên này có thể trùng với mã sinh viên khác hoặc thông tin bạn nhập không chính xác."
                 );
             }
         }
     };
+    
 
     //hiển thị select lớp học
     useEffect(() => {
@@ -189,12 +180,7 @@ function Student_Edit() {
         fetchClasses();
     }, []);
 
-    //con mắt hiển thị password
-    const [showPassword, setShowPassword] = useState(false);
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-    };
-    const passwordInputType = showPassword ? "text" : "password";
+    //con mắt hiển thị passwor
     const renderStudentImage = () => {
         return (
           <img
@@ -208,7 +194,7 @@ function Student_Edit() {
           />
         );
       };
-      
+    
     return (
         <>
             <div className="page-header">
@@ -504,50 +490,7 @@ function Student_Edit() {
                                             </span>
                                         </h5>
                                     </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms password-input-container">
-                                            <label>
-                                                Password{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <div className="password-input">
-                                                <input
-                                                    type={passwordInputType}
-                                                    className="form-control"
-                                                    onChange={(e) =>
-                                                        setStudentData({
-                                                            ...studentData,
-                                                            password:
-                                                                e.target.value,
-                                                        })
-                                                    }
-                                                />
-                                                <span
-                                                    className={`password-toggle-icon ${
-                                                        showPassword
-                                                            ? "show"
-                                                            : "hide"
-                                                    }`}
-                                                    onClick={
-                                                        togglePasswordVisibility
-                                                    }
-                                                >
-                                                    {showPassword ? (
-                                                        <i className="fa fa-eye-slash"></i>
-                                                    ) : (
-                                                        <i className="fa fa-eye"></i>
-                                                    )}
-                                                </span>
-                                            </div>
-                                            {errors.password && (
-                                                <div className="text-danger">
-                                                    {errors.password}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
+                                   
 
                                     <div className="col-12">
                                         <div className="student-submit">
