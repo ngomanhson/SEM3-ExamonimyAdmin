@@ -105,7 +105,7 @@ function Sidebar() {
                                 <li className="submenu">
                                     <a href="#">
                                         <i className="fas fa-clipboard-list"></i>
-                                        <span> Exam</span>
+                                        <span>Exam & Test</span>
                                         <span className="menu-arrow"></span>
                                     </a>
                                     <ul>

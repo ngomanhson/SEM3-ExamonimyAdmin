@@ -18,7 +18,8 @@ function Exam_Edit() {
 
     const [errors, setErrors] = useState({
         name: "",
-        room: "",
+        start_date: "",
+        courseClass_id: "",
         teacher_id: "",
     });
 
@@ -37,8 +38,8 @@ function Exam_Edit() {
             valid = false;
         }
 
-        if (examData.course_id === "") {
-            newErrors.course_id = "Please enter course";
+        if (examData.courseClass_id === "") {
+            newErrors.courseClass_id = "Please enter course";
             valid = false;
         }
 
@@ -112,10 +113,10 @@ function Exam_Edit() {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const response = await api.get(url.COURSE.LIST);
-                const courseData = response.data.map((courses) => ({
-                    value: courses.id,
-                    label: courses.name,
+                const response = await api.get(url.ClassCourse.LIST);
+                const courseData = response.data.data.map((course) => ({
+                    value: course.id,
+                    label: course.courseName,
                 }));
                 setCourses(courseData);
             } catch (error) {}
@@ -124,7 +125,7 @@ function Exam_Edit() {
     }, []);
     const optionsCourse = courses;
     const handleChangeCourse = (selectedOption) => {
-        setExamData({ ...examData, course_id: selectedOption.value });
+        setExamData({ ...examData, courseClass_id: selectedOption.value });
     };
 
     //hiển thị select creator
@@ -227,13 +228,13 @@ function Exam_Edit() {
                                         value={optionsCourse.find(
                                             (option) =>
                                                 option.value ===
-                                                examData.course_id
+                                                examData.courseClass_id
                                         )}
                                         onChange={handleChangeCourse}
                                     />
-                                    {errors.course_id && (
+                                    {errors.courseClass_id && (
                                         <div className="text-danger">
-                                            {errors.course_id}
+                                            {errors.courseClass_id}
                                         </div>
                                     )}
                                 </div>

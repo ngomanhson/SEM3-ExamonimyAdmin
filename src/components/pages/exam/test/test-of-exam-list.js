@@ -2,21 +2,34 @@ import { NavLink, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
 import url from "../../../services/url";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { format } from "date-fns";
 function Test_Of_Exam_List() {
     const { id } = useParams();
     const [tests, setTests] = useState([]);
     const [examNames, setExamNames] = useState({});
-    const [studentNames, setStudentNames] = useState({});
+    const [studentAvatars, setStudentAvatars] = useState({});
+    const maxInitialStudents = 2;
     const [examName, setExamName] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [testsPerPage] = useState(15);
+    const [testsPerPage] = useState(10);
     //in ra danh sách bài thi theo kì thi
     const loadTestForExam = async (examId) => {
         try {
             const response = await api.get(
                 `${url.TEST.EXAM_ID}?examId=${examId}`
             );
+            //lấy ảnh của sinh viên qua slug của bài test
+            const studentAvatarData = {};
+            for (const test of response.data) {
+                const slug = test.slug; // Lấy slug của bài test từ dữ liệu
+                const studentListResponse = await api.get(
+                    url.STUDENT.TEST_SLUG.replace("{}", slug)
+                );
+                studentAvatarData[slug] = studentListResponse.data;
+            }
+            setStudentAvatars(studentAvatarData);
             setTests(response.data);
         } catch (error) {}
     };
@@ -36,18 +49,6 @@ function Test_Of_Exam_List() {
         } catch (error) {}
     };
 
-    // hiển thị tên học sinh
-    const fetchStudentNames = async () => {
-        try {
-            const response = await api.get(url.STUDENT.LIST);
-            const studentData = response.data.reduce((acc, curr) => {
-                acc[curr.id] = curr.fullname;
-                return acc;
-            }, {});
-            setStudentNames(studentData);
-        } catch (error) {}
-    };
-
     const indexOfLastTest = currentPage * testsPerPage;
     const indexOfFirstTest = indexOfLastTest - testsPerPage;
     const currentTests = tests.slice(indexOfFirstTest, indexOfLastTest);
@@ -56,7 +57,6 @@ function Test_Of_Exam_List() {
     useEffect(() => {
         loadTestForExam(id);
         fetchExamNames();
-        fetchStudentNames();
     }, [id]);
     return (
         <>
@@ -102,6 +102,7 @@ function Test_Of_Exam_List() {
                                             <th>End Date Time</th>
                                             <th>Past Marks</th>
                                             <th>Total Marks</th>
+                                            <th>Status</th>
                                             <th className="text-end">Action</th>
                                         </tr>
                                     </thead>
@@ -119,11 +120,56 @@ function Test_Of_Exam_List() {
                                                         }
                                                     </td>
                                                     <td>
-                                                        {
-                                                            studentNames[
-                                                                item.student_id
-                                                            ]
-                                                        }
+                                                        <div className="avatar-group">
+                                                            {studentAvatars[
+                                                                item.slug
+                                                            ] &&
+                                                                studentAvatars[
+                                                                    item.slug
+                                                                ]
+                                                                    .slice(
+                                                                        0,
+                                                                        maxInitialStudents
+                                                                    )
+                                                                    .map(
+                                                                        (
+                                                                            student
+                                                                        ) => (
+                                                                            <div
+                                                                                className="avatar"
+                                                                                key={
+                                                                                    student.id
+                                                                                }
+                                                                            >
+                                                                                <img
+                                                                                    className="avatar-img rounded-circle border border-white"
+                                                                                    src={
+                                                                                        student.avatar
+                                                                                    }
+                                                                                />
+                                                                            </div>
+                                                                        )
+                                                                    )}
+                                                            {studentAvatars[
+                                                                item.slug
+                                                            ] &&
+                                                                studentAvatars[
+                                                                    item.slug
+                                                                ].length >
+                                                                    maxInitialStudents && (
+                                                                    <div className="avatar">
+                                                                        <span className="avatar-title rounded-circle border border-white">
+                                                                            +
+                                                                            {studentAvatars[
+                                                                                item
+                                                                                    .slug
+                                                                            ]
+                                                                                .length -
+                                                                                maxInitialStudents}
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+                                                        </div>
                                                     </td>
                                                     <td>
                                                         {format(
@@ -144,6 +190,11 @@ function Test_Of_Exam_List() {
 
                                                     <td>{item.past_marks}</td>
                                                     <td>{item.total_marks}</td>
+                                                    <td>
+                                                        {item.status === 0
+                                                            ? "It's not time yet"
+                                                            : "Test time is over"}
+                                                    </td>
                                                     <td className="text-end">
                                                         <div className="actions">
                                                             <a
@@ -152,9 +203,12 @@ function Test_Of_Exam_List() {
                                                             >
                                                                 <i className="feather-eye"></i>
                                                             </a>
-                                                            <a className="btn btn-sm bg-danger-light">
+                                                            <NavLink
+                                                                to={`/test-edit/${item.slug}`}
+                                                                className="btn btn-sm bg-danger-light"
+                                                            >
                                                                 <i className="feather-edit"></i>
-                                                            </a>
+                                                            </NavLink>
                                                         </div>
                                                     </td>
                                                 </tr>

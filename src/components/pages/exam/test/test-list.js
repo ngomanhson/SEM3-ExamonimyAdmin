@@ -2,40 +2,61 @@ import { NavLink, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
 import url from "../../../services/url";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { format } from "date-fns";
 function Test_List() {
+    const { id } = useParams();
     const [tests, setTests] = useState([]);
-    const [studentNames, setStudentNames] = useState({});
-    const [exams, setExams] = useState([]);
+    const [examNames, setExamNames] = useState({});
+    const [examName, setExamName] = useState("");
+    const [studentAvatars, setStudentAvatars] = useState({});
+    const maxInitialStudents = 2;
     const [currentPage, setCurrentPage] = useState(1);
-    const [testsPerPage] = useState(15);
-    //in ra danh sách bài thi theo kì thi
-    const loadTestList = async (examId) => {
+    const [testsPerPage] = useState(10);
+    //in ra danh sách bài test
+    const loadTestList = async () => {
         try {
             const response = await api.get(url.TEST.LIST);
+            //lấy ảnh của sinh viên qua slug của bài test
+            const studentAvatarData = {};
+            for (const test of response.data) {
+                const slug = test.slug; // Lấy slug của bài test từ dữ liệu
+                const studentListResponse = await api.get(
+                    url.STUDENT.TEST_SLUG.replace("{}", slug)
+                );
+                studentAvatarData[slug] = studentListResponse.data;
+            }
+            setStudentAvatars(studentAvatarData);
             setTests(response.data);
+        } catch (error) {
+            console.error("Error creating test:", error);
+            console.error("Response data:", error.response.data);
+        }
+    };
+
+    // hiển thị tên kì thi
+    const fetchExamNames = async () => {
+        try {
+            const response = await api.get(url.EXAM.LIST);
+            const examData = response.data.reduce((acc, curr) => {
+                acc[curr.id] = curr.name;
+                return acc;
+            }, {});
+            setExamNames(examData);
+            if (examData[id]) {
+                setExamName(examData[id]);
+            }
         } catch (error) {}
     };
 
-    useEffect(() => {
-        const fetchTestList = async () => {
-            try {
-                const response = await api.get(url.TEST.LIST);
-                setTests(response.data);
-                const examResponse = await api.get(url.EXAM.LIST);
-                setExams(examResponse.data);
-            } catch (error) {
-                console.error("Error loading data: ", error);
-            }
-        };
-        fetchTestList();
-    }, []);
-
-    const getExamName = (examId) => {
-        //hien thi ten exam
-        const exam = exams.find((exam) => exam.id === examId);
-        return exam ? exam.name : "";
+    const canEditTest = (startDate) => {
+        // So sánh startDate với thời gian hiện tại
+        const currentDate = Date.now();
+        return startDate > currentDate;
     };
+
+    //pa gi nết
     const indexOfLastTest = currentPage * testsPerPage;
     const indexOfFirstTest = indexOfLastTest - testsPerPage;
     const currentTests = tests.slice(indexOfFirstTest, indexOfLastTest);
@@ -43,7 +64,8 @@ function Test_List() {
 
     useEffect(() => {
         loadTestList();
-    });
+        fetchExamNames();
+    }, []);
     return (
         <>
             <div className="page-header">
@@ -63,7 +85,7 @@ function Test_List() {
                             <div className="page-header">
                                 <div className="row align-items-center">
                                     <h5 class="card-title">
-                                        Test List
+                                        List of tests
                                         <NavLink
                                             to={`/test-create`}
                                             data-bs-toggle="modal"
@@ -94,21 +116,71 @@ function Test_List() {
                                     </thead>
                                     <tbody>
                                         {currentTests.map((item, index) => {
+                                            const isEditable = canEditTest(
+                                                new Date(item.startDate)
+                                            );
                                             return (
                                                 <tr>
                                                     <td>{index + 1}</td>
                                                     <td>{item.name}</td>
                                                     <td>
-                                                        {getExamName(
-                                                            item.exam_id
-                                                        )}
-                                                    </td>
-                                                    <td>
                                                         {
-                                                            studentNames[
-                                                                item.student_id
+                                                            examNames[
+                                                                item.exam_id
                                                             ]
                                                         }
+                                                    </td>
+                                                    <td>
+                                                        <div className="avatar-group">
+                                                            {studentAvatars[
+                                                                item.slug
+                                                            ] &&
+                                                                studentAvatars[
+                                                                    item.slug
+                                                                ]
+                                                                    .slice(
+                                                                        0,
+                                                                        maxInitialStudents
+                                                                    )
+                                                                    .map(
+                                                                        (
+                                                                            student
+                                                                        ) => (
+                                                                            <div
+                                                                                className="avatar"
+                                                                                key={
+                                                                                    student.id
+                                                                                }
+                                                                            >
+                                                                                <img
+                                                                                    className="avatar-img rounded-circle border border-white"
+                                                                                    src={
+                                                                                        student.avatar
+                                                                                    }
+                                                                                />
+                                                                            </div>
+                                                                        )
+                                                                    )}
+                                                            {studentAvatars[
+                                                                item.slug
+                                                            ] &&
+                                                                studentAvatars[
+                                                                    item.slug
+                                                                ].length >
+                                                                    maxInitialStudents && (
+                                                                    <div className="avatar">
+                                                                        <span className="avatar-title rounded-circle border border-white">
+                                                                            +
+                                                                            {studentAvatars[
+                                                                                item
+                                                                                    .slug
+                                                                            ]
+                                                                                .length -
+                                                                                maxInitialStudents}
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+                                                        </div>
                                                     </td>
                                                     <td>
                                                         {format(
@@ -126,6 +198,7 @@ function Test_List() {
                                                             "yyyy-MM-dd HH:mm"
                                                         )}
                                                     </td>
+
                                                     <td>{item.past_marks}</td>
                                                     <td>{item.total_marks}</td>
                                                     <td>
@@ -141,9 +214,32 @@ function Test_List() {
                                                             >
                                                                 <i className="feather-eye"></i>
                                                             </a>
-                                                            <a className="btn btn-sm bg-danger-light">
-                                                                <i className="feather-edit"></i>
-                                                            </a>
+                                                            {isEditable ? (
+                                                                <NavLink
+                                                                    to={`/test-edit/${item.slug}`}
+                                                                    className="btn btn-sm bg-danger-light"
+                                                                >
+                                                                    <i className="feather-edit"></i>
+                                                                </NavLink>
+                                                            ) : (
+                                                                <NavLink
+                                                                    onClick={() =>
+                                                                        toast.warning(
+                                                                            "This test cannot be edited because this test is being taken or has already been taken!",
+                                                                            {
+                                                                                position:
+                                                                                    toast
+                                                                                        .POSITION
+                                                                                        .TOP_RIGHT,
+                                                                                autoClose: 3000,
+                                                                            }
+                                                                        )
+                                                                    }
+                                                                    className="btn btn-sm bg-danger-light"
+                                                                >
+                                                                    <i className="feather-edit"></i>
+                                                                </NavLink>
+                                                            )}
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -272,6 +368,8 @@ function Test_List() {
                     </div>
                 </div>
             </div>
+
+            <ToastContainer />
         </>
     );
 }

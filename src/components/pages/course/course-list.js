@@ -1,4 +1,41 @@
+import { useEffect, useState } from "react";
+import api from "../../services/api";
+import url from "../../services/url";
+import { format } from "date-fns";
 function Course_List() {
+    const [courses, setCourses] = useState([]);
+    const [courseCodes, setCourseCodes] = useState([]);
+
+    const loadCourses = async () => {
+        try {
+            const classCourseResponse = await api.get(url.ClassCourse.LIST);
+            const classIds = classCourseResponse.data.data.map(
+                (item) => item.class_id
+            );
+            const courseResponse = await api.get(url.COURSE.LIST, {
+                params: {
+                    classIds: classIds.join(","),
+                },
+            });
+            const fetchedCourseCodes = courseResponse.data.data.reduce(
+                (acc, item) => {
+                    acc[item.id] = item.course_code;
+                    return acc;
+                },
+                {}
+            );
+            setCourses(classCourseResponse.data.data);
+            setCourseCodes(fetchedCourseCodes);
+        } catch (error) {}
+    };
+
+    const getCourseCode = (courseId) => {
+        return courseCodes[courseId] || "";
+    };
+
+    useEffect(() => {
+        loadCourses();
+    }, []);
     return (
         <>
             <div className="page-header">
@@ -87,217 +124,71 @@ function Course_List() {
                                                     />
                                                 </div>
                                             </th>
-                                            <th>ID</th>
-                                            <th>Name</th>
-                                            <th>className</th>
+                                            <th>Ordinal</th>
+                                            <th>Name Course and Code Course</th>
+                                            <th>Name Class</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
                                             <th className="text-end">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE2209</td>
-                                            <td>
-                                                <h2>
-                                                    <a>Mathematics</a>
-                                                </h2>
-                                            </td>
-                                            <td>5</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-subject.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE2213</td>
-                                            <td>
-                                                <h2>
-                                                    <a>History</a>
-                                                </h2>
-                                            </td>
-                                            <td>6</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-subject.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE2143</td>
-                                            <td>
-                                                <h2>
-                                                    <a>Science</a>
-                                                </h2>
-                                            </td>
-                                            <td>3</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-subject.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE2431</td>
-                                            <td>
-                                                <h2>
-                                                    <a>Geography</a>
-                                                </h2>
-                                            </td>
-                                            <td>8</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-subject.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE1534</td>
-                                            <td>
-                                                <h2>
-                                                    <a>Botony</a>
-                                                </h2>
-                                            </td>
-                                            <td>9</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-subject.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
-                                                </div>
-                                            </td>
-                                            <td>PRE2153</td>
-                                            <td>
-                                                <h2>
-                                                    <a>English</a>
-                                                </h2>
-                                            </td>
-                                            <td>4</td>
-                                            <td className="text-end">
-                                                <div className="actions">
-                                                    <a
-                                                        href="javascript:;"
-                                                        className="btn btn-sm bg-success-light me-2"
-                                                    >
-                                                        <i className="feather-eye"></i>
-                                                    </a>
-                                                    <a
-                                                        href="edit-subject.html"
-                                                        className="btn btn-sm bg-danger-light"
-                                                    >
-                                                        <i className="feather-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        {courses.map((item, index) => {
+                                            return (
+                                                <tr>
+                                                    <td>
+                                                        <div className="form-check check-tables">
+                                                            <input
+                                                                className="form-check-input"
+                                                                type="checkbox"
+                                                                value="something"
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                    <td>{index + 1}</td>
+                                                    <td>
+                                                        {item.courseName} (
+                                                        {getCourseCode(
+                                                            item.course_id
+                                                        )}
+                                                        )
+                                                    </td>
+                                                    <td>{item.className}</td>
+                                                    <td>
+                                                        {format(
+                                                            new Date(
+                                                                item.startDate
+                                                            ),
+                                                            "yyyy-MM-dd"
+                                                        )}
+                                                    </td>
+                                                    <td>
+                                                        {format(
+                                                            new Date(
+                                                                item.endDate
+                                                            ),
+                                                            "yyyy-MM-dd"
+                                                        )}
+                                                    </td>
+                                                    <td className="text-end">
+                                                        <div className="actions">
+                                                            <a
+                                                                href="javascript:;"
+                                                                className="btn btn-sm bg-success-light me-2"
+                                                            >
+                                                                <i className="feather-eye"></i>
+                                                            </a>
+                                                            <a
+                                                                href="edit-subject.html"
+                                                                className="btn btn-sm bg-danger-light"
+                                                            >
+                                                                <i className="feather-edit"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>
