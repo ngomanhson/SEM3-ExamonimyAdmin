@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import Layout from "../../../layouts/layouts";
+import { Helmet } from "react-helmet";
 function Test_Edit() {
     const { slug } = useParams();
     const [isLoading, setIsLoading] = useState(true);
@@ -228,201 +230,210 @@ function Test_Edit() {
     };
     return (
         <>
-            <div className="page-header">
-                <div className="row">
-                    <div className="col">
-                        <h3 className="page-title">Edit Test Information</h3>
+            <Helmet>
+                <title>Test | Examonimy</title>
+            </Helmet>
+            <Layout>
+                <div className="page-header">
+                    <div className="row">
+                        <div className="col">
+                            <h3 className="page-title">
+                                Edit Test Information
+                            </h3>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-12">
-                    <form onSubmit={handleSubmit}>
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">
-                                    Edit Test Information
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div className="form-group">
-                                    <label>Name Test</label>
-                                    <input
-                                        type="text"
-                                        value={testData.name}
-                                        onChange={(e) =>
-                                            setTestData({
-                                                ...testData,
-                                                name: e.target.value,
-                                            })
-                                        }
-                                        class="form-control"
-                                    />
-                                    {errors.name && (
-                                        <div className="text-danger">
-                                            {errors.name}
-                                        </div>
-                                    )}
-                                    {nameExistsError && (
-                                        <div className="text-danger">
-                                            {nameExistsError}
-                                        </div>
-                                    )}
+                <div class="row">
+                    <div class="col-md-12">
+                        <form onSubmit={handleSubmit}>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        Edit Test Information
+                                    </h5>
                                 </div>
-                                <div class="form-group">
-                                    <label>Exam</label>
-                                    <Select
-                                        options={optionsExam}
-                                        isSearchable={isSearchable}
-                                        isClearable={isClearable}
-                                        value={optionsExam.find(
-                                            (option) =>
-                                                option.value ===
-                                                testData.exam_id
-                                        )}
-                                        onChange={handleChangeExam}
-                                    />
-                                    {errors.exam_id && (
-                                        <div className="text-danger">
-                                            {errors.exam_id}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <label>Class</label>
-                                    <Select
-                                        isSearchable={isSearchable}
-                                        isClearable={isClearable}
-                                        options={OptionsClasses}
-                                        onChange={handleClassChange}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Student</label>
-                                    <Select
-                                        closeMenuOnSelect={false}
-                                        components={animatedComponents}
-                                        isMulti
-                                        options={studentOptions}
-                                        onChange={(selectedOption) => {
-                                            if (isClassEdited) {
-                                                handleStudentChange(
-                                                    selectedOption
-                                                );
-                                            } else {
-                                                setTestStudents(selectedOption);
+                                <div class="card-body">
+                                    <div className="form-group">
+                                        <label>Name Test</label>
+                                        <input
+                                            type="text"
+                                            value={testData.name}
+                                            onChange={(e) =>
+                                                setTestData({
+                                                    ...testData,
+                                                    name: e.target.value,
+                                                })
                                             }
-                                        }}
-                                        value={studentValue}
-                                    />
-                                    {errors.studentTds && (
-                                        <div className="text-danger">
-                                            {errors.studentTds}
-                                        </div>
-                                    )}
-                                </div>
-                                <div class="form-group">
-                                    <label>Start Date Time</label>
-                                    <input
-                                        className="form-control"
-                                        type="datetime-local"
-                                        value={testData.startDate}
-                                        onChange={(e) =>
-                                            setTestData({
-                                                ...testData,
-                                                startDate: e.target.value,
-                                            })
-                                        }
-                                        min={todayDateTimeLocal}
-                                    />
-                                    {errors.startDate && (
-                                        <div className="text-danger">
-                                            {errors.startDate}
-                                        </div>
-                                    )}
-                                </div>
-                                <div class="form-group">
-                                    <label>End Date Time</label>
-                                    <input
-                                        className="form-control"
-                                        type="datetime-local"
-                                        value={testData.endDate}
-                                        onChange={(e) =>
-                                            setTestData({
-                                                ...testData,
-                                                endDate: e.target.value,
-                                            })
-                                        }
-                                        min={testData.startDate}
-                                    />
-                                    {errors.endDate && (
-                                        <div className="text-danger">
-                                            {errors.endDate}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Pass Score{" "}
-                                        <span
-                                            style={{
-                                                color: "#808080",
-                                                fontSize: "13px",
+                                            class="form-control"
+                                        />
+                                        {errors.name && (
+                                            <div className="text-danger">
+                                                {errors.name}
+                                            </div>
+                                        )}
+                                        {nameExistsError && (
+                                            <div className="text-danger">
+                                                {nameExistsError}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Exam</label>
+                                        <Select
+                                            options={optionsExam}
+                                            isSearchable={isSearchable}
+                                            isClearable={isClearable}
+                                            value={optionsExam.find(
+                                                (option) =>
+                                                    option.value ===
+                                                    testData.exam_id
+                                            )}
+                                            onChange={handleChangeExam}
+                                        />
+                                        {errors.exam_id && (
+                                            <div className="text-danger">
+                                                {errors.exam_id}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Class</label>
+                                        <Select
+                                            isSearchable={isSearchable}
+                                            isClearable={isClearable}
+                                            options={OptionsClasses}
+                                            onChange={handleClassChange}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Student</label>
+                                        <Select
+                                            closeMenuOnSelect={false}
+                                            components={animatedComponents}
+                                            isMulti
+                                            options={studentOptions}
+                                            onChange={(selectedOption) => {
+                                                if (isClassEdited) {
+                                                    handleStudentChange(
+                                                        selectedOption
+                                                    );
+                                                } else {
+                                                    setTestStudents(
+                                                        selectedOption
+                                                    );
+                                                }
                                             }}
+                                            value={studentValue}
+                                        />
+                                        {errors.studentTds && (
+                                            <div className="text-danger">
+                                                {errors.studentTds}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Start Date Time</label>
+                                        <input
+                                            className="form-control"
+                                            type="datetime-local"
+                                            value={testData.startDate}
+                                            onChange={(e) =>
+                                                setTestData({
+                                                    ...testData,
+                                                    startDate: e.target.value,
+                                                })
+                                            }
+                                            min={todayDateTimeLocal}
+                                        />
+                                        {errors.startDate && (
+                                            <div className="text-danger">
+                                                {errors.startDate}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div class="form-group">
+                                        <label>End Date Time</label>
+                                        <input
+                                            className="form-control"
+                                            type="datetime-local"
+                                            value={testData.endDate}
+                                            onChange={(e) =>
+                                                setTestData({
+                                                    ...testData,
+                                                    endDate: e.target.value,
+                                                })
+                                            }
+                                            min={testData.startDate}
+                                        />
+                                        {errors.endDate && (
+                                            <div className="text-danger">
+                                                {errors.endDate}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>
+                                            Pass Score{" "}
+                                            <span
+                                                style={{
+                                                    color: "#808080",
+                                                    fontSize: "13px",
+                                                }}
+                                            >
+                                                (Points to pass the test)
+                                            </span>
+                                        </label>
+                                        <select
+                                            className="form-control"
+                                            name="past_marks"
+                                            value={testData.past_marks}
+                                            onChange={(e) =>
+                                                setTestData({
+                                                    ...testData,
+                                                    past_marks: e.target.value,
+                                                })
+                                            }
                                         >
-                                            (Points to pass the test)
-                                        </span>
-                                    </label>
-                                    <select
-                                        className="form-control"
-                                        name="past_marks"
-                                        value={testData.past_marks}
-                                        onChange={(e) =>
-                                            setTestData({
-                                                ...testData,
-                                                past_marks: e.target.value,
-                                            })
-                                        }
-                                    >
-                                        <option value="">
-                                            Select pass score...
-                                        </option>
-                                        <option value="50">50</option>
-                                        <option value="40">40</option>
-                                        <option value="30">30</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    {errors.past_marks && (
-                                        <div className="text-danger">
-                                            {errors.past_marks}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <label>Total Score</label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        value="100"
-                                        name="total_marks"
-                                        disabled
-                                    />
-                                </div>
-                                <div className="text-end">
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary"
-                                    >
-                                        Update Test
-                                    </button>
+                                            <option value="">
+                                                Select pass score...
+                                            </option>
+                                            <option value="50">50</option>
+                                            <option value="40">40</option>
+                                            <option value="30">30</option>
+                                            <option value="20">20</option>
+                                        </select>
+                                        {errors.past_marks && (
+                                            <div className="text-danger">
+                                                {errors.past_marks}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Total Score</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            value="100"
+                                            name="total_marks"
+                                            disabled
+                                        />
+                                    </div>
+                                    <div className="text-end">
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary"
+                                        >
+                                            Update Test
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
+                    <ToastContainer />
                 </div>
-                <ToastContainer />
-            </div>
+            </Layout>
         </>
     );
 }

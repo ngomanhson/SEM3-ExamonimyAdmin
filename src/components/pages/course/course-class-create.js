@@ -6,6 +6,8 @@ import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import api from "../../services/api";
 import url from "../../services/url";
+import Layout from "../../layouts/layouts";
+import { Helmet } from "react-helmet";
 function Course_Class_Create() {
     const animatedComponents = makeAnimated();
     const [isClearable, setIsClearable] = useState(true);
@@ -138,127 +140,138 @@ function Course_Class_Create() {
     };
     return (
         <>
-            <div className="page-header">
-                <div className="row align-items-center">
-                    <div className="col">
-                        <h3 className="page-title">Add Course For Class</h3>
+            <Helmet>
+                <title>Course | Examonimy</title>
+            </Helmet>
+            <Layout>
+                <div className="page-header">
+                    <div className="row align-items-center">
+                        <div className="col">
+                            <h3 className="page-title">Add Course For Class</h3>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="row">
-                <div class="col-md-9">
-                    <ul class="list-links mb-4">
-                        <li>
-                            <NavLink to="/course-create">Create Course</NavLink>
-                        </li>
-                        <li className="active">
-                            <NavLink to="">Create Course with Class</NavLink>
-                        </li>
-                    </ul>
+                <div className="row">
+                    <div class="col-md-9">
+                        <ul class="list-links mb-4">
+                            <li>
+                                <NavLink to="/course-create">
+                                    Create Course
+                                </NavLink>
+                            </li>
+                            <li className="active">
+                                <NavLink to="">
+                                    Create Course with Class
+                                </NavLink>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
 
-            <form onSubmit={handleSubmit}>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">
-                                    Information Course Of Class
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div className="row">
-                                    <div class="form-group col-12 col-sm-6">
-                                        <label>Course</label>
-                                        <Select
-                                            options={optionsCourse}
-                                            isSearchable={isSearchable}
-                                            isClearable={isClearable}
-                                            value={optionsCourse.find(
-                                                (option) =>
-                                                    option.value ===
-                                                    formCourseClass.course_id
+                <form onSubmit={handleSubmit}>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">
+                                        Information Course Of Class
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div className="row">
+                                        <div class="form-group col-12 col-sm-6">
+                                            <label>Course</label>
+                                            <Select
+                                                options={optionsCourse}
+                                                isSearchable={isSearchable}
+                                                isClearable={isClearable}
+                                                value={optionsCourse.find(
+                                                    (option) =>
+                                                        option.value ===
+                                                        formCourseClass.course_id
+                                                )}
+                                                onChange={handleChangeCourse}
+                                                name="course_id"
+                                                placeholder="Select Course"
+                                            />
+                                            {errors.course_id && (
+                                                <div className="text-danger">
+                                                    {errors.course_id}
+                                                </div>
                                             )}
-                                            onChange={handleChangeCourse}
-                                            name="course_id"
-                                            placeholder="Select Course"
-                                        />
-                                        {errors.course_id && (
-                                            <div className="text-danger">
-                                                {errors.course_id}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="form-group col-12 col-sm-6">
-                                        <label>Class</label>
-                                        <Select
-                                            options={optionsClasses}
-                                            isSearchable={isSearchable}
-                                            isClearable={isClearable}
-                                            value={optionsClasses.find(
-                                                (option) =>
-                                                    option.value ===
-                                                    formCourseClass.classes_id
+                                        </div>
+                                        <div className="form-group col-12 col-sm-6">
+                                            <label>Class</label>
+                                            <Select
+                                                options={optionsClasses}
+                                                isSearchable={isSearchable}
+                                                isClearable={isClearable}
+                                                value={optionsClasses.find(
+                                                    (option) =>
+                                                        option.value ===
+                                                        formCourseClass.classes_id
+                                                )}
+                                                onChange={hanldeChangeClasses}
+                                                name="class_id"
+                                                placeholder="Select Class..."
+                                            />
+                                            {errors.class_id && (
+                                                <div className="text-danger">
+                                                    {errors.class_id}
+                                                </div>
                                             )}
-                                            onChange={hanldeChangeClasses}
-                                            name="class_id"
-                                            placeholder="Select Class..."
-                                        />
-                                        {errors.class_id && (
-                                            <div className="text-danger">
-                                                {errors.class_id}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div class="form-group col-12 col-sm-6">
-                                        <label>Start Date Time</label>
-                                        <input
-                                            className="form-control"
-                                            type="datetime-local"
-                                            name="start_date"
-                                            value={formCourseClass.start_date}
-                                            onChange={handleChange}
-                                            min={todayDateTimeLocal}
-                                        />
-                                        {errors.start_date && (
-                                            <div className="text-danger">
-                                                {errors.start_date}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div class="form-group col-12 col-sm-6">
-                                        <label>End Date Time</label>
-                                        <input
-                                            className="form-control"
-                                            type="datetime-local"
-                                            name="end_date"
-                                            value={formCourseClass.end_date}
-                                            onChange={handleChange}
-                                            min={formCourseClass.start_date}
-                                        />
-                                        {errors.end_date && (
-                                            <div className="text-danger">
-                                                {errors.end_date}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="text-end">
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary"
-                                        >
-                                            Add
-                                        </button>
+                                        </div>
+                                        <div class="form-group col-12 col-sm-6">
+                                            <label>Start Date Time</label>
+                                            <input
+                                                className="form-control"
+                                                type="datetime-local"
+                                                name="start_date"
+                                                value={
+                                                    formCourseClass.start_date
+                                                }
+                                                onChange={handleChange}
+                                                min={todayDateTimeLocal}
+                                            />
+                                            {errors.start_date && (
+                                                <div className="text-danger">
+                                                    {errors.start_date}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div class="form-group col-12 col-sm-6">
+                                            <label>End Date Time</label>
+                                            <input
+                                                className="form-control"
+                                                type="datetime-local"
+                                                name="end_date"
+                                                value={formCourseClass.end_date}
+                                                onChange={handleChange}
+                                                min={formCourseClass.start_date}
+                                            />
+                                            {errors.end_date && (
+                                                <div className="text-danger">
+                                                    {errors.end_date}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="text-end">
+                                            <button
+                                                type="submit"
+                                                className="btn btn-primary"
+                                            >
+                                                Add
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <ToastContainer />
                     </div>
-                    <ToastContainer />
-                </div>
-            </form>
+                </form>
+            </Layout>
         </>
     );
 }

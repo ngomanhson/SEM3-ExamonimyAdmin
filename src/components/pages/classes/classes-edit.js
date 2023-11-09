@@ -2,6 +2,8 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import api from "../../services/api";
 import url from "../../services/url";
+import Layout from "../../layouts/layouts";
+import { Helmet } from "react-helmet";
 function Classes_Edit() {
     const { slug } = useParams();
     const [classData, setClassData] = useState({});
@@ -110,142 +112,157 @@ function Classes_Edit() {
 
     return (
         <>
-            <div className="page-header">
-                <div className="row align-items-center">
-                    <div className="col">
-                        <h3 className="page-title">Edit Class</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div className="row">
-                <div className="col-sm-12">
-                    <div className="card">
-                        <div className="card-body">
-                            <form onSubmit={handleSubmit}>
-                                <div className="row">
-                                    <div className="col-12">
-                                        <h5 className="form-title">
-                                            <span>Class Information</span>
-                                        </h5>
-                                    </div>
-                                    <div id="notification-container"></div>
-
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Class Name{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                value={classData.name}
-                                                onChange={(e) =>
-                                                    setClassData({
-                                                        ...classData,
-                                                        name: e.target.value,
-                                                    })
-                                                }
-                                            />
-                                            {errors.name && (
-                                                <div className="text-danger">
-                                                    {errors.name}
-                                                </div>
-                                            )}
-                                            {nameExistsError && (
-                                                <div className="text-danger">
-                                                    {nameExistsError}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Room{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                value={classData.room}
-                                                onChange={(e) =>
-                                                    setClassData({
-                                                        ...classData,
-                                                        room: e.target.value,
-                                                    })
-                                                }
-                                            />
-                                            {errors.room && (
-                                                <div className="text-danger">
-                                                    {errors.room}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Teacher{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <select
-                                                className="form-control select"
-                                                name="teacher_id"
-                                                value={classData.teacher_id}
-                                                onChange={(e) =>
-                                                    setClassData({
-                                                        ...classData,
-                                                        teacher_id:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                            >
-                                                <option value="">
-                                                    Please select teacher
-                                                </option>
-                                                {teacher.map((classItem) => (
-                                                    <option
-                                                        key={classItem.id}
-                                                        value={classItem.id}
-                                                    >
-                                                        {classItem.fullname}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            {errors.teacher_id && (
-                                                <div className="text-danger">
-                                                    {errors.teacher_id}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="col-12">
-                                        <div className="student-submit">
-                                            <button
-                                                type="submit"
-                                                className="btn btn-primary"
-                                            >
-                                                Update
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+            <Helmet>
+                <title>Class | Examonimy</title>
+            </Helmet>
+            <Layout>
+                <div className="page-header">
+                    <div className="row align-items-center">
+                        <div className="col">
+                            <h3 className="page-title">Edit Class</h3>
                         </div>
                     </div>
                 </div>
-            </div>
+
+                <div className="row">
+                    <div className="col-sm-12">
+                        <div className="card">
+                            <div className="card-body">
+                                <form onSubmit={handleSubmit}>
+                                    <div className="row">
+                                        <div className="col-12">
+                                            <h5 className="form-title">
+                                                <span>Class Information</span>
+                                            </h5>
+                                        </div>
+                                        <div id="notification-container"></div>
+
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group local-forms">
+                                                <label>
+                                                    Class Name{" "}
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={classData.name}
+                                                    onChange={(e) =>
+                                                        setClassData({
+                                                            ...classData,
+                                                            name: e.target
+                                                                .value,
+                                                        })
+                                                    }
+                                                />
+                                                {errors.name && (
+                                                    <div className="text-danger">
+                                                        {errors.name}
+                                                    </div>
+                                                )}
+                                                {nameExistsError && (
+                                                    <div className="text-danger">
+                                                        {nameExistsError}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group local-forms">
+                                                <label>
+                                                    Room{" "}
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={classData.room}
+                                                    onChange={(e) =>
+                                                        setClassData({
+                                                            ...classData,
+                                                            room: e.target
+                                                                .value,
+                                                        })
+                                                    }
+                                                />
+                                                {errors.room && (
+                                                    <div className="text-danger">
+                                                        {errors.room}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group local-forms">
+                                                <label>
+                                                    Teacher{" "}
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <select
+                                                    className="form-control select"
+                                                    name="teacher_id"
+                                                    value={classData.teacher_id}
+                                                    onChange={(e) =>
+                                                        setClassData({
+                                                            ...classData,
+                                                            teacher_id:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                >
+                                                    <option value="">
+                                                        Please select teacher
+                                                    </option>
+                                                    {teacher.map(
+                                                        (classItem) => (
+                                                            <option
+                                                                key={
+                                                                    classItem.id
+                                                                }
+                                                                value={
+                                                                    classItem.id
+                                                                }
+                                                            >
+                                                                {
+                                                                    classItem.fullname
+                                                                }
+                                                            </option>
+                                                        )
+                                                    )}
+                                                </select>
+                                                {errors.teacher_id && (
+                                                    <div className="text-danger">
+                                                        {errors.teacher_id}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="col-12">
+                                            <div className="student-submit">
+                                                <button
+                                                    type="submit"
+                                                    className="btn btn-primary"
+                                                >
+                                                    Update
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Layout>
         </>
     );
 }
