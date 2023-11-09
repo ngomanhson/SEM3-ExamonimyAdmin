@@ -5,6 +5,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import Layout from "../../layouts/layouts";
+import { Helmet } from "react-helmet";
 function Course_Create() {
     const navigate = useNavigate();
     const [formCourse, setFormCourse] = useState({
@@ -88,106 +90,113 @@ function Course_Create() {
 
     return (
         <>
-            <div className="page-header">
-                <div className="row align-items-center">
-                    <div className="col">
-                        <h3 className="page-title">Add Course</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div className="row">
-                <div class="col-md-9">
-                    <ul class="list-links mb-4">
-                        <li className="active">
-                            <NavLink to="">Create Course</NavLink>
-                        </li>
-                        <li>
-                            <NavLink to="/course-class-create">
-                                Create Course with Class
-                            </NavLink>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div className="row">
-                <div className="col-sm-12">
-                    <div className="card">
-                        <div className="card-body">
-                            <form onSubmit={handleSubmit}>
-                                <div className="row">
-                                    <div className="col-12">
-                                        <h5 className="form-title">
-                                            <span>Course Information</span>
-                                        </h5>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Course Name{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                name="name"
-                                                value={formCourse.name}
-                                                onChange={handleChange}
-                                            />
-                                            {errors.name && (
-                                                <div className="text-danger">
-                                                    {errors.name}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Course Code{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                name="course_code"
-                                                value={formCourse.course_code}
-                                                onChange={handleChange}
-                                            />
-                                            {errors.course_code && (
-                                                <div className="text-danger">
-                                                    {errors.course_code}
-                                                </div>
-                                            )}
-                                            {courseCodeExistsError && (
-                                                <div className="text-danger">
-                                                    {errors.name}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-12">
-                                        <div className="student-submit">
-                                            <button
-                                                type="submit"
-                                                className="btn btn-primary"
-                                            >
-                                                Create Course
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+            <Helmet>
+                <title>Course | Examonimy</title>
+            </Helmet>
+            <Layout>
+                <div className="page-header">
+                    <div className="row align-items-center">
+                        <div className="col">
+                            <h3 className="page-title">Add Course</h3>
                         </div>
                     </div>
                 </div>
-            </div>
-            <ToastContainer />
+
+                <div className="row">
+                    <div class="col-md-9">
+                        <ul class="list-links mb-4">
+                            <li className="active">
+                                <NavLink to="">Create Course</NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/course-class-create">
+                                    Create Course with Class
+                                </NavLink>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div className="row">
+                    <div className="col-sm-12">
+                        <div className="card">
+                            <div className="card-body">
+                                <form onSubmit={handleSubmit}>
+                                    <div className="row">
+                                        <div className="col-12">
+                                            <h5 className="form-title">
+                                                <span>Course Information</span>
+                                            </h5>
+                                        </div>
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group local-forms">
+                                                <label>
+                                                    Course Name{" "}
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    name="name"
+                                                    value={formCourse.name}
+                                                    onChange={handleChange}
+                                                />
+                                                {errors.name && (
+                                                    <div className="text-danger">
+                                                        {errors.name}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group local-forms">
+                                                <label>
+                                                    Course Code{" "}
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    name="course_code"
+                                                    value={
+                                                        formCourse.course_code
+                                                    }
+                                                    onChange={handleChange}
+                                                />
+                                                {errors.course_code && (
+                                                    <div className="text-danger">
+                                                        {errors.course_code}
+                                                    </div>
+                                                )}
+                                                {courseCodeExistsError && (
+                                                    <div className="text-danger">
+                                                        {errors.name}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="col-12">
+                                            <div className="student-submit">
+                                                <button
+                                                    type="submit"
+                                                    className="btn btn-primary"
+                                                >
+                                                    Create Course
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <ToastContainer />
+            </Layout>
         </>
     );
 }

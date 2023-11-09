@@ -5,6 +5,8 @@ import url from "../../services/url";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Layout from "../../layouts/layouts";
+import { Helmet } from "react-helmet";
 function Exam_Create() {
     const [isSearchable, setIsSearchable] = useState(true);
     const [isClearable, setIsClearable] = useState(true);
@@ -123,134 +125,147 @@ function Exam_Create() {
     };
     return (
         <>
-            <div className="page-header">
-                <div className="row">
-                    <div className="col">
-                        <h3 className="page-title">Create Exam</h3>
+            <Helmet>
+                <title>Exam | Examonimy</title>
+            </Helmet>
+            <Layout>
+                <div className="page-header">
+                    <div className="row">
+                        <div className="col">
+                            <h3 className="page-title">Create Exam</h3>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title">Exam Information</h5>
-                        </div>
-                        <div class="card-body">
-                            <form onSubmit={handleSubmit}>
-                                <div className="form-group">
-                                    <label>
-                                        Exam Name
-                                        <span className="login-danger">*</span>
-                                    </label>
-                                    <input
-                                        className="form-control"
-                                        type="text"
-                                        name="name"
-                                        value={formExam.name}
-                                        onChange={handleChange}
-                                        placeholder="Enter Exam Name"
-                                    />
-                                    {errors.name && (
-                                        <div className="text-danger">
-                                            {errors.name}
-                                        </div>
-                                    )}
-                                    {nameExistsError && (
-                                        <div className="text-danger">
-                                            {nameExistsError}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Exam Day
-                                        <span className="login-danger">*</span>
-                                    </label>
-                                    <input
-                                        className="form-control"
-                                        type="date"
-                                        name="start_date"
-                                        value={formExam.start_date}
-                                        onChange={handleChange}
-                                        min={today}
-                                    />
-                                    {errors.start_date && (
-                                        <div className="text-danger">
-                                            {errors.start_date}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Course
-                                        <span className="login-danger">*</span>
-                                    </label>
-                                    <Select
-                                        options={courses}
-                                        isSearchable={isSearchable}
-                                        isClearable={isClearable}
-                                        name="courseClass_id"
-                                        value={courses.find(
-                                            (option) =>
-                                                option.value ===
-                                                formExam.courseClass_id
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Exam Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <form onSubmit={handleSubmit}>
+                                    <div className="form-group">
+                                        <label>
+                                            Exam Name
+                                            <span className="login-danger">
+                                                *
+                                            </span>
+                                        </label>
+                                        <input
+                                            className="form-control"
+                                            type="text"
+                                            name="name"
+                                            value={formExam.name}
+                                            onChange={handleChange}
+                                            placeholder="Enter Exam Name"
+                                        />
+                                        {errors.name && (
+                                            <div className="text-danger">
+                                                {errors.name}
+                                            </div>
                                         )}
-                                        onChange={(selectedOption) => {
-                                            setFormExam({
-                                                ...formExam,
-                                                courseClass_id:
-                                                    selectedOption.value,
-                                            });
-                                        }}
-                                        placeholder="Select Course"
-                                    />
-                                    {errors.courseClass_id && (
-                                        <div className="text-danger">
-                                            {errors.courseClass_id}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Creator
-                                        <span className="login-danger">*</span>
-                                    </label>
-                                    <Select
-                                        options={optionsCreator}
-                                        isSearchable={isSearchable}
-                                        isClearable={isClearable}
-                                        name="created_by"
-                                        value={optionsCreator.find(
-                                            (option) =>
-                                                option.value ===
-                                                formExam.created_by
+                                        {nameExistsError && (
+                                            <div className="text-danger">
+                                                {nameExistsError}
+                                            </div>
                                         )}
-                                        onChange={handleChangeCreator}
-                                        placeholder="Select Creator"
-                                    />
-                                    {errors.created_by && (
-                                        <div className="text-danger">
-                                            {errors.created_by}
-                                        </div>
-                                    )}
-                                </div>
-                                <div class="form-group"></div>
-                                <div className="text-end">
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary"
-                                    >
-                                        Create
-                                    </button>
-                                </div>
-                            </form>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>
+                                            Exam Day
+                                            <span className="login-danger">
+                                                *
+                                            </span>
+                                        </label>
+                                        <input
+                                            className="form-control"
+                                            type="date"
+                                            name="start_date"
+                                            value={formExam.start_date}
+                                            onChange={handleChange}
+                                            min={today}
+                                        />
+                                        {errors.start_date && (
+                                            <div className="text-danger">
+                                                {errors.start_date}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>
+                                            Course
+                                            <span className="login-danger">
+                                                *
+                                            </span>
+                                        </label>
+                                        <Select
+                                            options={courses}
+                                            isSearchable={isSearchable}
+                                            isClearable={isClearable}
+                                            name="courseClass_id"
+                                            value={courses.find(
+                                                (option) =>
+                                                    option.value ===
+                                                    formExam.courseClass_id
+                                            )}
+                                            onChange={(selectedOption) => {
+                                                setFormExam({
+                                                    ...formExam,
+                                                    courseClass_id:
+                                                        selectedOption.value,
+                                                });
+                                            }}
+                                            placeholder="Select Course"
+                                        />
+                                        {errors.courseClass_id && (
+                                            <div className="text-danger">
+                                                {errors.courseClass_id}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>
+                                            Creator
+                                            <span className="login-danger">
+                                                *
+                                            </span>
+                                        </label>
+                                        <Select
+                                            options={optionsCreator}
+                                            isSearchable={isSearchable}
+                                            isClearable={isClearable}
+                                            name="created_by"
+                                            value={optionsCreator.find(
+                                                (option) =>
+                                                    option.value ===
+                                                    formExam.created_by
+                                            )}
+                                            onChange={handleChangeCreator}
+                                            placeholder="Select Creator"
+                                        />
+                                        {errors.created_by && (
+                                            <div className="text-danger">
+                                                {errors.created_by}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div class="form-group"></div>
+                                    <div className="text-end">
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary"
+                                        >
+                                            Create
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <ToastContainer />
+                <ToastContainer />
+            </Layout>
         </>
     );
 }

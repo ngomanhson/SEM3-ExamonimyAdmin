@@ -1,5 +1,8 @@
 const url = {
     BASE_URL: "https://localhost:7218/api",
+    AUTH: {
+        LOGIN: "Auth/staff-login",
+    },
     CLASS: {
         LIST: "/classes",
         CREATE: "/classes",

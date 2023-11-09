@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import api from "../../services/api";
 import url from "../../services/url";
 import { format } from "date-fns";
-
+import Layout from "../../layouts/layouts";
+import { Helmet } from "react-helmet";
 function Student_Edit() {
     const { student_code } = useParams();
     const [studentData, setStudentData] = useState({});
@@ -104,7 +105,6 @@ function Student_Edit() {
             valid = false;
         }
 
-    
         setErrors(newErrors);
         return valid;
     };
@@ -129,7 +129,7 @@ function Student_Edit() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const isFormValid = await validateForm(); // Chờ hàm validateForm hoàn thành
-    
+
         if (isFormValid) {
             try {
                 const formData = new FormData();
@@ -137,7 +137,7 @@ function Student_Edit() {
                 for (const key in studentData) {
                     formData.append(key, studentData[key]);
                 }
-    
+
                 const response = await api.put(
                     url.STUDENT.EDIT,
                     formData, // Sử dụng đối tượng FormData để gửi dữ liệu
@@ -145,19 +145,27 @@ function Student_Edit() {
                         headers: { "Content-Type": "multipart/form-data" },
                     }
                 );
-    
-                showNotification("success", "Successfully edited student information!");
+
+                showNotification(
+                    "success",
+                    "Successfully edited student information!"
+                );
             } catch (error) {
                 if (error.response) {
                     const { status, data } = error.response;
                     if (status === 400) {
                         if (data === "Student code already exists") {
-                            setStudentCodeExistsError("Student code already exists"); // Kiểm tra mã sinh viên
+                            setStudentCodeExistsError(
+                                "Student code already exists"
+                            ); // Kiểm tra mã sinh viên
                         } else {
                             setErrors(data);
                         }
                     } else {
-                        console.error("Student information cannot be edited:", error);
+                        console.error(
+                            "Student information cannot be edited:",
+                            error
+                        );
                     }
                 }
                 showNotification(
@@ -167,7 +175,6 @@ function Student_Edit() {
             }
         }
     };
-    
 
     //hiển thị select lớp học
     useEffect(() => {
@@ -183,331 +190,348 @@ function Student_Edit() {
     //con mắt hiển thị passwor
     const renderStudentImage = () => {
         return (
-          <img
-            src={studentData.avatar instanceof Blob
-              ? URL.createObjectURL(studentData.avatar)
-              : studentData.avatar
-            } // Hiển thị tệp mới nếu có, hoặc URL hình ảnh đã có sẵn
-            alt="Student Avatar"
-            width="150"
-            height="150"
-          />
+            <img
+                src={
+                    studentData.avatar instanceof Blob
+                        ? URL.createObjectURL(studentData.avatar)
+                        : studentData.avatar
+                } // Hiển thị tệp mới nếu có, hoặc URL hình ảnh đã có sẵn
+                alt="Student Avatar"
+                width="150"
+                height="150"
+            />
         );
-      };
-    
+    };
+
     return (
         <>
-            <div className="page-header">
-                <div className="row align-items-center">
-                    <div className="col">
-                        <h3 className="page-title">Edit Student</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div className="row">
-                <div className="col-sm-12">
-                    <div className="card comman-shadow">
-                        <div className="card-body">
-                            <form onSubmit={handleSubmit}>
-                                <div className="row">
-                                    <div className="col-12">
-                                        <h5 className="form-title student-info">
-                                            Student Information
-                                            <span>
-                                                <a href="javascript:;">
-                                                    <i className="feather-more-vertical"></i>
-                                                </a>
-                                            </span>
-                                        </h5>
-                                    </div>
-                                    <div id="notification-container"></div>
-
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Student Code{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                className="form-control"
-                                                type="text"
-                                                value={studentData.student_code}
-                                                onChange={(e) =>
-                                                    setStudentData({
-                                                        ...studentData,
-                                                        student_code:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                            />
-                                            {errors.student_code && (
-                                                <div className="text-danger">
-                                                    {errors.student_code}
-                                                </div>
-                                            )}
-                                            {studentCodeExistsError && (
-                                                <div className="text-danger">
-                                                    {studentCodeExistsError}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Full Name{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                className="form-control"
-                                                type="text"
-                                                value={studentData.fullname}
-                                                onChange={(e) =>
-                                                    setStudentData({
-                                                        ...studentData,
-                                                        fullname:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                            />
-                                            {errors.fullname && (
-                                                <div className="text-danger">
-                                                    {errors.fullname}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Gender{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <select
-                                                className="form-control select"
-                                                value={studentData.gender}
-                                                onChange={(e) =>
-                                                    setStudentData({
-                                                        ...studentData,
-                                                        gender: e.target.value,
-                                                    })
-                                                }
-                                            >
-                                                <option>Male</option>
-                                                <option>Female</option>
-                                                <option>Others</option>
-                                            </select>
-                                            {errors.gender && (
-                                                <div className="text-danger">
-                                                    {errors.gender}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Date Of Birth{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                className="form-control"
-                                                type="date"
-                                                value={studentData.birthday}
-                                                onChange={(e) =>
-                                                    setStudentData({
-                                                        ...studentData,
-                                                        birthday:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                            />
-                                            {errors.birthday && (
-                                                <div className="text-danger">
-                                                    {errors.birthday}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Email{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                className="form-control"
-                                                type="email"
-                                                value={studentData.email}
-                                                onChange={(e) =>
-                                                    setStudentData({
-                                                        ...studentData,
-                                                        email: e.target.value,
-                                                    })
-                                                }
-                                            />
-                                            {errors.email && (
-                                                <div className="text-danger">
-                                                    {errors.email}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Phone Number{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                className="form-control"
-                                                type="number"
-                                                value={studentData.phone}
-                                                onChange={(e) =>
-                                                    setStudentData({
-                                                        ...studentData,
-                                                        phone: e.target.value,
-                                                    })
-                                                }
-                                            />
-                                            {errors.phone && (
-                                                <div className="text-danger">
-                                                    {errors.phone}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Address{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <input
-                                                className="form-control"
-                                                type="text"
-                                                value={studentData.address}
-                                                onChange={(e) =>
-                                                    setStudentData({
-                                                        ...studentData,
-                                                        address: e.target.value,
-                                                    })
-                                                }
-                                            />
-                                            {errors.address && (
-                                                <div className="text-danger">
-                                                    {errors.address}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group local-forms">
-                                            <label>
-                                                Class Name{" "}
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            <select
-                                                className="form-control select"
-                                                value={studentData.class_id}
-                                                onChange={(e) =>
-                                                    setStudentData({
-                                                        ...studentData,
-                                                        class_id:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                            >
-                                                {classes.map((classItem) => (
-                                                    <option
-                                                        key={classItem.id}
-                                                        value={classItem.id}
-                                                    >
-                                                        {classItem.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-
-                                            {errors.class_id && (
-                                                <div className="text-danger">
-                                                    {errors.class_id}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-sm-4">
-                                        <div className="form-group students-up-files">
-                                            <label>
-                                                Update Student Photo (150px X
-                                                150px)
-                                                <span className="login-danger">
-                                                    *
-                                                </span>
-                                            </label>
-                                            {renderStudentImage()}
-                                            <input
-                                                type="file"
-                                                className="form-control"
-                                                onChange={(e) => {
-                                                    const file =
-                                                        e.target.files[0];
-                                                    setStudentData({
-                                                        ...studentData,
-                                                        avatar: file, // Update the avatar with the selected file
-                                                    });
-                                                }}
-                                            />
-                                            {errors.avatar && (
-                                                <div className="text-danger">
-                                                    {errors.avatar}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="col-12">
-                                        <h5 className="form-title">
-                                            <span>
-                                                Updated login accounts for
-                                                students
-                                            </span>
-                                        </h5>
-                                    </div>
-                                   
-
-                                    <div className="col-12">
-                                        <div className="student-submit">
-                                            <button
-                                                type="submit"
-                                                className="btn btn-primary"
-                                            >
-                                                Submit
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+            <Helmet>
+                <title>Student | Examonimy</title>
+            </Helmet>
+            <Layout>
+                <div className="page-header">
+                    <div className="row align-items-center">
+                        <div className="col">
+                            <h3 className="page-title">Edit Student</h3>
                         </div>
                     </div>
                 </div>
-            </div>
+
+                <div className="row">
+                    <div className="col-sm-12">
+                        <div className="card comman-shadow">
+                            <div className="card-body">
+                                <form onSubmit={handleSubmit}>
+                                    <div className="row">
+                                        <div className="col-12">
+                                            <h5 className="form-title student-info">
+                                                Student Information
+                                                <span>
+                                                    <a href="javascript:;">
+                                                        <i className="feather-more-vertical"></i>
+                                                    </a>
+                                                </span>
+                                            </h5>
+                                        </div>
+                                        <div id="notification-container"></div>
+
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group local-forms">
+                                                <label>
+                                                    Student Code{" "}
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <input
+                                                    className="form-control"
+                                                    type="text"
+                                                    value={
+                                                        studentData.student_code
+                                                    }
+                                                    onChange={(e) =>
+                                                        setStudentData({
+                                                            ...studentData,
+                                                            student_code:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                />
+                                                {errors.student_code && (
+                                                    <div className="text-danger">
+                                                        {errors.student_code}
+                                                    </div>
+                                                )}
+                                                {studentCodeExistsError && (
+                                                    <div className="text-danger">
+                                                        {studentCodeExistsError}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group local-forms">
+                                                <label>
+                                                    Full Name{" "}
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <input
+                                                    className="form-control"
+                                                    type="text"
+                                                    value={studentData.fullname}
+                                                    onChange={(e) =>
+                                                        setStudentData({
+                                                            ...studentData,
+                                                            fullname:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                />
+                                                {errors.fullname && (
+                                                    <div className="text-danger">
+                                                        {errors.fullname}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group local-forms">
+                                                <label>
+                                                    Gender{" "}
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <select
+                                                    className="form-control select"
+                                                    value={studentData.gender}
+                                                    onChange={(e) =>
+                                                        setStudentData({
+                                                            ...studentData,
+                                                            gender: e.target
+                                                                .value,
+                                                        })
+                                                    }
+                                                >
+                                                    <option>Male</option>
+                                                    <option>Female</option>
+                                                    <option>Others</option>
+                                                </select>
+                                                {errors.gender && (
+                                                    <div className="text-danger">
+                                                        {errors.gender}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group local-forms">
+                                                <label>
+                                                    Date Of Birth{" "}
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <input
+                                                    className="form-control"
+                                                    type="date"
+                                                    value={studentData.birthday}
+                                                    onChange={(e) =>
+                                                        setStudentData({
+                                                            ...studentData,
+                                                            birthday:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                />
+                                                {errors.birthday && (
+                                                    <div className="text-danger">
+                                                        {errors.birthday}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group local-forms">
+                                                <label>
+                                                    Email{" "}
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <input
+                                                    className="form-control"
+                                                    type="email"
+                                                    value={studentData.email}
+                                                    onChange={(e) =>
+                                                        setStudentData({
+                                                            ...studentData,
+                                                            email: e.target
+                                                                .value,
+                                                        })
+                                                    }
+                                                />
+                                                {errors.email && (
+                                                    <div className="text-danger">
+                                                        {errors.email}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group local-forms">
+                                                <label>
+                                                    Phone Number{" "}
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <input
+                                                    className="form-control"
+                                                    type="number"
+                                                    value={studentData.phone}
+                                                    onChange={(e) =>
+                                                        setStudentData({
+                                                            ...studentData,
+                                                            phone: e.target
+                                                                .value,
+                                                        })
+                                                    }
+                                                />
+                                                {errors.phone && (
+                                                    <div className="text-danger">
+                                                        {errors.phone}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group local-forms">
+                                                <label>
+                                                    Address{" "}
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <input
+                                                    className="form-control"
+                                                    type="text"
+                                                    value={studentData.address}
+                                                    onChange={(e) =>
+                                                        setStudentData({
+                                                            ...studentData,
+                                                            address:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                />
+                                                {errors.address && (
+                                                    <div className="text-danger">
+                                                        {errors.address}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group local-forms">
+                                                <label>
+                                                    Class Name{" "}
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                <select
+                                                    className="form-control select"
+                                                    value={studentData.class_id}
+                                                    onChange={(e) =>
+                                                        setStudentData({
+                                                            ...studentData,
+                                                            class_id:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                >
+                                                    {classes.map(
+                                                        (classItem) => (
+                                                            <option
+                                                                key={
+                                                                    classItem.id
+                                                                }
+                                                                value={
+                                                                    classItem.id
+                                                                }
+                                                            >
+                                                                {classItem.name}
+                                                            </option>
+                                                        )
+                                                    )}
+                                                </select>
+
+                                                {errors.class_id && (
+                                                    <div className="text-danger">
+                                                        {errors.class_id}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="col-12 col-sm-4">
+                                            <div className="form-group students-up-files">
+                                                <label>
+                                                    Update Student Photo (150px
+                                                    X 150px)
+                                                    <span className="login-danger">
+                                                        *
+                                                    </span>
+                                                </label>
+                                                {renderStudentImage()}
+                                                <input
+                                                    type="file"
+                                                    className="form-control"
+                                                    onChange={(e) => {
+                                                        const file =
+                                                            e.target.files[0];
+                                                        setStudentData({
+                                                            ...studentData,
+                                                            avatar: file, // Update the avatar with the selected file
+                                                        });
+                                                    }}
+                                                />
+                                                {errors.avatar && (
+                                                    <div className="text-danger">
+                                                        {errors.avatar}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="col-12">
+                                            <h5 className="form-title">
+                                                <span>
+                                                    Updated login accounts for
+                                                    students
+                                                </span>
+                                            </h5>
+                                        </div>
+
+                                        <div className="col-12">
+                                            <div className="student-submit">
+                                                <button
+                                                    type="submit"
+                                                    className="btn btn-primary"
+                                                >
+                                                    Submit
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Layout>
         </>
     );
 }
