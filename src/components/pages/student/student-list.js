@@ -136,17 +136,12 @@ function Student_List() {
                                             </h3>
                                         </div>
                                         <div className="col-auto text-end float-end ms-auto download-grp">
-                                            <a
-                                                href=""
-                                                className="btn btn-outline-gray me-2 active"
-                                            >
-                                                <i className="feather-list"></i>
-                                            </a>
+                                           
                                             <a
                                                 href=""
                                                 className="btn btn-outline-gray me-2"
                                             >
-                                                <i className="feather-grid"></i>
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
                                             </a>
                                             <a
                                                 href=""
