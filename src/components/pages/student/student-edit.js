@@ -3,12 +3,17 @@ import { useState, useEffect } from "react";
 import api from "../../services/api";
 import url from "../../services/url";
 import { format } from "date-fns";
+
+
+
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+
 function Student_Edit() {
     const { student_code } = useParams();
     const [studentData, setStudentData] = useState({});
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         api.get(`${url.STUDENT.DETAIL}?code_student=${student_code}`)
@@ -128,6 +133,7 @@ function Student_Edit() {
     //xử lý sửa sinh viên
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         const isFormValid = await validateForm(); // Chờ hàm validateForm hoàn thành
 
         if (isFormValid) {
@@ -146,10 +152,11 @@ function Student_Edit() {
                     }
                 );
 
+
                 showNotification(
                     "success",
                     "Successfully edited student information!"
-                );
+
             } catch (error) {
                 if (error.response) {
                     const { status, data } = error.response;
