@@ -4,7 +4,8 @@ import api from "../../services/api";
 import url from "../../services/url";
 import Select from "react-select";
 import { format } from "date-fns";
-
+import Layout from "../../layouts/layouts";
+import { Helmet } from "react-helmet";
 function Exam_Edit() {
     const { slug } = useParams();
     const [isSearchable, setIsSearchable] = useState(true);
@@ -18,7 +19,8 @@ function Exam_Edit() {
 
     const [errors, setErrors] = useState({
         name: "",
-        room: "",
+        start_date: "",
+        courseClass_id: "",
         teacher_id: "",
     });
 
@@ -37,8 +39,8 @@ function Exam_Edit() {
             valid = false;
         }
 
-        if (examData.course_id === "") {
-            newErrors.course_id = "Please enter course";
+        if (examData.courseClass_id === "") {
+            newErrors.courseClass_id = "Please enter course";
             valid = false;
         }
 
@@ -112,10 +114,10 @@ function Exam_Edit() {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const response = await api.get(url.COURSE.LIST);
-                const courseData = response.data.map((courses) => ({
-                    value: courses.id,
-                    label: courses.name,
+                const response = await api.get(url.ClassCourse.LIST);
+                const courseData = response.data.data.map((course) => ({
+                    value: course.id,
+                    label: course.courseName,
                 }));
                 setCourses(courseData);
             } catch (error) {}
@@ -124,7 +126,7 @@ function Exam_Edit() {
     }, []);
     const optionsCourse = courses;
     const handleChangeCourse = (selectedOption) => {
-        setExamData({ ...examData, course_id: selectedOption.value });
+        setExamData({ ...examData, courseClass_id: selectedOption.value });
     };
 
     //hiển thị select creator
@@ -147,133 +149,146 @@ function Exam_Edit() {
     };
     return (
         <>
-            <div className="page-header">
-                <div className="row">
-                    <div className="col">
-                        <h3 className="page-title">Edit Exam</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title">Exam Information</h5>
-                        </div>
-                        <div class="card-body">
-                            <form onSubmit={handleSubmit}>
-                                <div id="notification-container"></div>
-
-                                <div className="form-group">
-                                    <label>
-                                        Exam Name
-                                        <span className="login-danger">*</span>
-                                    </label>
-                                    <input
-                                        className="form-control"
-                                        type="text"
-                                        value={examData.name}
-                                        onChange={(e) =>
-                                            setExamData({
-                                                ...examData,
-                                                name: e.target.value,
-                                            })
-                                        }
-                                    />
-                                    {errors.name && (
-                                        <div className="text-danger">
-                                            {errors.name}
-                                        </div>
-                                    )}
-                                    {nameExistsError && (
-                                        <div className="text-danger">
-                                            {nameExistsError}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Exam Day
-                                        <span className="login-danger">*</span>
-                                    </label>
-                                    <input
-                                        className="form-control"
-                                        type="date"
-                                        value={examData.start_date}
-                                        onChange={(e) =>
-                                            setExamData({
-                                                ...examData,
-                                                start_date: e.target.value,
-                                            })
-                                        }
-                                        min={today}
-                                    />
-                                    {errors.start_date && (
-                                        <div className="text-danger">
-                                            {errors.start_date}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Course
-                                        <span className="login-danger">*</span>
-                                    </label>
-                                    <Select
-                                        options={optionsCourse}
-                                        isSearchable={isSearchable}
-                                        isClearable={isClearable}
-                                        value={optionsCourse.find(
-                                            (option) =>
-                                                option.value ===
-                                                examData.course_id
-                                        )}
-                                        onChange={handleChangeCourse}
-                                    />
-                                    {errors.course_id && (
-                                        <div className="text-danger">
-                                            {errors.course_id}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Creator
-                                        <span className="login-danger">*</span>
-                                    </label>
-                                    <Select
-                                        options={optionsCreator}
-                                        isSearchable={isSearchable}
-                                        isClearable={isClearable}
-                                        value={optionsCreator.find(
-                                            (option) =>
-                                                option.value ===
-                                                examData.created_by
-                                        )}
-                                        onChange={handleChangeCreator}
-                                        placeholder="Select Creator"
-                                    />
-                                    {errors.created_by && (
-                                        <div className="text-danger">
-                                            {errors.created_by}
-                                        </div>
-                                    )}
-                                </div>
-                                <div class="form-group"></div>
-                                <div className="text-end">
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary"
-                                    >
-                                        Update
-                                    </button>
-                                </div>
-                            </form>
+            <Helmet>
+                <title>Exam | Examonimy</title>
+            </Helmet>
+            <Layout>
+                <div className="page-header">
+                    <div className="row">
+                        <div className="col">
+                            <h3 className="page-title">Edit Exam</h3>
                         </div>
                     </div>
                 </div>
-            </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Exam Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <form onSubmit={handleSubmit}>
+                                    <div id="notification-container"></div>
+
+                                    <div className="form-group">
+                                        <label>
+                                            Exam Name
+                                            <span className="login-danger">
+                                                *
+                                            </span>
+                                        </label>
+                                        <input
+                                            className="form-control"
+                                            type="text"
+                                            value={examData.name}
+                                            onChange={(e) =>
+                                                setExamData({
+                                                    ...examData,
+                                                    name: e.target.value,
+                                                })
+                                            }
+                                        />
+                                        {errors.name && (
+                                            <div className="text-danger">
+                                                {errors.name}
+                                            </div>
+                                        )}
+                                        {nameExistsError && (
+                                            <div className="text-danger">
+                                                {nameExistsError}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>
+                                            Exam Day
+                                            <span className="login-danger">
+                                                *
+                                            </span>
+                                        </label>
+                                        <input
+                                            className="form-control"
+                                            type="date"
+                                            value={examData.start_date}
+                                            onChange={(e) =>
+                                                setExamData({
+                                                    ...examData,
+                                                    start_date: e.target.value,
+                                                })
+                                            }
+                                            min={today}
+                                        />
+                                        {errors.start_date && (
+                                            <div className="text-danger">
+                                                {errors.start_date}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>
+                                            Course
+                                            <span className="login-danger">
+                                                *
+                                            </span>
+                                        </label>
+                                        <Select
+                                            options={optionsCourse}
+                                            isSearchable={isSearchable}
+                                            isClearable={isClearable}
+                                            value={optionsCourse.find(
+                                                (option) =>
+                                                    option.value ===
+                                                    examData.courseClass_id
+                                            )}
+                                            onChange={handleChangeCourse}
+                                        />
+                                        {errors.courseClass_id && (
+                                            <div className="text-danger">
+                                                {errors.courseClass_id}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>
+                                            Creator
+                                            <span className="login-danger">
+                                                *
+                                            </span>
+                                        </label>
+                                        <Select
+                                            options={optionsCreator}
+                                            isSearchable={isSearchable}
+                                            isClearable={isClearable}
+                                            value={optionsCreator.find(
+                                                (option) =>
+                                                    option.value ===
+                                                    examData.created_by
+                                            )}
+                                            onChange={handleChangeCreator}
+                                            placeholder="Select Creator"
+                                        />
+                                        {errors.created_by && (
+                                            <div className="text-danger">
+                                                {errors.created_by}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div class="form-group"></div>
+                                    <div className="text-end">
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary"
+                                        >
+                                            Update
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Layout>
         </>
     );
 }

@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 import Select from "react-select";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import api from "../../../services/api";
 import url from "../../../services/url";
 import makeAnimated from "react-select/animated";
-import { ToastContainer, toast } from "react-toastify";
+import { useEffect, useState } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 import Layout from "../../../layouts/layouts";
 import { Helmet } from "react-helmet";
-function Test_Essay_Create() {
+function Test_Edit() {
+    const { slug } = useParams();
+    const [isLoading, setIsLoading] = useState(true);
     const animatedComponents = makeAnimated();
     const [isClearable, setIsClearable] = useState(true);
     const [isSearchable, setIsSearchable] = useState(true);
@@ -19,9 +20,9 @@ function Test_Essay_Create() {
     const [selectedClass, setSelectedClass] = useState(null);
     const [selectedStudents, setSelectedStudents] = useState([]);
     const [classes, setClasses] = useState([]);
+    const [isClassEdited, setIsClassEdited] = useState(false);
     const [students, setStudents] = useState([]);
-    const [essayQuestion, setEssayQuestion] = useState("");
-    const [editorError, setEditorError] = useState("");
+    const [testStudents, setTestStudents] = useState([]);
     const today = new Date();
     const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, "0");
@@ -29,66 +30,56 @@ function Test_Essay_Create() {
     const currentTime = "00:00";
     const todayDateTimeLocal = `${year}-${month}-${day}T${currentTime}`; //chỉ cho người dùng chọn từ ngay hôm nay trở đi
     const navigate = useNavigate();
-    const [errors, setErrors] = useState({});
     const [nameExistsError, setNameExistsError] = useState("");
     const selectAllOption = {
         value: "select_all",
         label: "Select All Students",
     };
-    const allStudentsOptions = [selectAllOption, ...students];
-    const [formTest, setFormTest] = useState({
+    const [testData, setTestData] = useState({
         name: "",
         exam_id: "",
         startDate: "",
         endDate: "",
-        past_marks: "",
-        total_marks: 100,
         studentTds: [],
-        questions: [],
-        created_by: 1,
+        past_marks: "",
     });
-    const clearForm = () => {
-        setFormTest({
-            name: "",
-            exam_id: "",
-            startDate: "",
-            endDate: "",
-            past_marks: "",
-            total_marks: 100,
-            studentTds: [],
-            questions: [],
-            created_by: 1,
-        });
-        setSelectedStudents([]);
-    };
+    const allStudentsOptions = [selectAllOption, ...students];
+    const [errors, setErrors] = useState({
+        name: "",
+        exam_id: "",
+        startDate: "",
+        endDate: "",
+        studentTds: "",
+        past_marks: "",
+    });
     const validateForm = () => {
         //validate cho thông tin bài test
         let valid = true;
         const newErrors = {};
-        if (formTest.name === "") {
+        if (testData.name === "") {
             newErrors.name = "Please enter name test";
             valid = false;
-        } else if (formTest.name.length < 3) {
+        } else if (testData.name.length < 3) {
             newErrors.name = "Enter at least 3 characters";
             valid = false;
-        } else if (formTest.name.length > 255) {
+        } else if (testData.name.length > 255) {
             newErrors.name = "Enter up to 255 characters";
             valid = false;
         }
-        if (formTest.exam_id === "") {
+        if (testData.exam_id === "") {
             newErrors.exam_id = "Please choose exam";
             valid = false;
         }
-        if (formTest.startDate === "") {
+        if (testData.startDate === "") {
             newErrors.startDate = "Please choose start date";
             valid = false;
         }
-        if (formTest.endDate === "") {
+        if (testData.endDate === "") {
             newErrors.endDate = "Please choose end date";
             valid = false;
         }
-        const startDate = new Date(formTest.startDate);
-        const endDate = new Date(formTest.endDate);
+        const startDate = new Date(testData.startDate);
+        const endDate = new Date(testData.endDate);
 
         if (startDate >= endDate) {
             newErrors.startDate = "Start Date must be before End Date";
@@ -101,13 +92,12 @@ function Test_Essay_Create() {
             const selectedStudentIds = selectedStudents.map(
                 (option) => option.value
             );
-            setFormTest({ ...formTest, studentTds: selectedStudentIds });
+            setTestData({ ...testData, studentTds: selectedStudentIds });
         }
-        if (formTest.past_marks === "") {
+        if (testData.past_marks === "") {
             newErrors.past_marks = "Please choose past marks";
             valid = false;
         }
-
         setErrors(newErrors);
         return valid;
     };
@@ -128,7 +118,7 @@ function Test_Essay_Create() {
     }, []);
     const optionsExam = exam;
     const handleChangeExam = (selectedOption) => {
-        setFormTest({ ...formTest, exam_id: selectedOption.value });
+        setTestData({ ...testData, exam_id: selectedOption.value });
     };
 
     //hiển thị danh sách lớp học
@@ -167,9 +157,10 @@ function Test_Essay_Create() {
     const handleClassChange = (selectedOption) => {
         setSelectedClass(selectedOption);
         setSelectedStudents([]);
+        setIsClassEdited(true);
     };
+
     const handleStudentChange = (selectedOption) => {
-        //xử lý các phần chọn sinh viên bao gồm cả select all
         if (selectedOption.some((option) => option.value === "select_all")) {
             const allStudents = students.map((student) => ({
                 value: student.value,
@@ -179,55 +170,52 @@ function Test_Essay_Create() {
         } else {
             setSelectedStudents(selectedOption);
         }
-        setFormTest({ ...formTest, studentTds: selectedOption.value });
+        const selectedStudentIds = selectedStudents.map(
+            (option) => option.value
+        );
+        setTestData({ ...testData, studentTds: selectedStudentIds });
     };
+    const studentOptions = isClassEdited ? allStudentsOptions : testStudents;
+    const studentValue = isClassEdited ? selectedStudents : testStudents;
+    useEffect(() => {
+        const fetchTestStudents = async () => {
+            try {
+                const response = await api.get(
+                    url.STUDENT.TEST_SLUG.replace("{}", slug)
+                );
+                const studentData = response.data.map((std) => ({
+                    value: std.id,
+                    label: std.fullname,
+                }));
+                setTestStudents(studentData);
+            } catch (error) {}
+        };
+        fetchTestStudents();
+    }, [slug]);
+
+    useEffect(() => {
+        api.get(`${url.TEST.DETAIL}?slug=${slug}`)
+            .then((response) => {
+                setTestData(response.data);
+                setIsLoading(false);
+            })
+            .catch((error) => {});
+    }, [slug]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validateEditorContent(essayQuestion)) {
-            const formValidationResult = validateForm();
-            if (!formValidationResult) {
-                toast.error(
-                    "You have not completely filled in the Test information",
-                    {
-                        position: toast.POSITION.TOP_RIGHT,
-                        autoClose: 3000,
-                    }
-                );
-                return;
-            }
-
-            if (formTest.questions.length === 0) {
-                toast.error("Please add at least one question", {
-                    position: toast.POSITION.TOP_RIGHT,
-                    autoClose: 3000,
-                });
-                return;
-            }
-
+        if (validateForm()) {
             try {
-                const data = {
-                    name: formTest.name,
-                    exam_id: formTest.exam_id,
-                    startDate: formTest.startDate,
-                    endDate: formTest.endDate,
-                    past_marks: formTest.past_marks,
-                    total_marks: formTest.total_marks,
-                    created_by: formTest.created_by,
-                    studentIds: selectedStudents.map(
-                        (student) => student.value
-                    ),
-                    questions: formTest.questions,
-                };
-                const rs = await api.post(url.TEST.CREATE_ESSAY, data);
-                const createdExamId = rs.data.exam_id;
-                clearForm();
-                toast.success("Create Test Successfully", {
+                const rs = await api.put(
+                    `${url.TEST.EDIT}?id=${testData.id}`,
+                    testData
+                );
+                toast.success("Update Test Successfully", {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 3000,
                 });
                 setTimeout(() => {
-                    navigate(`/test-of-exam-list/${createdExamId}`); //chuyển đến trang test-list
+                    navigate(`/test-list`); //chuyển đến trang test-list
                 }, 3000);
             } catch (error) {
                 if (
@@ -237,43 +225,8 @@ function Test_Essay_Create() {
                     setNameExistsError("This test name already exists");
                 } else {
                 }
-                console.error("Error creating test:", error);
-                console.error("Response data:", error.response.data);
             }
-        } else {
-            // Hiển thị thông báo lỗi
-            console.log("Editor content is invalid.");
         }
-    };
-
-    // Hàm kiểm tra độ dài của nội dung editor
-    const validateEditorContent = (content) => {
-        if (content.length < 3) {
-            setEditorError("Content must be at least 3 characters.");
-            return false;
-        } else if (content.length > 255) {
-            setEditorError("Content must be at most 255 characters.");
-            return false;
-        } else {
-            setEditorError("");
-            return true;
-        }
-    };
-    const handleChangeEditor = (value) => {
-        setEssayQuestion(value);
-        const newEssayQuestion = {
-            title: value,
-        };
-        setFormTest((prevFormTest) => ({
-            ...prevFormTest,
-            questions: [newEssayQuestion],
-        }));
-        validateEditorContent(value);
-    };
-    const handleChange = (e, selectedOption) => {
-        const { name, value } = e.target;
-        setFormTest({ ...formTest, [name]: value });
-        setNameExistsError("");
     };
     return (
         <>
@@ -284,46 +237,35 @@ function Test_Essay_Create() {
                 <div className="page-header">
                     <div className="row">
                         <div className="col">
-                            <h3 className="page-title">Create An Essay Test</h3>
+                            <h3 className="page-title">
+                                Edit Test Information
+                            </h3>
                         </div>
                     </div>
                 </div>
 
-                <div className="row">
-                    <div class="col-md-9">
-                        <ul class="list-links mb-4">
-                            <li class="active">
-                                <NavLink to="">
-                                    Create your own questions
-                                </NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="">
-                                    With questions available
-                                </NavLink>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <form onSubmit={handleSubmit}>
-                    <div class="row">
-                        <div class="col-md-6">
-                            {" "}
+                <div class="row">
+                    <div class="col-md-12">
+                        <form onSubmit={handleSubmit}>
                             <div class="card">
                                 <div class="card-header">
-                                    <h5 class="card-title">Test Information</h5>
+                                    <h5 class="card-title">
+                                        Edit Test Information
+                                    </h5>
                                 </div>
                                 <div class="card-body">
                                     <div className="form-group">
                                         <label>Name Test</label>
                                         <input
                                             type="text"
-                                            name="name"
-                                            value={formTest.name}
-                                            onChange={handleChange}
+                                            value={testData.name}
+                                            onChange={(e) =>
+                                                setTestData({
+                                                    ...testData,
+                                                    name: e.target.value,
+                                                })
+                                            }
                                             class="form-control"
-                                            placeholder="Enter Test Name"
                                         />
                                         {errors.name && (
                                             <div className="text-danger">
@@ -345,10 +287,9 @@ function Test_Essay_Create() {
                                             value={optionsExam.find(
                                                 (option) =>
                                                     option.value ===
-                                                    formTest.exam_id
+                                                    testData.exam_id
                                             )}
                                             onChange={handleChangeExam}
-                                            placeholder="Select Exam"
                                         />
                                         {errors.exam_id && (
                                             <div className="text-danger">
@@ -363,7 +304,6 @@ function Test_Essay_Create() {
                                             isClearable={isClearable}
                                             options={OptionsClasses}
                                             onChange={handleClassChange}
-                                            placeholder="Select class to select students"
                                         />
                                     </div>
                                     <div className="form-group">
@@ -372,11 +312,19 @@ function Test_Essay_Create() {
                                             closeMenuOnSelect={false}
                                             components={animatedComponents}
                                             isMulti
-                                            options={allStudentsOptions}
-                                            onChange={handleStudentChange}
-                                            value={selectedStudents}
-                                            name="studentIds"
-                                            placeholder="Select Student..."
+                                            options={studentOptions}
+                                            onChange={(selectedOption) => {
+                                                if (isClassEdited) {
+                                                    handleStudentChange(
+                                                        selectedOption
+                                                    );
+                                                } else {
+                                                    setTestStudents(
+                                                        selectedOption
+                                                    );
+                                                }
+                                            }}
+                                            value={studentValue}
                                         />
                                         {errors.studentTds && (
                                             <div className="text-danger">
@@ -389,9 +337,13 @@ function Test_Essay_Create() {
                                         <input
                                             className="form-control"
                                             type="datetime-local"
-                                            name="startDate"
-                                            value={formTest.startDate}
-                                            onChange={handleChange}
+                                            value={testData.startDate}
+                                            onChange={(e) =>
+                                                setTestData({
+                                                    ...testData,
+                                                    startDate: e.target.value,
+                                                })
+                                            }
                                             min={todayDateTimeLocal}
                                         />
                                         {errors.startDate && (
@@ -405,10 +357,14 @@ function Test_Essay_Create() {
                                         <input
                                             className="form-control"
                                             type="datetime-local"
-                                            name="endDate"
-                                            value={formTest.endDate}
-                                            onChange={handleChange}
-                                            min={formTest.startDate}
+                                            value={testData.endDate}
+                                            onChange={(e) =>
+                                                setTestData({
+                                                    ...testData,
+                                                    endDate: e.target.value,
+                                                })
+                                            }
+                                            min={testData.startDate}
                                         />
                                         {errors.endDate && (
                                             <div className="text-danger">
@@ -431,8 +387,13 @@ function Test_Essay_Create() {
                                         <select
                                             className="form-control"
                                             name="past_marks"
-                                            value={formTest.past_marks}
-                                            onChange={handleChange}
+                                            value={testData.past_marks}
+                                            onChange={(e) =>
+                                                setTestData({
+                                                    ...testData,
+                                                    past_marks: e.target.value,
+                                                })
+                                            }
                                         >
                                             <option value="">
                                                 Select pass score...
@@ -463,90 +424,17 @@ function Test_Essay_Create() {
                                             type="submit"
                                             className="btn btn-primary"
                                         >
-                                            Create Test
+                                            Update Test
                                         </button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title">Content Question</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div className="row">
-                                        <div className="col-md-12">
-                                            <div className="card">
-                                                <div className="card-body">
-                                                    {editorError && (
-                                                        <div className="text-danger">
-                                                            {editorError}
-                                                        </div>
-                                                    )}
-                                                    <ReactQuill
-                                                        value={essayQuestion}
-                                                        onChange={
-                                                            handleChangeEditor
-                                                        }
-                                                        modules={{
-                                                            toolbar: [
-                                                                [
-                                                                    {
-                                                                        header: "1",
-                                                                    },
-                                                                    {
-                                                                        header: "2",
-                                                                    },
-                                                                    {
-                                                                        font: [],
-                                                                    },
-                                                                ],
-                                                                [
-                                                                    "bold",
-                                                                    "italic",
-                                                                    "underline",
-                                                                    "strike",
-                                                                    "blockquote",
-                                                                ],
-                                                                [
-                                                                    "link",
-                                                                    // "image",
-                                                                    "video",
-                                                                ],
-                                                                [
-                                                                    {
-                                                                        list: "ordered",
-                                                                    },
-                                                                    {
-                                                                        list: "bullet",
-                                                                    },
-                                                                    {
-                                                                        indent: "-1",
-                                                                    },
-                                                                    {
-                                                                        indent: "+1",
-                                                                    },
-                                                                ],
-                                                            ],
-                                                        }}
-                                                        style={{
-                                                            height: "300px",
-                                                        }}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <ToastContainer />
+                        </form>
                     </div>
-                </form>
+                    <ToastContainer />
+                </div>
             </Layout>
         </>
     );
 }
-export default Test_Essay_Create;
+export default Test_Edit;

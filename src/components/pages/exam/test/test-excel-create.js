@@ -7,6 +7,8 @@ import makeAnimated from "react-select/animated";
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
 import url from "../../../services/url";
+import Layout from "../../../layouts/layouts";
+import { Helmet } from "react-helmet";
 function Test_Excel_Create() {
     const animatedComponents = makeAnimated();
     const [isClearable, setIsClearable] = useState(true);
@@ -244,216 +246,221 @@ function Test_Excel_Create() {
     };
     return (
         <>
-            <div className="page-header">
-                <div className="row">
-                    <div className="col">
-                        <h3 className="page-title">
-                            Create Test Multiple Choice
-                        </h3>
+            <Helmet>
+                <title>Test | Examonimy</title>
+            </Helmet>
+            <Layout>
+                <div className="page-header">
+                    <div className="row">
+                        <div className="col">
+                            <h3 className="page-title">
+                                Create Test Multiple Choice
+                            </h3>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div className="row">
-                <div class="col-md-9">
-                    <ul class="list-links mb-4">
-                        <li>
-                            <NavLink to="/test-create">
-                                Create your own questions
-                            </NavLink>
-                        </li>
-                        <li class="active">
-                            <NavLink to="">With excel files</NavLink>
-                        </li>
-                        <li>
-                            <NavLink to="/test-available">
-                                With questions available
-                            </NavLink>
-                        </li>
-                    </ul>
+                <div className="row">
+                    <div class="col-md-9">
+                        <ul class="list-links mb-4">
+                            <li>
+                                <NavLink to="/test-create">
+                                    Create your own questions
+                                </NavLink>
+                            </li>
+                            <li class="active">
+                                <NavLink to="">With excel files</NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/test-available">
+                                    With questions available
+                                </NavLink>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="col-md-12">
-                    <form onSubmit={handleSubmit}>
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">Test Information</h5>
-                            </div>
-                            <div class="card-body">
-                                <div className="form-group">
-                                    <label>Name Test</label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={formTest.name}
-                                        onChange={handleChange}
-                                        class="form-control"
-                                        placeholder="Enter Test Name"
-                                    />
-                                    {errors.name && (
-                                        <div className="text-danger">
-                                            {errors.name}
-                                        </div>
-                                    )}
-                                    {nameExistsError && (
-                                        <div className="text-danger">
-                                            {nameExistsError}
-                                        </div>
-                                    )}
+                <div class="row">
+                    <div class="col-md-12">
+                        <form onSubmit={handleSubmit}>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">Test Information</h5>
                                 </div>
-                                <div className="form-group">
-                                    <label>Upload Excel File</label>
-                                    <input
-                                        type="file"
-                                        name="excelFile"
-                                        accept=".xlsx"
-                                        onChange={handleFileUpload}
-                                        className="form-control"
-                                    />
-                                    {errors.excelFile && (
-                                        <div className="text-danger">
-                                            {errors.excelFile}
-                                        </div>
-                                    )}
-                                </div>
-                                <div class="form-group">
-                                    <label>Exam</label>
-                                    <Select
-                                        options={optionsExam}
-                                        isSearchable={isSearchable}
-                                        isClearable={isClearable}
-                                        value={optionsExam.find(
-                                            (option) =>
-                                                option.value ===
-                                                formTest.exam_id
+                                <div class="card-body">
+                                    <div className="form-group">
+                                        <label>Name Test</label>
+                                        <input
+                                            type="text"
+                                            name="name"
+                                            value={formTest.name}
+                                            onChange={handleChange}
+                                            class="form-control"
+                                            placeholder="Enter Test Name"
+                                        />
+                                        {errors.name && (
+                                            <div className="text-danger">
+                                                {errors.name}
+                                            </div>
                                         )}
-                                        onChange={handleChangeExam}
-                                        placeholder="Select Exam"
-                                    />
-                                    {errors.exam_id && (
-                                        <div className="text-danger">
-                                            {errors.exam_id}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <label>Class</label>
-                                    <Select
-                                        isSearchable={isSearchable}
-                                        isClearable={isClearable}
-                                        options={OptionsClasses}
-                                        onChange={handleClassChange}
-                                        placeholder="Select class to select students"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Student</label>
-                                    <Select
-                                        closeMenuOnSelect={false}
-                                        components={animatedComponents}
-                                        isMulti
-                                        options={allStudentsOptions}
-                                        onChange={handleStudentChange}
-                                        value={selectedStudents}
-                                        name="studentIds"
-                                        placeholder="Select Student..."
-                                    />
-                                    {errors.studentTds && (
-                                        <div className="text-danger">
-                                            {errors.studentTds}
-                                        </div>
-                                    )}
-                                </div>
-                                <div class="form-group">
-                                    <label>Start Date Time</label>
-                                    <input
-                                        className="form-control"
-                                        type="datetime-local"
-                                        name="startDate"
-                                        value={formTest.startDate}
-                                        onChange={handleChange}
-                                        min={todayDateTimeLocal}
-                                    />
-                                    {errors.startDate && (
-                                        <div className="text-danger">
-                                            {errors.startDate}
-                                        </div>
-                                    )}
-                                </div>
-                                <div class="form-group">
-                                    <label>End Date Time</label>
-                                    <input
-                                        className="form-control"
-                                        type="datetime-local"
-                                        name="endDate"
-                                        value={formTest.endDate}
-                                        onChange={handleChange}
-                                        min={formTest.startDate}
-                                    />
-                                    {errors.endDate && (
-                                        <div className="text-danger">
-                                            {errors.endDate}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <label>
-                                        Pass Score{" "}
-                                        <span
-                                            style={{
-                                                color: "#808080",
-                                                fontSize: "13px",
-                                            }}
+                                        {nameExistsError && (
+                                            <div className="text-danger">
+                                                {nameExistsError}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Upload Excel File</label>
+                                        <input
+                                            type="file"
+                                            name="excelFile"
+                                            accept=".xlsx"
+                                            onChange={handleFileUpload}
+                                            className="form-control"
+                                        />
+                                        {errors.excelFile && (
+                                            <div className="text-danger">
+                                                {errors.excelFile}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Exam</label>
+                                        <Select
+                                            options={optionsExam}
+                                            isSearchable={isSearchable}
+                                            isClearable={isClearable}
+                                            value={optionsExam.find(
+                                                (option) =>
+                                                    option.value ===
+                                                    formTest.exam_id
+                                            )}
+                                            onChange={handleChangeExam}
+                                            placeholder="Select Exam"
+                                        />
+                                        {errors.exam_id && (
+                                            <div className="text-danger">
+                                                {errors.exam_id}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Class</label>
+                                        <Select
+                                            isSearchable={isSearchable}
+                                            isClearable={isClearable}
+                                            options={OptionsClasses}
+                                            onChange={handleClassChange}
+                                            placeholder="Select class to select students"
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Student</label>
+                                        <Select
+                                            closeMenuOnSelect={false}
+                                            components={animatedComponents}
+                                            isMulti
+                                            options={allStudentsOptions}
+                                            onChange={handleStudentChange}
+                                            value={selectedStudents}
+                                            name="studentIds"
+                                            placeholder="Select Student..."
+                                        />
+                                        {errors.studentTds && (
+                                            <div className="text-danger">
+                                                {errors.studentTds}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Start Date Time</label>
+                                        <input
+                                            className="form-control"
+                                            type="datetime-local"
+                                            name="startDate"
+                                            value={formTest.startDate}
+                                            onChange={handleChange}
+                                            min={todayDateTimeLocal}
+                                        />
+                                        {errors.startDate && (
+                                            <div className="text-danger">
+                                                {errors.startDate}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div class="form-group">
+                                        <label>End Date Time</label>
+                                        <input
+                                            className="form-control"
+                                            type="datetime-local"
+                                            name="endDate"
+                                            value={formTest.endDate}
+                                            onChange={handleChange}
+                                            min={formTest.startDate}
+                                        />
+                                        {errors.endDate && (
+                                            <div className="text-danger">
+                                                {errors.endDate}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>
+                                            Pass Score{" "}
+                                            <span
+                                                style={{
+                                                    color: "#808080",
+                                                    fontSize: "13px",
+                                                }}
+                                            >
+                                                (Points to pass the test)
+                                            </span>
+                                        </label>
+                                        <select
+                                            className="form-control"
+                                            name="past_marks"
+                                            value={formTest.past_marks}
+                                            onChange={handleChange}
                                         >
-                                            (Points to pass the test)
-                                        </span>
-                                    </label>
-                                    <select
-                                        className="form-control"
-                                        name="past_marks"
-                                        value={formTest.past_marks}
-                                        onChange={handleChange}
-                                    >
-                                        <option value="">
-                                            Select pass score...
-                                        </option>
-                                        <option value="50">50</option>
-                                        <option value="40">40</option>
-                                        <option value="30">30</option>
-                                        <option value="20">20</option>
-                                    </select>
-                                    {errors.past_marks && (
-                                        <div className="text-danger">
-                                            {errors.past_marks}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="form-group">
-                                    <label>Total Score</label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        value="100"
-                                        name="total_marks"
-                                        disabled
-                                    />
-                                </div>
-                                <div className="text-end">
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary"
-                                    >
-                                        Create Test
-                                    </button>
+                                            <option value="">
+                                                Select pass score...
+                                            </option>
+                                            <option value="50">50</option>
+                                            <option value="40">40</option>
+                                            <option value="30">30</option>
+                                            <option value="20">20</option>
+                                        </select>
+                                        {errors.past_marks && (
+                                            <div className="text-danger">
+                                                {errors.past_marks}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Total Score</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            value="100"
+                                            name="total_marks"
+                                            disabled
+                                        />
+                                    </div>
+                                    <div className="text-end">
+                                        <button
+                                            type="submit"
+                                            className="btn btn-primary"
+                                        >
+                                            Create Test
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
+                    <ToastContainer />
                 </div>
-                <ToastContainer />
-            </div>
+            </Layout>
         </>
     );
 }

@@ -1,5 +1,8 @@
 const url = {
     BASE_URL: "https://localhost:7218/api",
+    AUTH: {
+        LOGIN: "Auth/staff-login",
+    },
     CLASS: {
         LIST: "/classes",
         CREATE: "/classes",
@@ -15,6 +18,7 @@ const url = {
         DELETE_FOREVER: "/student/permanently-delete",
         DETAIL: "/student/get-by-codeStudent",
         CLASS_ID: "/student/get-by-classId",
+        TEST_SLUG: "/student/student-test/{}",
     },
     COURSE: {
         LIST: "/course",
@@ -23,6 +27,7 @@ const url = {
     },
     ClassCourse: {
         LIST: "/ClassCourse",
+        CREATE: "/ClassCourse",
     },
     STAFF: {
         LIST: "/staff",
