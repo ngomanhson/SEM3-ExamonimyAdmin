@@ -3,6 +3,7 @@ import api from "../../services/api";
 import url from "../../services/url";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import { useNavigate } from "react-router-dom";
 function Student_Create() {
     const [formStudent, setFormStudent] = useState({
         student_code: "",
@@ -16,7 +17,7 @@ function Student_Create() {
         class_id: "",
         password: "",
     });
-
+    const navigate =useNavigate();
     const [errors, setErrors] = useState({});
 
     const [classes, setClasses] = useState([]);
@@ -153,6 +154,7 @@ function Student_Create() {
                     // Handle the case where response or response.data is undefined
                     console.error("Response or response.data is undefined.");
                 }
+                navigate("/student-list");
             } catch (error) {
                 if (error.response) {
                     const { status, data } = error.response;

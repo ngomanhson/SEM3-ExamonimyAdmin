@@ -3,18 +3,14 @@ import { useState, useEffect } from "react";
 import api from "../../services/api";
 import url from "../../services/url";
 import { format } from "date-fns";
-
-
-
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
-
+import { useNavigate } from "react-router-dom";
 function Student_Edit() {
     const { student_code } = useParams();
     const [studentData, setStudentData] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
-
     useEffect(() => {
         api.get(`${url.STUDENT.DETAIL}?code_student=${student_code}`)
             .then((response) => {
@@ -133,7 +129,6 @@ function Student_Edit() {
     //xử lý sửa sinh viên
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         const isFormValid = await validateForm(); // Chờ hàm validateForm hoàn thành
 
         if (isFormValid) {
@@ -152,11 +147,12 @@ function Student_Edit() {
                     }
                 );
 
-
                 showNotification(
                     "success",
                     "Successfully edited student information!"
-
+                );
+                // Sử dụng navigate để chuyển hướng đến "/student-list"
+                navigate("/student-list");
             } catch (error) {
                 if (error.response) {
                     const { status, data } = error.response;
@@ -179,6 +175,7 @@ function Student_Edit() {
                     "danger",
                     "Student information cannot be edited, please check the information again. This student code may overlap with another student code or the information you entered is incorrect."
                 );
+                 
             }
         }
     };
