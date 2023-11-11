@@ -28,6 +28,7 @@ import Test_Edit from "./components/pages/exam/test/test-edit";
 import Course_Class_Create from "./components/pages/course/course-class-create";
 import Login from "./components/pages/auth/login";
 import { useJwt } from "react-jwt";
+import Profile from "./components/pages/auth/profile";
 function App() {
     const ProtectedRoute = ({ element }) => {
         const token = localStorage.getItem("accessToken");
@@ -183,6 +184,10 @@ function App() {
                     element={<ProtectedRoute element={<Blog_Create />} />}
                 ></Route>
                 {/* end route blog */}
+                <Route
+                    path="/profile"
+                    element={<ProtectedRoute element={<Profile />} />}
+                ></Route>
                 <Route
                     path="/login"
                     element={<ProtectedLoginRoute element={<Login />} />}

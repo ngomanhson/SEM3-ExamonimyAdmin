@@ -1,6 +1,24 @@
+import { useEffect, useState } from "react";
+import { useJwt } from "react-jwt";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 function Header() {
     const navigate = useNavigate();
+    const [studentName, setStudentName] = useState("");
+    const { isExpired, isInvalid } = useJwt();
+
+    //lấy tên đăng nhập
+    useEffect(() => {
+        const token = localStorage.getItem("accessToken");
+        try {
+            const decodedToken = JSON.parse(atob(token.split(".")[1]));
+            const studentName =
+                decodedToken[
+                    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+                ];
+            setStudentName(studentName);
+        } catch (error) {}
+    }, [isExpired, isInvalid]);
+
     const handleLogout = () => {
         localStorage.removeItem("accessToken");
         navigate("/login");
@@ -269,7 +287,7 @@ function Header() {
                                         alt="Ryan Taylor"
                                     />
                                     <div className="user-text">
-                                        <h6>Ryan Taylor</h6>
+                                        <h6> {studentName}</h6>
                                         <p className="text-muted mb-0">
                                             Administrator
                                         </p>
@@ -286,15 +304,18 @@ function Header() {
                                         />
                                     </div>
                                     <div className="user-text">
-                                        <h6>Ryan Taylor</h6>
+                                        <h6> {studentName}</h6>
                                         <p className="text-muted mb-0">
                                             Administrator
                                         </p>
                                     </div>
                                 </div>
-                                <a className="dropdown-item" href="">
+                                <NavLink
+                                    className="dropdown-item"
+                                    to="/profile"
+                                >
                                     My Profile
-                                </a>
+                                </NavLink>
                                 <a className="dropdown-item" href="">
                                     Inbox
                                 </a>

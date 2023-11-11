@@ -1,7 +1,10 @@
 const url = {
     BASE_URL: "https://localhost:7218/api",
     AUTH: {
-        LOGIN: "Auth/staff-login",
+        PROFILE: "/Auth/staff/profile",
+        LOGIN: "/Auth/staff-login",
+        UPDATE_PROFILE: "/Auth/staff/update-profile",
+        CHANGE_PASSWORD: "/Auth/staff/change-password",
     },
     CLASS: {
         LIST: "/classes",
