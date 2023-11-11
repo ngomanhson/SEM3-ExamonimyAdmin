@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 function Login() {
     const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
     const [formStaff, setFormStaff] = useState({
         email: "",
         password: "",
@@ -14,6 +15,10 @@ function Login() {
         email: "",
         password: "",
     });
+
+    const handleTogglePassword = () => {
+        setShowPassword(!showPassword);
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -150,7 +155,11 @@ function Login() {
                                                     </span>
                                                 </label>
                                                 <input
-                                                    type="password"
+                                                    type={
+                                                        showPassword
+                                                            ? "text"
+                                                            : "password"
+                                                    }
                                                     name="password"
                                                     id="password"
                                                     className={`form-control ${
@@ -165,6 +174,20 @@ function Login() {
                                                     <div className="invalid-feedback">
                                                         {formErrors.password}
                                                     </div>
+                                                )}
+                                                {!formErrors.password && (
+                                                    <span
+                                                        className="profile-views"
+                                                        onClick={
+                                                            handleTogglePassword
+                                                        }
+                                                    >
+                                                        {showPassword ? (
+                                                            <i className="fa fa-eye-slash"></i>
+                                                        ) : (
+                                                            <i className="fa fa-eye"></i>
+                                                        )}
+                                                    </span>
                                                 )}
                                             </div>
                                         </div>

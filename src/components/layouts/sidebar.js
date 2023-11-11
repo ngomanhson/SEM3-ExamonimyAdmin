@@ -239,10 +239,10 @@ function Sidebar() {
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="settings.html">
+                                    <NavLink to="/profile">
                                         <i className="fas fa-cog"></i>
                                         <span>Settings</span>
-                                    </a>
+                                    </NavLink>
                                 </li>
                             </ul>
                         </div>

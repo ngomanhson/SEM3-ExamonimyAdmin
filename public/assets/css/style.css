@@ -9552,7 +9552,7 @@ body[data-layout-mode="dark"]
 .password-toggle-icon {
     position: absolute;
     top: 50%;
-    right: 10px; /* Điều chỉnh vị trí của biểu tượng con mắt */
+    right: 10px;
     transform: translateY(-50%);
     cursor: pointer;
     color: #333;
@@ -9561,3 +9561,30 @@ body[data-layout-mode="dark"]
 .password-toggle-icon.show {
     color: #007bff;
 }
+/* css cho nút hiển thị mật khẩu */
+.show-pass {
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    transform: translateY(-140%);
+}
+
+.show-pass i {
+    font-size: 18px;
+    color: #555;
+}
+
+.input-group-append {
+    position: relative;
+}
+
+.input-group-append .show-pass {
+    right: 30px;
+}
+
+.input-change {
+    width: 400px;
+    height: 30px;
+    border: 0px solid #f1f1f1;
+}
+
