@@ -107,7 +107,6 @@ function Test_Of_Exam_List() {
                                                 <th>Start Date Time</th>
                                                 <th>End Date Time</th>
                                                 <th>Past Marks</th>
-                                                <th>Total Marks</th>
                                                 <th>Status</th>
                                                 <th className="text-end">
                                                     Action
@@ -200,9 +199,7 @@ function Test_Of_Exam_List() {
 
                                                         <td>
                                                             {item.past_marks}
-                                                        </td>
-                                                        <td>
-                                                            {item.total_marks}
+                                                            /100
                                                         </td>
                                                         <td>
                                                             {item.status === 0
@@ -211,12 +208,12 @@ function Test_Of_Exam_List() {
                                                         </td>
                                                         <td className="text-end">
                                                             <div className="actions">
-                                                                <a
-                                                                    href="javascript:;"
+                                                                <NavLink
+                                                                    to={`/test-view/${item.slug}`}
                                                                     className="btn btn-sm bg-success-light me-2"
                                                                 >
                                                                     <i className="feather-eye"></i>
-                                                                </a>
+                                                                </NavLink>
                                                                 <NavLink
                                                                     to={`/test-edit/${item.slug}`}
                                                                     className="btn btn-sm bg-danger-light"

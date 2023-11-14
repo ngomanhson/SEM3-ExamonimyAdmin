@@ -110,12 +110,12 @@ function Test_List() {
                                             <tr>
                                                 <th>Ordinal</th>
                                                 <th>Name Test</th>
+                                                <th>Type Test</th>
                                                 <th>Exam</th>
                                                 <th>Student List</th>
                                                 <th>Start Date Time</th>
                                                 <th>End Date Time</th>
                                                 <th>Past Marks</th>
-                                                <th>Total Marks</th>
                                                 <th>Status</th>
                                                 <th className="text-end">
                                                     Action
@@ -131,6 +131,12 @@ function Test_List() {
                                                     <tr>
                                                         <td>{index + 1}</td>
                                                         <td>{item.name}</td>
+                                                        <td>
+                                                            {item.type_test ===
+                                                            0
+                                                                ? "Multiple Choice"
+                                                                : "Essay Test"}
+                                                        </td>
                                                         <td>
                                                             {
                                                                 examNames[
@@ -211,23 +217,21 @@ function Test_List() {
 
                                                         <td>
                                                             {item.past_marks}
-                                                        </td>
-                                                        <td>
-                                                            {item.total_marks}
+                                                            /100
                                                         </td>
                                                         <td>
                                                             {item.status === 0
-                                                                ? "It's not time yet"
+                                                                ? "It's not time to take the test yet"
                                                                 : "Test time is over"}
                                                         </td>
                                                         <td className="text-end">
                                                             <div className="actions">
-                                                                <a
-                                                                    href="javascript:;"
+                                                                <NavLink
+                                                                    to={`/test-view/${item.slug}`}
                                                                     className="btn btn-sm bg-success-light me-2"
                                                                 >
                                                                     <i className="feather-eye"></i>
-                                                                </a>
+                                                                </NavLink>
                                                                 {isEditable ? (
                                                                     <NavLink
                                                                         to={`/test-edit/${item.slug}`}

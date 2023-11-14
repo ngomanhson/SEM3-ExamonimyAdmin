@@ -17,12 +17,6 @@ function Test_Edit() {
     const [isClearable, setIsClearable] = useState(true);
     const [isSearchable, setIsSearchable] = useState(true);
     const [exam, setExams] = useState([]);
-    const [selectedClass, setSelectedClass] = useState(null);
-    const [selectedStudents, setSelectedStudents] = useState([]);
-    const [classes, setClasses] = useState([]);
-    const [isClassEdited, setIsClassEdited] = useState(false);
-    const [students, setStudents] = useState([]);
-    const [testStudents, setTestStudents] = useState([]);
     const today = new Date();
     const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, "0");
@@ -31,25 +25,18 @@ function Test_Edit() {
     const todayDateTimeLocal = `${year}-${month}-${day}T${currentTime}`; //chỉ cho người dùng chọn từ ngay hôm nay trở đi
     const navigate = useNavigate();
     const [nameExistsError, setNameExistsError] = useState("");
-    const selectAllOption = {
-        value: "select_all",
-        label: "Select All Students",
-    };
     const [testData, setTestData] = useState({
         name: "",
         exam_id: "",
         startDate: "",
         endDate: "",
-        studentTds: [],
         past_marks: "",
     });
-    const allStudentsOptions = [selectAllOption, ...students];
     const [errors, setErrors] = useState({
         name: "",
         exam_id: "",
         startDate: "",
         endDate: "",
-        studentTds: "",
         past_marks: "",
     });
     const validateForm = () => {
@@ -85,15 +72,6 @@ function Test_Edit() {
             newErrors.startDate = "Start Date must be before End Date";
             valid = false;
         }
-        if (selectedStudents.length === 0) {
-            newErrors.studentTds = "Please choose students";
-            valid = false;
-        } else {
-            const selectedStudentIds = selectedStudents.map(
-                (option) => option.value
-            );
-            setTestData({ ...testData, studentTds: selectedStudentIds });
-        }
         if (testData.past_marks === "") {
             newErrors.past_marks = "Please choose past marks";
             valid = false;
@@ -120,78 +98,6 @@ function Test_Edit() {
     const handleChangeExam = (selectedOption) => {
         setTestData({ ...testData, exam_id: selectedOption.value });
     };
-
-    //hiển thị danh sách lớp học
-    useEffect(() => {
-        const fetchClasses = async () => {
-            try {
-                const response = await api.get(url.CLASS.LIST);
-                const classData = response.data.map((cls) => ({
-                    value: cls.id,
-                    label: cls.name,
-                }));
-                setClasses(classData);
-            } catch (error) {}
-        };
-        fetchClasses();
-    }, []);
-    const OptionsClasses = classes;
-    //hiển thị danh sách sinh viên theo lớp học đã được chọn
-    useEffect(() => {
-        if (selectedClass) {
-            const fetchStudentsByClass = async () => {
-                try {
-                    const response = await api.get(
-                        `${url.STUDENT.CLASS_ID}?classId=${selectedClass.value}`
-                    );
-                    const studentData = response.data.map((std) => ({
-                        value: std.id,
-                        label: std.fullname,
-                    }));
-                    setStudents(studentData);
-                } catch (error) {}
-            };
-            fetchStudentsByClass();
-        }
-    }, [selectedClass]);
-    const handleClassChange = (selectedOption) => {
-        setSelectedClass(selectedOption);
-        setSelectedStudents([]);
-        setIsClassEdited(true);
-    };
-
-    const handleStudentChange = (selectedOption) => {
-        if (selectedOption.some((option) => option.value === "select_all")) {
-            const allStudents = students.map((student) => ({
-                value: student.value,
-                label: student.label,
-            }));
-            setSelectedStudents(allStudents);
-        } else {
-            setSelectedStudents(selectedOption);
-        }
-        const selectedStudentIds = selectedStudents.map(
-            (option) => option.value
-        );
-        setTestData({ ...testData, studentTds: selectedStudentIds });
-    };
-    const studentOptions = isClassEdited ? allStudentsOptions : testStudents;
-    const studentValue = isClassEdited ? selectedStudents : testStudents;
-    useEffect(() => {
-        const fetchTestStudents = async () => {
-            try {
-                const response = await api.get(
-                    url.STUDENT.TEST_SLUG.replace("{}", slug)
-                );
-                const studentData = response.data.map((std) => ({
-                    value: std.id,
-                    label: std.fullname,
-                }));
-                setTestStudents(studentData);
-            } catch (error) {}
-        };
-        fetchTestStudents();
-    }, [slug]);
 
     useEffect(() => {
         api.get(`${url.TEST.DETAIL}?slug=${slug}`)
@@ -294,41 +200,6 @@ function Test_Edit() {
                                         {errors.exam_id && (
                                             <div className="text-danger">
                                                 {errors.exam_id}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Class</label>
-                                        <Select
-                                            isSearchable={isSearchable}
-                                            isClearable={isClearable}
-                                            options={OptionsClasses}
-                                            onChange={handleClassChange}
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Student</label>
-                                        <Select
-                                            closeMenuOnSelect={false}
-                                            components={animatedComponents}
-                                            isMulti
-                                            options={studentOptions}
-                                            onChange={(selectedOption) => {
-                                                if (isClassEdited) {
-                                                    handleStudentChange(
-                                                        selectedOption
-                                                    );
-                                                } else {
-                                                    setTestStudents(
-                                                        selectedOption
-                                                    );
-                                                }
-                                            }}
-                                            value={studentValue}
-                                        />
-                                        {errors.studentTds && (
-                                            <div className="text-danger">
-                                                {errors.studentTds}
                                             </div>
                                         )}
                                     </div>
