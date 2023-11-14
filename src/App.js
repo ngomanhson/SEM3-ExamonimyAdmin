@@ -202,6 +202,16 @@ function App() {
                     path="/login"
                     element={<ProtectedLoginRoute element={<Login />} />}
                 />
+
+                <Route
+                    path="/forgot-password"
+                    element={<ProtectedLoginRoute element={<ForgotPassword />} />}
+                />
+
+                 <Route
+                    path="/reset-password/:resetToken"
+                    element={<ProtectedLoginRoute element={<ResetPassword />} />}
+                />
             </Routes>
         </div>
     );
