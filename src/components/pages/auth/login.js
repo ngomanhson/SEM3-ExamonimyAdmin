@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet";
 import api from "../../services/api";
 import url from "../../services/url";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 function Login() {
     const navigate = useNavigate();
@@ -59,11 +59,7 @@ function Login() {
                         "Content-Type": "application/json",
                     },
                 };
-                const loginResponse = await api.post(
-                    url.AUTH.LOGIN,
-                    formStaff,
-                    config
-                );
+                const loginResponse = await api.post(url.AUTH.LOGIN, formStaff, config);
                 if (loginResponse.data.success) {
                     const token = loginResponse.data.data;
                     localStorage.setItem("accessToken", token);
@@ -92,101 +88,48 @@ function Login() {
                     <div className="container">
                         <div className="loginbox">
                             <div className="login-left">
-                                <img
-                                    className="img-fluid"
-                                    src="assets/img/login.png"
-                                    alt="Logo"
-                                />
+                                <img className="img-fluid" src="assets/img/login.png" alt="Logo" />
                             </div>
                             <div className="login-right">
                                 <div className="login-right-wrap">
                                     <h1>Welcome to Examonimy Admin</h1>
-                                    <p className="account-subtitle">
-                                        Login to your account
-                                    </p>
+                                    <p className="account-subtitle">Login to your account</p>
                                     <h2>Sign in</h2>
 
                                     <form onSubmit={handleLogin}>
-                                        <div
-                                            className={`form-group ${
-                                                formErrors.email
-                                                    ? "is-invalid"
-                                                    : ""
-                                            }`}
-                                        >
+                                        <div className={`form-group ${formErrors.email ? "is-invalid" : ""}`}>
                                             <div className="form-group">
                                                 <label>
-                                                    Email Adress{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Email Address <span className="login-danger">*</span>
                                                 </label>
                                                 <input
                                                     type="email"
                                                     name="email"
                                                     id="email"
-                                                    className={`form-control ${
-                                                        formErrors.email
-                                                            ? "is-invalid"
-                                                            : ""
-                                                    }`}
+                                                    className={`form-control ${formErrors.email ? "is-invalid" : ""}`}
                                                     value={formStaff.email}
                                                     onChange={handleChange}
                                                 />
-                                                {formErrors.email && (
-                                                    <div className="invalid-feedback">
-                                                        {formErrors.email}
-                                                    </div>
-                                                )}
+                                                {formErrors.email && <div className="invalid-feedback">{formErrors.email}</div>}
                                             </div>
                                         </div>
-                                        <div
-                                            className={`form-group form-group-2${
-                                                formErrors.password
-                                                    ? "is-invalid"
-                                                    : ""
-                                            }`}
-                                        >
+                                        <div className={`form-group form-group-2 ${formErrors.password ? "is-invalid" : ""}`}>
                                             <div className="form-group">
                                                 <label>
-                                                    Password{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Password <span className="login-danger">*</span>
                                                 </label>
                                                 <input
-                                                    type={
-                                                        showPassword
-                                                            ? "text"
-                                                            : "password"
-                                                    }
+                                                    type={showPassword ? "text" : "password"}
                                                     name="password"
                                                     id="password"
-                                                    className={`form-control ${
-                                                        formErrors.password
-                                                            ? "is-invalid"
-                                                            : ""
-                                                    }`}
+                                                    className={`form-control ${formErrors.password ? "is-invalid" : ""}`}
                                                     value={formStaff.password}
                                                     onChange={handleChange}
                                                 />
-                                                {formErrors.password && (
-                                                    <div className="invalid-feedback">
-                                                        {formErrors.password}
-                                                    </div>
-                                                )}
+                                                {formErrors.password && <div className="invalid-feedback">{formErrors.password}</div>}
                                                 {!formErrors.password && (
-                                                    <span
-                                                        className="profile-views"
-                                                        onClick={
-                                                            handleTogglePassword
-                                                        }
-                                                    >
-                                                        {showPassword ? (
-                                                            <i className="fa fa-eye-slash"></i>
-                                                        ) : (
-                                                            <i className="fa fa-eye"></i>
-                                                        )}
+                                                    <span className="profile-views" onClick={handleTogglePassword}>
+                                                        {showPassword ? <i className="fa fa-eye-slash"></i> : <i className="fa fa-eye"></i>}
                                                     </span>
                                                 )}
                                             </div>
@@ -195,20 +138,14 @@ function Login() {
                                             <div className="remember-me">
                                                 <label className="custom_check mr-2 mb-0 d-inline-flex remember-me">
                                                     Remember me
-                                                    <input
-                                                        type="checkbox"
-                                                        name="radio"
-                                                    />
+                                                    <input type="checkbox" name="radio" />
                                                     <span className="checkmark"></span>
                                                 </label>
                                             </div>
-                                            <a>Forgot Password?</a>
+                                            <Link to="/forgot-password">Forgot Password?</Link>
                                         </div>
                                         <div className="form-group">
-                                            <button
-                                                className="btn btn-primary btn-block"
-                                                type="submit"
-                                            >
+                                            <button className="btn btn-primary btn-block" type="submit">
                                                 Login
                                             </button>
                                         </div>
@@ -220,16 +157,16 @@ function Login() {
                                     </div>
 
                                     <div className="social-login">
-                                        <a href="#">
+                                        <a href="#!">
                                             <i className="fab fa-google-plus-g"></i>
                                         </a>
-                                        <a href="#">
+                                        <a href="#!">
                                             <i className="fab fa-facebook-f"></i>
                                         </a>
-                                        <a href="#">
+                                        <a href="#!">
                                             <i className="fab fa-twitter"></i>
                                         </a>
-                                        <a href="#">
+                                        <a href="#!">
                                             <i className="fab fa-linkedin-in"></i>
                                         </a>
                                     </div>

@@ -5,6 +5,8 @@ const url = {
         LOGIN: "/Auth/staff-login",
         UPDATE_PROFILE: "/Auth/staff/update-profile",
         CHANGE_PASSWORD: "/Auth/staff/change-password",
+        FORGOT_PASSWORD: "/Auth/staff/forgot-password",
+        RESET_PASSWORD: "/Auth/Staff/reset-password",
     },
     CLASS: {
         LIST: "/classes",
