@@ -56,7 +56,14 @@ const url = {
         EXAM_ID: "/test/get-by-examId",
     },
     TESTQUESTION: {
-        LIST: "/TestQuestion/{testId}",
+        LIST: "/TestQuestion/{}",
+        RESULT: "/TestQuestion/result-test/{}/details/{}",
+    },
+    GRADE: {
+        LIST: "/grade",
+    },
+    ANSWER: {
+        QUESTION_ID: "/answer/get-by-questionId",
     },
 };
 export default url;

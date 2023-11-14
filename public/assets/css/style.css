@@ -9588,3 +9588,9 @@ body[data-layout-mode="dark"]
     border: 0px solid #f1f1f1;
 }
 
+.line-clamp:hover::before {
+    content: attr(data-fulltext);
+    position: absolute;
+    white-space: nowrap;
+    background-color: #dee2e6;
+}

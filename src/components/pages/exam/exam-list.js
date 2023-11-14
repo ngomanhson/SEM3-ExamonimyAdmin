@@ -102,8 +102,7 @@ function Exam_List() {
                                                 href="#"
                                                 className="btn btn-outline-primary me-2"
                                             >
-                                                <i className="fas fa-download"></i>{" "}
-                                                Download
+                                                Retest List
                                             </a>
                                             <NavLink
                                                 to="/exam-create"
