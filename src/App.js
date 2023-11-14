@@ -31,6 +31,8 @@ import { useJwt } from "react-jwt";
 import Profile from "./components/pages/auth/profile";
 import Test_View from "./components/pages/exam/test/test-view";
 import Test_View_Essay from "./components/pages/exam/test/test-view-essay";
+import ForgotPassword from "./components/pages/auth/forgot-password";
+import ResetPassword from "./components/pages/auth/reset-password";
 function App() {
     const ProtectedRoute = ({ element }) => {
         const token = localStorage.getItem("accessToken");
@@ -208,7 +210,7 @@ function App() {
                     element={<ProtectedLoginRoute element={<ForgotPassword />} />}
                 />
 
-                 <Route
+                <Route
                     path="/reset-password/:resetToken"
                     element={<ProtectedLoginRoute element={<ResetPassword />} />}
                 />
