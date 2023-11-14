@@ -29,6 +29,8 @@ import Course_Class_Create from "./components/pages/course/course-class-create";
 import Login from "./components/pages/auth/login";
 import { useJwt } from "react-jwt";
 import Profile from "./components/pages/auth/profile";
+import ForgotPassword from "./components/pages/auth/forgot-password";
+import ResetPassword from "./components/pages/auth/reset-password";
 function App() {
     const ProtectedRoute = ({ element }) => {
         const token = localStorage.getItem("accessToken");
@@ -191,6 +193,16 @@ function App() {
                 <Route
                     path="/login"
                     element={<ProtectedLoginRoute element={<Login />} />}
+                />
+
+                <Route
+                    path="/forgot-password"
+                    element={<ProtectedLoginRoute element={<ForgotPassword />} />}
+                />
+
+                 <Route
+                    path="/reset-password/:resetToken"
+                    element={<ProtectedLoginRoute element={<ResetPassword />} />}
                 />
             </Routes>
         </div>
