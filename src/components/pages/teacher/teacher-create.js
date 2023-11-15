@@ -3,7 +3,16 @@ import api from "../../services/api";
 import url from "../../services/url";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import Loading from "../../layouts/loading";
 function Teacher_Create() {
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    });
+
     const [formTeacher, setFormTeacher] = useState({
         staff_code: "",
         fullname: "",
@@ -27,12 +36,10 @@ function Teacher_Create() {
             newErrors.staff_code = "Please enter Teacher code";
             valid = false;
         } else if (formTeacher.staff_code.length < 3) {
-            newErrors.staff_code =
-                "The Teacher code must be at least 3 characters";
+            newErrors.staff_code = "The Teacher code must be at least 3 characters";
             valid = false;
         } else if (formTeacher.staff_code.length > 100) {
-            newErrors.staff_code =
-                "Teacher code must be less than 100 characters";
+            newErrors.staff_code = "Teacher code must be less than 100 characters";
             valid = false;
         }
 
@@ -99,9 +106,7 @@ function Teacher_Create() {
     };
     // hiển thị thông báo thêm sinh viên thành công
     const showNotification = (type, message) => {
-        const notificationContainer = document.getElementById(
-            "notification-container"
-        );
+        const notificationContainer = document.getElementById("notification-container");
         const notification = document.createElement("div");
         notification.className = `alert alert-${type}`;
         notification.textContent = message;
@@ -155,10 +160,7 @@ function Teacher_Create() {
                 if (response && response.data) {
                     // Access the data property here
                     console.log(response.data);
-                    showNotification(
-                        "success",
-                        "Teacher created successfully!"
-                    );
+                    showNotification("success", "Teacher created successfully!");
                 } else {
                     // Handle the case where response or response.data is undefined
                     console.error("Response or response.data is undefined.");
@@ -168,9 +170,7 @@ function Teacher_Create() {
                     const { status, data } = error.response;
                     if (status === 400) {
                         if (data === "Student code already exists") {
-                            setTeacherCodeExistsError(
-                                "Student code already exists"
-                            );
+                            setTeacherCodeExistsError("Student code already exists");
                         } else {
                             setErrors(data); // Update errors state with validation errors
                         }
@@ -197,6 +197,7 @@ function Teacher_Create() {
     const passwordInputType = showPassword ? "text" : "password";
     return (
         <>
+            {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Teacher | Examonimy</title>
             </Helmet>
@@ -209,9 +210,7 @@ function Teacher_Create() {
                                 <li className="breadcrumb-item">
                                     <a href="teachers.html">Teachers</a>
                                 </li>
-                                <li className="breadcrumb-item active">
-                                    Add Teachers
-                                </li>
+                                <li className="breadcrumb-item active">Add Teachers</li>
                             </ul>
                         </div>
                     </div>
@@ -237,257 +236,111 @@ function Teacher_Create() {
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Teacher ID{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Teacher ID <span className="login-danger">*</span>
                                                 </label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    name="staff_code"
-                                                    value={
-                                                        formTeacher.staff_code
-                                                    }
-                                                    onChange={handleChange}
-                                                    placeholder="Teacher ID"
-                                                />
-                                                {errors.staff_code && (
-                                                    <div className="text-danger">
-                                                        {errors.staff_code}
-                                                    </div>
-                                                )}
-                                                {teacherCodeExistsError && (
-                                                    <div className="text-danger">
-                                                        {teacherCodeExistsError}
-                                                    </div>
-                                                )}
+                                                <input type="text" className="form-control" name="staff_code" value={formTeacher.staff_code} onChange={handleChange} placeholder="Teacher ID" />
+                                                {errors.staff_code && <div className="text-danger">{errors.staff_code}</div>}
+                                                {teacherCodeExistsError && <div className="text-danger">{teacherCodeExistsError}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Full Name{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Full Name <span className="login-danger">*</span>
                                                 </label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    name="fullname"
-                                                    value={formTeacher.fullName}
-                                                    onChange={handleChange}
-                                                    placeholder="Enter Name"
-                                                />
-                                                {errors.fullname && (
-                                                    <div className="text-danger">
-                                                        {errors.fullname}
-                                                    </div>
-                                                )}
+                                                <input type="text" className="form-control" name="fullname" value={formTeacher.fullName} onChange={handleChange} placeholder="Enter Name" />
+                                                {errors.fullname && <div className="text-danger">{errors.fullname}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Gender{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Gender <span className="login-danger">*</span>
                                                 </label>
-                                                <select
-                                                    className="form-control select"
-                                                    name="gender"
-                                                    value={formTeacher.gender}
-                                                    onChange={handleChange}
-                                                >
-                                                    <option value="">
-                                                        Please select gender
-                                                    </option>
+                                                <select className="form-control select" name="gender" value={formTeacher.gender} onChange={handleChange}>
+                                                    <option value="">Please select gender</option>
                                                     <option>Male</option>
                                                     <option>Female</option>
                                                     <option>Others</option>
                                                 </select>
-                                                {errors.gender && (
-                                                    <div className="text-danger">
-                                                        {errors.gender}
-                                                    </div>
-                                                )}
+                                                {errors.gender && <div className="text-danger">{errors.gender}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms ">
                                                 <label>
-                                                    Date Of Birth{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Date Of Birth <span className="login-danger">*</span>
                                                 </label>
-                                                <input
-                                                    className="form-control "
-                                                    type="date"
-                                                    name="birthday"
-                                                    value={formTeacher.birthday}
-                                                    onChange={handleChange}
-                                                    placeholder="YYY-MM-DD"
-                                                />
-                                                {errors.birthday && (
-                                                    <div className="text-danger">
-                                                        {errors.birthday}
-                                                    </div>
-                                                )}
+                                                <input className="form-control " type="date" name="birthday" value={formTeacher.birthday} onChange={handleChange} placeholder="YYY-MM-DD" />
+                                                {errors.birthday && <div className="text-danger">{errors.birthday}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Email{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Email <span className="login-danger">*</span>
                                                 </label>
-                                                <input
-                                                    className="form-control"
-                                                    type="email"
-                                                    name="email"
-                                                    value={formTeacher.email}
-                                                    onChange={handleChange}
-                                                    placeholder="Enter Email Address"
-                                                />
-                                                {errors.email && (
-                                                    <div className="text-danger">
-                                                        {errors.email}
-                                                    </div>
-                                                )}
+                                                <input className="form-control" type="email" name="email" value={formTeacher.email} onChange={handleChange} placeholder="Enter Email Address" />
+                                                {errors.email && <div className="text-danger">{errors.email}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Phone Number{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Phone Number <span className="login-danger">*</span>
                                                 </label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    name="phone"
-                                                    value={formTeacher.phone}
-                                                    onChange={handleChange}
-                                                    placeholder="Enter Phone"
-                                                />
-                                                {errors.phone && (
-                                                    <div className="text-danger">
-                                                        {errors.phone}
-                                                    </div>
-                                                )}
+                                                <input type="text" className="form-control" name="phone" value={formTeacher.phone} onChange={handleChange} placeholder="Enter Phone" />
+                                                {errors.phone && <div className="text-danger">{errors.phone}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Address{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Address <span className="login-danger">*</span>
                                                 </label>
-                                                <input
-                                                    className="form-control"
-                                                    type="text"
-                                                    name="address"
-                                                    value={formTeacher.address}
-                                                    onChange={handleChange}
-                                                    placeholder="Enter Address"
-                                                />
-                                                {errors.address && (
-                                                    <div className="text-danger">
-                                                        {errors.address}
-                                                    </div>
-                                                )}
+                                                <input className="form-control" type="text" name="address" value={formTeacher.address} onChange={handleChange} placeholder="Enter Address" />
+                                                {errors.address && <div className="text-danger">{errors.address}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group students-up-files">
                                                 <label>
-                                                    Upload Student Photo (150px
-                                                    X 150px){" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Upload Student Photo (150px X 150px) <span className="login-danger">*</span>
                                                 </label>{" "}
-                                                <input
-                                                    type="file"
-                                                    className="form-control"
-                                                    name="avatar"
-                                                    accept="image/*"
-                                                    onChange={handleChange}
-                                                />{" "}
-                                                {errors.avatar && (
-                                                    <div className="text-danger">
-                                                        {errors.avatar}
-                                                    </div>
-                                                )}
+                                                <input type="file" className="form-control" name="avatar" accept="image/*" onChange={handleChange} />{" "}
+                                                {errors.avatar && <div className="text-danger">{errors.avatar}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12">
                                             <h5 className="form-title">
-                                                <span>
-                                                    Create login accounts for
-                                                    teacher
-                                                </span>
+                                                <span>Create login accounts for teacher</span>
                                             </h5>
                                         </div>
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms password-input-container">
                                                 <label>
-                                                    Password{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Password <span className="login-danger">*</span>
                                                 </label>
                                                 <div className="password-input">
                                                     <input
                                                         type={passwordInputType}
                                                         className="form-control"
                                                         name="password"
-                                                        value={
-                                                            formTeacher.password
-                                                        }
+                                                        value={formTeacher.password}
                                                         onChange={handleChange}
                                                         placeholder="Enter Password"
                                                     />
-                                                    <span
-                                                        className={`password-toggle-icon ${
-                                                            showPassword
-                                                                ? "show"
-                                                                : "hide"
-                                                        }`}
-                                                        onClick={
-                                                            togglePasswordVisibility
-                                                        }
-                                                    >
-                                                        {showPassword ? (
-                                                            <i className="fa fa-eye-slash"></i>
-                                                        ) : (
-                                                            <i className="fa fa-eye"></i>
-                                                        )}
+                                                    <span className={`password-toggle-icon ${showPassword ? "show" : "hide"}`} onClick={togglePasswordVisibility}>
+                                                        {showPassword ? <i className="fa fa-eye-slash"></i> : <i className="fa fa-eye"></i>}
                                                     </span>
                                                 </div>
-                                                {errors.password && (
-                                                    <div className="text-danger">
-                                                        {errors.password}
-                                                    </div>
-                                                )}
+                                                {errors.password && <div className="text-danger">{errors.password}</div>}
                                             </div>
                                         </div>
 
                                         <div className="col-12">
                                             <div className="student-submit">
-                                                <button
-                                                    type="submit"
-                                                    className="btn btn-primary"
-                                                >
+                                                <button type="submit" className="btn btn-primary">
                                                     Submit
                                                 </button>
                                             </div>

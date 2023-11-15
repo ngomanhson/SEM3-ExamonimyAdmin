@@ -3,7 +3,16 @@ import api from "../../services/api";
 import url from "../../services/url";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import Loading from "../../layouts/loading";
 function Classes_Create() {
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    });
+
     const [formClass, setFormClass] = useState({
         name: "",
         room: "",
@@ -55,9 +64,7 @@ function Classes_Create() {
     };
 
     const showNotification = (type, message) => {
-        const notificationContainer = document.getElementById(
-            "notification-container"
-        );
+        const notificationContainer = document.getElementById("notification-container");
         const notification = document.createElement("div");
         notification.className = `alert alert-${type}`;
         notification.textContent = message;
@@ -75,10 +82,7 @@ function Classes_Create() {
                 const rs = await api.post(url.CLASS.CREATE, formClass);
                 showNotification("success", "Class created successfully!");
             } catch (error) {
-                if (
-                    error.response.status === 400 &&
-                    error.response.data === "Class name already exists"
-                ) {
+                if (error.response.status === 400 && error.response.data === "Class name already exists") {
                     setNameExistsError("The class name already exists");
                 } else {
                     // showNotification("danger", "Failed to create class.");
@@ -106,6 +110,7 @@ function Classes_Create() {
 
     return (
         <>
+            {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Class | Examonimy</title>
             </Helmet>
@@ -134,102 +139,44 @@ function Classes_Create() {
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Class Name{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Class Name <span className="login-danger">*</span>
                                                 </label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    name="name"
-                                                    value={formClass.name}
-                                                    onChange={handleChange}
-                                                />
-                                                {errors.name && (
-                                                    <div className="text-danger">
-                                                        {errors.name}
-                                                    </div>
-                                                )}
-                                                {nameExistsError && (
-                                                    <div className="text-danger">
-                                                        {nameExistsError}
-                                                    </div>
-                                                )}
+                                                <input type="text" className="form-control" name="name" value={formClass.name} onChange={handleChange} />
+                                                {errors.name && <div className="text-danger">{errors.name}</div>}
+                                                {nameExistsError && <div className="text-danger">{nameExistsError}</div>}
                                             </div>
                                         </div>
 
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Room{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Room <span className="login-danger">*</span>
                                                 </label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    name="room"
-                                                    value={formClass.room}
-                                                    onChange={handleChange}
-                                                />
-                                                {errors.room && (
-                                                    <div className="text-danger">
-                                                        {errors.room}
-                                                    </div>
-                                                )}
+                                                <input type="text" className="form-control" name="room" value={formClass.room} onChange={handleChange} />
+                                                {errors.room && <div className="text-danger">{errors.room}</div>}
                                             </div>
                                         </div>
 
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Teacher{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Teacher <span className="login-danger">*</span>
                                                 </label>
-                                                <select
-                                                    className="form-control select"
-                                                    name="teacher_id"
-                                                    value={formClass.teacher_id}
-                                                    onChange={handleChange}
-                                                >
-                                                    <option value="">
-                                                        Please select teacher
-                                                    </option>
-                                                    {teacher.map(
-                                                        (classItem) => (
-                                                            <option
-                                                                key={
-                                                                    classItem.id
-                                                                }
-                                                                value={
-                                                                    classItem.id
-                                                                }
-                                                            >
-                                                                {
-                                                                    classItem.fullname
-                                                                }
-                                                            </option>
-                                                        )
-                                                    )}
+                                                <select className="form-control select" name="teacher_id" value={formClass.teacher_id} onChange={handleChange}>
+                                                    <option value="">Please select teacher</option>
+                                                    {teacher.map((classItem) => (
+                                                        <option key={classItem.id} value={classItem.id}>
+                                                            {classItem.fullname}
+                                                        </option>
+                                                    ))}
                                                 </select>
 
-                                                {errors.teacher_id && (
-                                                    <div className="text-danger">
-                                                        {errors.teacher_id}
-                                                    </div>
-                                                )}
+                                                {errors.teacher_id && <div className="text-danger">{errors.teacher_id}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12">
                                             <div className="student-submit">
-                                                <button
-                                                    type="submit"
-                                                    className="btn btn-primary"
-                                                >
+                                                <button type="submit" className="btn btn-primary">
                                                     Submit
                                                 </button>
                                             </div>

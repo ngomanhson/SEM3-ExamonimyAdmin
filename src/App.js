@@ -33,6 +33,7 @@ import Test_View from "./components/pages/exam/test/test-view";
 import Test_View_Essay from "./components/pages/exam/test/test-view-essay";
 import ForgotPassword from "./components/pages/auth/forgot-password";
 import ResetPassword from "./components/pages/auth/reset-password";
+import NotFound from "./components/pages/other/not-found";
 function App() {
     const ProtectedRoute = ({ element }) => {
         const token = localStorage.getItem("accessToken");
@@ -213,6 +214,11 @@ function App() {
                 <Route
                     path="/reset-password/:resetToken"
                     element={<ProtectedLoginRoute element={<ResetPassword />} />}
+                />
+
+                <Route 
+                    path="*" 
+                    element={<ProtectedRoute element={<NotFound />} />} 
                 />
             </Routes>
         </div>
