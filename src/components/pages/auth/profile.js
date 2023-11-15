@@ -7,12 +7,21 @@ import Change_Password from "./changepassword";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import Loading from "../../layouts/loading";
 function Profile() {
     const [info, setInfo] = useState({});
     const [isEditing, setIsEditing] = useState(false);
     const [editedInfo, setEditedInfo] = useState({});
     const [avatarFile, setAvatarFile] = useState(null);
     const [avatarPreview, setAvatarPreview] = useState(null);
+
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    });
 
     const loadProfile = async () => {
         const userToken = localStorage.getItem("accessToken");
@@ -131,6 +140,7 @@ function Profile() {
     }, []);
     return (
         <>
+            {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Profile | Examonimy</title>
             </Helmet>

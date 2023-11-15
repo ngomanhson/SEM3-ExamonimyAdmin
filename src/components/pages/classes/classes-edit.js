@@ -4,17 +4,23 @@ import api from "../../services/api";
 import url from "../../services/url";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import Loading from "../../layouts/loading";
 function Classes_Edit() {
     const { slug } = useParams();
     const [classData, setClassData] = useState({});
-    const [isLoading, setIsLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    });
     const [teacher, setTeachers] = useState([]);
 
     useEffect(() => {
         api.get(`${url.CLASS.DETAIL}?slug=${slug}`)
             .then((response) => {
                 setClassData(response.data);
-                setIsLoading(false);
             })
             .catch((error) => {
                 console.error("Error fetching class details:", error);
@@ -65,9 +71,7 @@ function Classes_Edit() {
     };
 
     const showNotification = (type, message) => {
-        const notificationContainer = document.getElementById(
-            "notification-container"
-        );
+        const notificationContainer = document.getElementById("notification-container");
         const notification = document.createElement("div");
         notification.className = `alert alert-${type}`;
         notification.textContent = message;
@@ -82,16 +86,10 @@ function Classes_Edit() {
         e.preventDefault();
         if (validateForm()) {
             try {
-                const rs = await api.put(
-                    `${url.CLASS.EDIT}?id=${classData.id}`,
-                    classData
-                );
+                const rs = await api.put(`${url.CLASS.EDIT}?id=${classData.id}`, classData);
                 showNotification("success", "Class updated successfully!");
             } catch (error) {
-                if (
-                    error.response.status === 400 &&
-                    error.response.data === "Class name already exists"
-                ) {
+                if (error.response.status === 400 && error.response.data === "Class name already exists") {
                     setNameExistsError("The class name already exists");
                 } else {
                 }
@@ -112,6 +110,7 @@ function Classes_Edit() {
 
     return (
         <>
+            {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Class | Examonimy</title>
             </Helmet>
@@ -140,10 +139,7 @@ function Classes_Edit() {
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Class Name{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Class Name <span className="login-danger">*</span>
                                                 </label>
                                                 <input
                                                     type="text"
@@ -152,31 +148,19 @@ function Classes_Edit() {
                                                     onChange={(e) =>
                                                         setClassData({
                                                             ...classData,
-                                                            name: e.target
-                                                                .value,
+                                                            name: e.target.value,
                                                         })
                                                     }
                                                 />
-                                                {errors.name && (
-                                                    <div className="text-danger">
-                                                        {errors.name}
-                                                    </div>
-                                                )}
-                                                {nameExistsError && (
-                                                    <div className="text-danger">
-                                                        {nameExistsError}
-                                                    </div>
-                                                )}
+                                                {errors.name && <div className="text-danger">{errors.name}</div>}
+                                                {nameExistsError && <div className="text-danger">{nameExistsError}</div>}
                                             </div>
                                         </div>
 
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Room{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Room <span className="login-danger">*</span>
                                                 </label>
                                                 <input
                                                     type="text"
@@ -185,26 +169,18 @@ function Classes_Edit() {
                                                     onChange={(e) =>
                                                         setClassData({
                                                             ...classData,
-                                                            room: e.target
-                                                                .value,
+                                                            room: e.target.value,
                                                         })
                                                     }
                                                 />
-                                                {errors.room && (
-                                                    <div className="text-danger">
-                                                        {errors.room}
-                                                    </div>
-                                                )}
+                                                {errors.room && <div className="text-danger">{errors.room}</div>}
                                             </div>
                                         </div>
 
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Teacher{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Teacher <span className="login-danger">*</span>
                                                 </label>
                                                 <select
                                                     className="form-control select"
@@ -213,45 +189,24 @@ function Classes_Edit() {
                                                     onChange={(e) =>
                                                         setClassData({
                                                             ...classData,
-                                                            teacher_id:
-                                                                e.target.value,
+                                                            teacher_id: e.target.value,
                                                         })
                                                     }
                                                 >
-                                                    <option value="">
-                                                        Please select teacher
-                                                    </option>
-                                                    {teacher.map(
-                                                        (classItem) => (
-                                                            <option
-                                                                key={
-                                                                    classItem.id
-                                                                }
-                                                                value={
-                                                                    classItem.id
-                                                                }
-                                                            >
-                                                                {
-                                                                    classItem.fullname
-                                                                }
-                                                            </option>
-                                                        )
-                                                    )}
+                                                    <option value="">Please select teacher</option>
+                                                    {teacher.map((classItem) => (
+                                                        <option key={classItem.id} value={classItem.id}>
+                                                            {classItem.fullname}
+                                                        </option>
+                                                    ))}
                                                 </select>
-                                                {errors.teacher_id && (
-                                                    <div className="text-danger">
-                                                        {errors.teacher_id}
-                                                    </div>
-                                                )}
+                                                {errors.teacher_id && <div className="text-danger">{errors.teacher_id}</div>}
                                             </div>
                                         </div>
 
                                         <div className="col-12">
                                             <div className="student-submit">
-                                                <button
-                                                    type="submit"
-                                                    className="btn btn-primary"
-                                                >
+                                                <button type="submit" className="btn btn-primary">
                                                     Update
                                                 </button>
                                             </div>

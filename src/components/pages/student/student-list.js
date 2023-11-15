@@ -5,20 +5,28 @@ import { format } from "date-fns";
 import { NavLink } from "react-router-dom";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import Loading from "../../layouts/loading";
 function Student_List() {
     const [students, setStudents] = useState([]);
     const [classNames, setClassNames] = useState({});
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [studentsPerPage] = useState(20);
+
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    });
+
     //hiển thị danh sách sinh viên
     const loadStudents = async () => {
         try {
             const response = await api.get(url.STUDENT.LIST);
             // Filter out students with deleteAt not equal to null
-            const filteredStudents = response.data.filter(
-                (student) => student.deleteAt === null
-            );
+            const filteredStudents = response.data.filter((student) => student.deleteAt === null);
             setStudents(filteredStudents);
         } catch (error) {
             setError("Failed to load students.");
@@ -41,15 +49,11 @@ function Student_List() {
 
     //xử lý xoá sinh viên
     const handleDeleteStudent = async (id) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this student?"
-        );
+        const confirmed = window.confirm("Are you sure you want to delete this student?");
         if (confirmed) {
             try {
                 await api.delete(`${url.STUDENT.DELETE}?id=${id}`);
-                setStudents((prevStudents) =>
-                    prevStudents.filter((student) => student.id !== id)
-                );
+                setStudents((prevStudents) => prevStudents.filter((student) => student.id !== id));
             } catch (error) {
                 console.error("Failed to delete student:", error);
             }
@@ -59,10 +63,7 @@ function Student_List() {
     //paginate
     const indexOfLastStudent = currentPage * studentsPerPage;
     const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-    const currentStudents = students.slice(
-        indexOfFirstStudent,
-        indexOfLastStudent
-    );
+    const currentStudents = students.slice(indexOfFirstStudent, indexOfLastStudent);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -72,6 +73,7 @@ function Student_List() {
     }, []);
     return (
         <>
+            {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Student | Examonimy</title>
             </Helmet>
@@ -90,29 +92,17 @@ function Student_List() {
                     <div className="row">
                         <div className="col-lg-3 col-md-6">
                             <div className="form-group">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Search by ID ..."
-                                />
+                                <input type="text" className="form-control" placeholder="Search by ID ..." />
                             </div>
                         </div>
                         <div className="col-lg-3 col-md-6">
                             <div className="form-group">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Search by Name ..."
-                                />
+                                <input type="text" className="form-control" placeholder="Search by Name ..." />
                             </div>
                         </div>
                         <div className="col-lg-4 col-md-6">
                             <div className="form-group">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Search by Phone ..."
-                                />
+                                <input type="text" className="form-control" placeholder="Search by Phone ..." />
                             </div>
                         </div>
                         <div className="col-lg-2">
@@ -131,29 +121,16 @@ function Student_List() {
                                 <div className="page-header">
                                     <div className="row align-items-center">
                                         <div className="col">
-                                            <h3 className="page-title">
-                                                Students
-                                            </h3>
+                                            <h3 className="page-title">Students</h3>
                                         </div>
                                         <div className="col-auto text-end float-end ms-auto download-grp">
-                                           
-                                            <a
-                                                href=""
-                                                className="btn btn-outline-gray me-2"
-                                            >
-                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                            <a href="" className="btn btn-outline-gray me-2">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
                                             </a>
-                                            <a
-                                                href=""
-                                                className="btn btn-outline-primary me-2"
-                                            >
-                                                <i className="fas fa-download"></i>{" "}
-                                                Download
+                                            <a href="" className="btn btn-outline-primary me-2">
+                                                <i className="fas fa-download"></i> Download
                                             </a>
-                                            <NavLink
-                                                to="/student-create"
-                                                className="btn btn-primary"
-                                            >
+                                            <NavLink to="/student-create" className="btn btn-primary">
                                                 <i className="fas fa-plus"></i>
                                             </NavLink>
                                         </div>
@@ -166,11 +143,7 @@ function Student_List() {
                                             <tr>
                                                 <th>
                                                     <div className="form-check check-tables">
-                                                        <input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            value="something"
-                                                        />
+                                                        <input className="form-check-input" type="checkbox" value="something" />
                                                     </div>
                                                 </th>
                                                 <th>Student Code</th>
@@ -181,109 +154,49 @@ function Student_List() {
                                                 <th>Gender</th>
                                                 <th>Address</th>
                                                 <th>Class</th>
-                                                <th className="text-end">
-                                                    Action
-                                                </th>
+                                                <th className="text-end">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {currentStudents.map(
-                                                (item, index) => {
-                                                    return (
-                                                        <tr>
-                                                            <td>
-                                                                <div className="form-check check-tables">
-                                                                    <input
-                                                                        className="form-check-input"
-                                                                        type="checkbox"
-                                                                        value="something"
-                                                                    />
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                {
-                                                                    item.student_code
-                                                                }
-                                                            </td>
-                                                            <td>
-                                                                <h2 className="table-avatar">
-                                                                    <a
-                                                                        href="student-details.html"
-                                                                        className="avatar avatar-sm me-2"
-                                                                    >
-                                                                        <img
-                                                                            className="avatar-img rounded-circle"
-                                                                            src={
-                                                                                item.avatar
-                                                                            }
-                                                                            alt="User Image"
-                                                                        />
-                                                                    </a>
-                                                                    <a href="student-details.html">
-                                                                        {
-                                                                            item.fullname
-                                                                        }
-                                                                    </a>
-                                                                </h2>
-                                                            </td>
-                                                            <td>
-                                                                {format(
-                                                                    new Date(
-                                                                        item.birthday
-                                                                    ),
-                                                                    "yyyy-MM-dd"
-                                                                )}
-                                                            </td>
-                                                            <td>
-                                                                {item.email}
-                                                            </td>
-                                                            <td>
-                                                                {item.phone}
-                                                            </td>
-                                                            <td>
-                                                                {item.gender}
-                                                            </td>
-                                                            <td>
-                                                                {item.address}
-                                                            </td>
-                                                            <td>
-                                                                {
-                                                                    classNames[
-                                                                        item
-                                                                            .class_id
-                                                                    ]
-                                                                }
-                                                            </td>
-                                                            <td className="text-end">
-                                                                <div className="actions">
-                                                                    <a
-                                                                        href="javascript:;"
-                                                                        className="btn btn-sm bg-success-light me-2"
-                                                                    >
-                                                                        <i className="feather-eye"></i>
-                                                                    </a>
-                                                                    <NavLink
-                                                                        to={`/student-edit/${item.student_code}`}
-                                                                        className="btn btn-sm bg-danger-light"
-                                                                    >
-                                                                        <i className="feather-edit"></i>
-                                                                    </NavLink>
-                                                                    <NavLink
-                                                                        onClick={() =>
-                                                                            handleDeleteStudent(
-                                                                                item.id
-                                                                            )
-                                                                        }
-                                                                        className="btn btn-sm bg-danger-light"
-                                                                    >
-                                                                        <i className="feather-trash"></i>
-                                                                    </NavLink>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                }
-                                            )}
+                                            {currentStudents.map((item, index) => {
+                                                return (
+                                                    <tr>
+                                                        <td>
+                                                            <div className="form-check check-tables">
+                                                                <input className="form-check-input" type="checkbox" value="something" />
+                                                            </div>
+                                                        </td>
+                                                        <td>{item.student_code}</td>
+                                                        <td>
+                                                            <h2 className="table-avatar">
+                                                                <a href="student-details.html" className="avatar avatar-sm me-2">
+                                                                    <img className="avatar-img rounded-circle" src={item.avatar} alt="User Image" />
+                                                                </a>
+                                                                <a href="student-details.html">{item.fullname}</a>
+                                                            </h2>
+                                                        </td>
+                                                        <td>{format(new Date(item.birthday), "yyyy-MM-dd")}</td>
+                                                        <td>{item.email}</td>
+                                                        <td>{item.phone}</td>
+                                                        <td>{item.gender}</td>
+                                                        <td>{item.address}</td>
+                                                        <td>{classNames[item.class_id]}</td>
+                                                        <td className="text-end">
+                                                            <div className="actions">
+                                                                <a href="javascript:;" className="btn btn-sm bg-success-light me-2">
+                                                                    <i className="feather-eye"></i>
+                                                                </a>
+                                                                <NavLink to={`/student-edit/${item.student_code}`} className="btn btn-sm bg-danger-light">
+                                                                    <i className="feather-edit"></i>
+                                                                </NavLink>
+                                                                <NavLink onClick={() => handleDeleteStudent(item.id)} className="btn btn-sm bg-danger-light">
+                                                                    <i className="feather-trash"></i>
+                                                                </NavLink>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
                                         </tbody>
                                     </table>
                                 </div>
@@ -296,50 +209,25 @@ function Student_List() {
                     <div className="col">
                         <ul className="pagination mb-4">
                             <li className="page-item">
-                                <button
-                                    className="page-link"
-                                    onClick={() => paginate(currentPage - 1)}
-                                    disabled={currentPage === 1}
-                                >
+                                <button className="page-link" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
                                     Previous
                                 </button>
                             </li>
 
                             {Array.from(
                                 {
-                                    length: Math.ceil(
-                                        students.length / studentsPerPage
-                                    ),
+                                    length: Math.ceil(students.length / studentsPerPage),
                                 },
                                 (_, i) => (
-                                    <li
-                                        key={i}
-                                        className={`page-item ${
-                                            i + 1 === currentPage
-                                                ? "active"
-                                                : ""
-                                        }`}
-                                    >
-                                        <button
-                                            className="page-link"
-                                            onClick={() => paginate(i + 1)}
-                                        >
+                                    <li key={i} className={`page-item ${i + 1 === currentPage ? "active" : ""}`}>
+                                        <button className="page-link" onClick={() => paginate(i + 1)}>
                                             {i + 1}
                                         </button>
                                     </li>
                                 )
                             )}
                             <li className="page-item">
-                                <button
-                                    className="page-link"
-                                    onClick={() => paginate(currentPage + 1)}
-                                    disabled={
-                                        currentPage ===
-                                        Math.ceil(
-                                            students.length / studentsPerPage
-                                        )
-                                    }
-                                >
+                                <button className="page-link" onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(students.length / studentsPerPage)}>
                                     Next
                                 </button>
                             </li>

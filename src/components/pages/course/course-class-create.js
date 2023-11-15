@@ -8,6 +8,7 @@ import api from "../../services/api";
 import url from "../../services/url";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import Loading from "../../layouts/loading";
 function Course_Class_Create() {
     const animatedComponents = makeAnimated();
     const [isClearable, setIsClearable] = useState(true);
@@ -20,6 +21,15 @@ function Course_Class_Create() {
     const day = today.getDate().toString().padStart(2, "0");
     const currentTime = "00:00";
     const todayDateTimeLocal = `${year}-${month}-${day}T${currentTime}`; //chỉ cho người dùng chọn từ ngay hôm nay trở đi
+
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    });
+
     const [formCourseClass, setFormCourseClass] = useState({
         course_id: "",
         class_id: "",
@@ -119,10 +129,7 @@ function Course_Class_Create() {
         e.preventDefault();
         if (validateForm()) {
             try {
-                const rs = await api.post(
-                    url.ClassCourse.CREATE,
-                    formCourseClass
-                );
+                const rs = await api.post(url.ClassCourse.CREATE, formCourseClass);
                 toast.success("Add course with class successful.", {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 5000,
@@ -140,6 +147,7 @@ function Course_Class_Create() {
     };
     return (
         <>
+            {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Course | Examonimy</title>
             </Helmet>
@@ -156,14 +164,10 @@ function Course_Class_Create() {
                     <div class="col-md-9">
                         <ul class="list-links mb-4">
                             <li>
-                                <NavLink to="/course-create">
-                                    Create Course
-                                </NavLink>
+                                <NavLink to="/course-create">Create Course</NavLink>
                             </li>
                             <li className="active">
-                                <NavLink to="">
-                                    Create Course with Class
-                                </NavLink>
+                                <NavLink to="">Create Course with Class</NavLink>
                             </li>
                         </ul>
                     </div>
@@ -174,9 +178,7 @@ function Course_Class_Create() {
                         <div class="col-sm-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h5 class="card-title">
-                                        Information Course Of Class
-                                    </h5>
+                                    <h5 class="card-title">Information Course Of Class</h5>
                                 </div>
                                 <div class="card-body">
                                     <div className="row">
@@ -186,20 +188,12 @@ function Course_Class_Create() {
                                                 options={optionsCourse}
                                                 isSearchable={isSearchable}
                                                 isClearable={isClearable}
-                                                value={optionsCourse.find(
-                                                    (option) =>
-                                                        option.value ===
-                                                        formCourseClass.course_id
-                                                )}
+                                                value={optionsCourse.find((option) => option.value === formCourseClass.course_id)}
                                                 onChange={handleChangeCourse}
                                                 name="course_id"
                                                 placeholder="Select Course"
                                             />
-                                            {errors.course_id && (
-                                                <div className="text-danger">
-                                                    {errors.course_id}
-                                                </div>
-                                            )}
+                                            {errors.course_id && <div className="text-danger">{errors.course_id}</div>}
                                         </div>
                                         <div className="form-group col-12 col-sm-6">
                                             <label>Class</label>
@@ -207,20 +201,12 @@ function Course_Class_Create() {
                                                 options={optionsClasses}
                                                 isSearchable={isSearchable}
                                                 isClearable={isClearable}
-                                                value={optionsClasses.find(
-                                                    (option) =>
-                                                        option.value ===
-                                                        formCourseClass.classes_id
-                                                )}
+                                                value={optionsClasses.find((option) => option.value === formCourseClass.classes_id)}
                                                 onChange={hanldeChangeClasses}
                                                 name="class_id"
                                                 placeholder="Select Class..."
                                             />
-                                            {errors.class_id && (
-                                                <div className="text-danger">
-                                                    {errors.class_id}
-                                                </div>
-                                            )}
+                                            {errors.class_id && <div className="text-danger">{errors.class_id}</div>}
                                         </div>
                                         <div class="form-group col-12 col-sm-6">
                                             <label>Start Date Time</label>
@@ -228,17 +214,11 @@ function Course_Class_Create() {
                                                 className="form-control"
                                                 type="datetime-local"
                                                 name="start_date"
-                                                value={
-                                                    formCourseClass.start_date
-                                                }
+                                                value={formCourseClass.start_date}
                                                 onChange={handleChange}
                                                 min={todayDateTimeLocal}
                                             />
-                                            {errors.start_date && (
-                                                <div className="text-danger">
-                                                    {errors.start_date}
-                                                </div>
-                                            )}
+                                            {errors.start_date && <div className="text-danger">{errors.start_date}</div>}
                                         </div>
                                         <div class="form-group col-12 col-sm-6">
                                             <label>End Date Time</label>
@@ -250,17 +230,10 @@ function Course_Class_Create() {
                                                 onChange={handleChange}
                                                 min={formCourseClass.start_date}
                                             />
-                                            {errors.end_date && (
-                                                <div className="text-danger">
-                                                    {errors.end_date}
-                                                </div>
-                                            )}
+                                            {errors.end_date && <div className="text-danger">{errors.end_date}</div>}
                                         </div>
                                         <div className="text-end">
-                                            <button
-                                                type="submit"
-                                                className="btn btn-primary"
-                                            >
+                                            <button type="submit" className="btn btn-primary">
                                                 Add
                                             </button>
                                         </div>

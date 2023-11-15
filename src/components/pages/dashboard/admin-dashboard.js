@@ -1,8 +1,18 @@
+import { useEffect, useState } from "react";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import Loading from "../../layouts/loading";
 function Admin_Dashboard() {
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    });
     return (
         <>
+            {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Dashboard | Examonimy</title>
             </Helmet>
@@ -16,9 +26,7 @@ function Admin_Dashboard() {
                                     <li className="breadcrumb-item">
                                         <a href="index.html">Home</a>
                                     </li>
-                                    <li className="breadcrumb-item active">
-                                        Admin
-                                    </li>
+                                    <li className="breadcrumb-item active">Admin</li>
                                 </ul>
                             </div>
                         </div>
@@ -35,10 +43,7 @@ function Admin_Dashboard() {
                                         <h3>50055</h3>
                                     </div>
                                     <div className="db-icon">
-                                        <img
-                                            src="assets/img/icons/dash-icon-01.svg"
-                                            alt="Dashboard Icon"
-                                        />
+                                        <img src="assets/img/icons/dash-icon-01.svg" alt="Dashboard Icon" />
                                     </div>
                                 </div>
                             </div>
@@ -53,10 +58,7 @@ function Admin_Dashboard() {
                                         <h3>50+</h3>
                                     </div>
                                     <div className="db-icon">
-                                        <img
-                                            src="assets/img/icons/dash-icon-02.svg"
-                                            alt="Dashboard Icon"
-                                        />
+                                        <img src="assets/img/icons/dash-icon-02.svg" alt="Dashboard Icon" />
                                     </div>
                                 </div>
                             </div>
@@ -71,10 +73,7 @@ function Admin_Dashboard() {
                                         <h3>30+</h3>
                                     </div>
                                     <div className="db-icon">
-                                        <img
-                                            src="assets/img/icons/dash-icon-03.svg"
-                                            alt="Dashboard Icon"
-                                        />
+                                        <img src="assets/img/icons/dash-icon-03.svg" alt="Dashboard Icon" />
                                     </div>
                                 </div>
                             </div>
@@ -89,10 +88,7 @@ function Admin_Dashboard() {
                                         <h3>$505</h3>
                                     </div>
                                     <div className="db-icon">
-                                        <img
-                                            src="assets/img/icons/dash-icon-04.svg"
-                                            alt="Dashboard Icon"
-                                        />
+                                        <img src="assets/img/icons/dash-icon-04.svg" alt="Dashboard Icon" />
                                     </div>
                                 </div>
                             </div>
@@ -137,9 +133,7 @@ function Admin_Dashboard() {
                             <div className="card-header">
                                 <div className="row align-items-center">
                                     <div className="col-6">
-                                        <h5 className="card-title">
-                                            Number of Students
-                                        </h5>
+                                        <h5 className="card-title">Number of Students</h5>
                                     </div>
                                     <div className="col-6">
                                         <ul className="chart-list-out">
@@ -186,15 +180,9 @@ function Admin_Dashboard() {
                                             <tr>
                                                 <th>ID</th>
                                                 <th>Name</th>
-                                                <th className="text-center">
-                                                    Marks
-                                                </th>
-                                                <th className="text-center">
-                                                    Percentage
-                                                </th>
-                                                <th className="text-end">
-                                                    Year
-                                                </th>
+                                                <th className="text-center">Marks</th>
+                                                <th className="text-center">Percentage</th>
+                                                <th className="text-end">Year</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -204,21 +192,12 @@ function Admin_Dashboard() {
                                                 </td>
                                                 <td className="text-nowrap">
                                                     <a href="profile.html">
-                                                        <img
-                                                            className="rounded-circle"
-                                                            src="assets/img/profiles/avatar-02.jpg"
-                                                            width="25"
-                                                            alt="Star Students"
-                                                        />
+                                                        <img className="rounded-circle" src="assets/img/profiles/avatar-02.jpg" width="25" alt="Star Students" />
                                                         John Smith
                                                     </a>
                                                 </td>
-                                                <td className="text-center">
-                                                    1185
-                                                </td>
-                                                <td className="text-center">
-                                                    98%
-                                                </td>
+                                                <td className="text-center">1185</td>
+                                                <td className="text-center">98%</td>
                                                 <td className="text-end">
                                                     <div>2019</div>
                                                 </td>
@@ -229,21 +208,12 @@ function Admin_Dashboard() {
                                                 </td>
                                                 <td className="text-nowrap">
                                                     <a href="profile.html">
-                                                        <img
-                                                            className="rounded-circle"
-                                                            src="assets/img/profiles/avatar-01.jpg"
-                                                            width="25"
-                                                            alt="Star Students"
-                                                        />
+                                                        <img className="rounded-circle" src="assets/img/profiles/avatar-01.jpg" width="25" alt="Star Students" />
                                                         Jolie Hoskins
                                                     </a>
                                                 </td>
-                                                <td className="text-center">
-                                                    1195
-                                                </td>
-                                                <td className="text-center">
-                                                    99.5%
-                                                </td>
+                                                <td className="text-center">1195</td>
+                                                <td className="text-center">99.5%</td>
                                                 <td className="text-end">
                                                     <div>2018</div>
                                                 </td>
@@ -254,21 +224,12 @@ function Admin_Dashboard() {
                                                 </td>
                                                 <td className="text-nowrap">
                                                     <a href="profile.html">
-                                                        <img
-                                                            className="rounded-circle"
-                                                            src="assets/img/profiles/avatar-03.jpg"
-                                                            width="25"
-                                                            alt="Star Students"
-                                                        />
+                                                        <img className="rounded-circle" src="assets/img/profiles/avatar-03.jpg" width="25" alt="Star Students" />
                                                         Pennington Joy
                                                     </a>
                                                 </td>
-                                                <td className="text-center">
-                                                    1196
-                                                </td>
-                                                <td className="text-center">
-                                                    99.6%
-                                                </td>
+                                                <td className="text-center">1196</td>
+                                                <td className="text-center">99.6%</td>
                                                 <td className="text-end">
                                                     <div>2017</div>
                                                 </td>
@@ -279,21 +240,12 @@ function Admin_Dashboard() {
                                                 </td>
                                                 <td className="text-nowrap">
                                                     <a href="profile.html">
-                                                        <img
-                                                            className="rounded-circle"
-                                                            src="assets/img/profiles/avatar-04.jpg"
-                                                            width="25"
-                                                            alt="Star Students"
-                                                        />
+                                                        <img className="rounded-circle" src="assets/img/profiles/avatar-04.jpg" width="25" alt="Star Students" />
                                                         Millie Marsden
                                                     </a>
                                                 </td>
-                                                <td className="text-center">
-                                                    1187
-                                                </td>
-                                                <td className="text-center">
-                                                    98.2%
-                                                </td>
+                                                <td className="text-center">1187</td>
+                                                <td className="text-center">98.2%</td>
                                                 <td className="text-end">
                                                     <div>2016</div>
                                                 </td>
@@ -304,21 +256,12 @@ function Admin_Dashboard() {
                                                 </td>
                                                 <td className="text-nowrap">
                                                     <a href="profile.html">
-                                                        <img
-                                                            className="rounded-circle"
-                                                            src="assets/img/profiles/avatar-05.jpg"
-                                                            width="25"
-                                                            alt="Star Students"
-                                                        />
+                                                        <img className="rounded-circle" src="assets/img/profiles/avatar-05.jpg" width="25" alt="Star Students" />
                                                         John Smith
                                                     </a>
                                                 </td>
-                                                <td className="text-center">
-                                                    1185
-                                                </td>
-                                                <td className="text-center">
-                                                    98%
-                                                </td>
+                                                <td className="text-center">1185</td>
+                                                <td className="text-center">98%</td>
                                                 <td className="text-end">
                                                     <div>2015</div>
                                                 </td>
@@ -345,17 +288,11 @@ function Admin_Dashboard() {
                                 <div className="activity-groups">
                                     <div className="activity-awards">
                                         <div className="award-boxs">
-                                            <img
-                                                src="assets/img/icons/award-icon-01.svg"
-                                                alt="Award"
-                                            />
+                                            <img src="assets/img/icons/award-icon-01.svg" alt="Award" />
                                         </div>
                                         <div className="award-list-outs">
                                             <h4>1st place in "Chess”</h4>
-                                            <h5>
-                                                John Doe won 1st place in
-                                                "Chess"
-                                            </h5>
+                                            <h5>John Doe won 1st place in "Chess"</h5>
                                         </div>
                                         <div className="award-time-list">
                                             <span>1 Day ago</span>
@@ -363,17 +300,11 @@ function Admin_Dashboard() {
                                     </div>
                                     <div className="activity-awards">
                                         <div className="award-boxs">
-                                            <img
-                                                src="assets/img/icons/award-icon-02.svg"
-                                                alt="Award"
-                                            />
+                                            <img src="assets/img/icons/award-icon-02.svg" alt="Award" />
                                         </div>
                                         <div className="award-list-outs">
                                             <h4>Participated in "Carrom"</h4>
-                                            <h5>
-                                                Justin Lee participated in
-                                                "Carrom"
-                                            </h5>
+                                            <h5>Justin Lee participated in "Carrom"</h5>
                                         </div>
                                         <div className="award-time-list">
                                             <span>2 hours ago</span>
@@ -381,20 +312,11 @@ function Admin_Dashboard() {
                                     </div>
                                     <div className="activity-awards">
                                         <div className="award-boxs">
-                                            <img
-                                                src="assets/img/icons/award-icon-03.svg"
-                                                alt="Award"
-                                            />
+                                            <img src="assets/img/icons/award-icon-03.svg" alt="Award" />
                                         </div>
                                         <div className="award-list-outs">
-                                            <h4>
-                                                Internation conference in
-                                                "St.John School"
-                                            </h4>
-                                            <h5>
-                                                Justin Leeattended internation
-                                                conference in "St.John School"
-                                            </h5>
+                                            <h4>Internation conference in "St.John School"</h4>
+                                            <h5>Justin Leeattended internation conference in "St.John School"</h5>
                                         </div>
                                         <div className="award-time-list">
                                             <span>2 Week ago</span>
@@ -402,17 +324,11 @@ function Admin_Dashboard() {
                                     </div>
                                     <div className="activity-awards mb-0">
                                         <div className="award-boxs">
-                                            <img
-                                                src="assets/img/icons/award-icon-04.svg"
-                                                alt="Award"
-                                            />
+                                            <img src="assets/img/icons/award-icon-04.svg" alt="Award" />
                                         </div>
                                         <div className="award-list-outs">
                                             <h4>Won 1st place in "Chess"</h4>
-                                            <h5>
-                                                John Doe won 1st place in
-                                                "Chess"
-                                            </h5>
+                                            <h5>John Doe won 1st place in "Chess"</h5>
                                         </div>
                                         <div className="award-time-list">
                                             <span>3 Day ago</span>
@@ -432,10 +348,7 @@ function Admin_Dashboard() {
                                 <h6>50,095</h6>
                             </div>
                             <div className="social-boxs">
-                                <img
-                                    src="assets/img/icons/social-icon-01.svg"
-                                    alt="Social Icon"
-                                />
+                                <img src="assets/img/icons/social-icon-01.svg" alt="Social Icon" />
                             </div>
                         </div>
                     </div>
@@ -446,10 +359,7 @@ function Admin_Dashboard() {
                                 <h6>48,596</h6>
                             </div>
                             <div className="social-boxs">
-                                <img
-                                    src="assets/img/icons/social-icon-02.svg"
-                                    alt="Social Icon"
-                                />
+                                <img src="assets/img/icons/social-icon-02.svg" alt="Social Icon" />
                             </div>
                         </div>
                     </div>
@@ -460,10 +370,7 @@ function Admin_Dashboard() {
                                 <h6>52,085</h6>
                             </div>
                             <div className="social-boxs">
-                                <img
-                                    src="assets/img/icons/social-icon-03.svg"
-                                    alt="Social Icon"
-                                />
+                                <img src="assets/img/icons/social-icon-03.svg" alt="Social Icon" />
                             </div>
                         </div>
                     </div>
@@ -474,10 +381,7 @@ function Admin_Dashboard() {
                                 <h6>69,050</h6>
                             </div>
                             <div className="social-boxs">
-                                <img
-                                    src="assets/img/icons/social-icon-04.svg"
-                                    alt="Social Icon"
-                                />
+                                <img src="assets/img/icons/social-icon-04.svg" alt="Social Icon" />
                             </div>
                         </div>
                     </div>

@@ -7,8 +7,18 @@ import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import Loading from "../../layouts/loading";
 function Course_Create() {
     const navigate = useNavigate();
+
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    });
+
     const [formCourse, setFormCourse] = useState({
         name: "",
         course_code: "",
@@ -42,12 +52,10 @@ function Course_Create() {
             newErrors.course_code = "Please enter course code ";
             valid = false;
         } else if (formCourse.course_code.length < 3) {
-            newErrors.course_code =
-                "course_code must have at least 3 characters";
+            newErrors.course_code = "course_code must have at least 3 characters";
             valid = false;
         } else if (formCourse.course_code.length > 50) {
-            newErrors.course_code =
-                "course_code must be less than 50 characters";
+            newErrors.course_code = "course_code must be less than 50 characters";
             valid = false;
         }
 
@@ -60,21 +68,15 @@ function Course_Create() {
         if (validateForm()) {
             try {
                 const rs = await api.post(url.COURSE.CREATE, formCourse);
-                toast.success(
-                    "To successfully create a course, continue to choose the class for the course.",
-                    {
-                        position: toast.POSITION.TOP_RIGHT,
-                        autoClose: 5000,
-                    }
-                );
+                toast.success("To successfully create a course, continue to choose the class for the course.", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 5000,
+                });
                 setTimeout(() => {
                     navigate(`/course-class-create`); //chuyển đến trang course-class
                 }, 5000);
             } catch (error) {
-                if (
-                    error.response.status === 400 &&
-                    error.response.data === "Course code already exists"
-                ) {
+                if (error.response.status === 400 && error.response.data === "Course code already exists") {
                     setCourseCodeExistsError("The course code already exists");
                 } else {
                 }
@@ -90,6 +92,7 @@ function Course_Create() {
 
     return (
         <>
+            {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Course | Examonimy</title>
             </Helmet>
@@ -109,9 +112,7 @@ function Course_Create() {
                                 <NavLink to="">Create Course</NavLink>
                             </li>
                             <li>
-                                <NavLink to="/course-class-create">
-                                    Create Course with Class
-                                </NavLink>
+                                <NavLink to="/course-class-create">Create Course with Class</NavLink>
                             </li>
                         </ul>
                     </div>
@@ -131,60 +132,25 @@ function Course_Create() {
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Course Name{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Course Name <span className="login-danger">*</span>
                                                 </label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    name="name"
-                                                    value={formCourse.name}
-                                                    onChange={handleChange}
-                                                />
-                                                {errors.name && (
-                                                    <div className="text-danger">
-                                                        {errors.name}
-                                                    </div>
-                                                )}
+                                                <input type="text" className="form-control" name="name" value={formCourse.name} onChange={handleChange} />
+                                                {errors.name && <div className="text-danger">{errors.name}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>
-                                                    Course Code{" "}
-                                                    <span className="login-danger">
-                                                        *
-                                                    </span>
+                                                    Course Code <span className="login-danger">*</span>
                                                 </label>
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    name="course_code"
-                                                    value={
-                                                        formCourse.course_code
-                                                    }
-                                                    onChange={handleChange}
-                                                />
-                                                {errors.course_code && (
-                                                    <div className="text-danger">
-                                                        {errors.course_code}
-                                                    </div>
-                                                )}
-                                                {courseCodeExistsError && (
-                                                    <div className="text-danger">
-                                                        {errors.name}
-                                                    </div>
-                                                )}
+                                                <input type="text" className="form-control" name="course_code" value={formCourse.course_code} onChange={handleChange} />
+                                                {errors.course_code && <div className="text-danger">{errors.course_code}</div>}
+                                                {courseCodeExistsError && <div className="text-danger">{errors.name}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12">
                                             <div className="student-submit">
-                                                <button
-                                                    type="submit"
-                                                    className="btn btn-primary"
-                                                >
+                                                <button type="submit" className="btn btn-primary">
                                                     Create Course
                                                 </button>
                                             </div>

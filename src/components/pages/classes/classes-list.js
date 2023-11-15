@@ -4,12 +4,21 @@ import url from "../../services/url";
 import { NavLink } from "react-router-dom";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import Loading from "../../layouts/loading";
 function Classes_List() {
     const [classes, setClasses] = useState([]);
     const [teacherNames, setTeacherNames] = useState({});
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [classesPerPage] = useState(10);
+
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    });
 
     //hiển thị danh sách lớp
     const loadClasses = async () => {
@@ -23,9 +32,7 @@ function Classes_List() {
 
     //thông báo
     const showNotification = (type, message) => {
-        const notificationContainer = document.getElementById(
-            "notification-container"
-        );
+        const notificationContainer = document.getElementById("notification-container");
         const notification = document.createElement("div");
         notification.className = `alert alert-${type}`;
         notification.textContent = message;
@@ -38,9 +45,7 @@ function Classes_List() {
 
     //xử lý xoá lớp học
     const handleDeleteClass = (id) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this class?"
-        );
+        const confirmed = window.confirm("Are you sure you want to delete this class?");
         if (confirmed) {
             deleteClass(id);
         }
@@ -51,10 +56,7 @@ function Classes_List() {
             await api.delete(`${url.CLASS.DELETE}?id=${id}`);
             setClasses(classes.filter((c) => c.id !== id));
         } catch (error) {
-            showNotification(
-                "danger",
-                "The class cannot be deleted because this class currently has students."
-            );
+            showNotification("danger", "The class cannot be deleted because this class currently has students.");
         }
     };
 
@@ -84,6 +86,7 @@ function Classes_List() {
     }, []);
     return (
         <>
+            {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Class | Examonimy</title>
             </Helmet>
@@ -100,29 +103,17 @@ function Classes_List() {
                     <div className="row">
                         <div className="col-lg-3 col-md-6">
                             <div className="form-group">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Search by ID ..."
-                                />
+                                <input type="text" className="form-control" placeholder="Search by ID ..." />
                             </div>
                         </div>
                         <div className="col-lg-3 col-md-6">
                             <div className="form-group">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Search by Name ..."
-                                />
+                                <input type="text" className="form-control" placeholder="Search by Name ..." />
                             </div>
                         </div>
                         <div className="col-lg-4 col-md-6">
                             <div className="form-group">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Search by Room ..."
-                                />
+                                <input type="text" className="form-control" placeholder="Search by Room ..." />
                             </div>
                         </div>
                         <div className="col-lg-2">
@@ -142,15 +133,10 @@ function Classes_List() {
                                 <div className="page-header">
                                     <div className="row align-items-center">
                                         <div className="col">
-                                            <h3 className="page-title">
-                                                Class
-                                            </h3>
+                                            <h3 className="page-title">Class</h3>
                                         </div>
                                         <div className="col-auto text-end float-end ms-auto download-grp">
-                                            <NavLink
-                                                to="/class-create"
-                                                className="btn btn-primary"
-                                            >
+                                            <NavLink to="/class-create" className="btn btn-primary">
                                                 <i className="fas fa-plus"></i>
                                             </NavLink>
                                         </div>
@@ -164,11 +150,7 @@ function Classes_List() {
                                         <tr>
                                             <th>
                                                 <div className="form-check check-tables">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        value="something"
-                                                    />
+                                                    <input className="form-check-input" type="checkbox" value="something" />
                                                 </div>
                                             </th>
                                             <th>Ordinal</th>
@@ -184,45 +166,22 @@ function Classes_List() {
                                                 <tr>
                                                     <td>
                                                         <div className="form-check check-tables">
-                                                            <input
-                                                                className="form-check-input"
-                                                                type="checkbox"
-                                                                value="something"
-                                                            />
+                                                            <input className="form-check-input" type="checkbox" value="something" />
                                                         </div>
                                                     </td>
                                                     <td>{index + 1}</td>
                                                     <td>{item.name}</td>
                                                     <td>{item.room}</td>
-                                                    <td>
-                                                        {
-                                                            teacherNames[
-                                                                item.teacher_id
-                                                            ]
-                                                        }
-                                                    </td>
+                                                    <td>{teacherNames[item.teacher_id]}</td>
                                                     <td className="text-end">
                                                         <div className="actions">
-                                                            <NavLink
-                                                                to={`/student-of-class-list/${item.id}`}
-                                                                className="btn btn-sm bg-success-light me-2"
-                                                            >
+                                                            <NavLink to={`/student-of-class-list/${item.id}`} className="btn btn-sm bg-success-light me-2">
                                                                 <i className="feather-eye"></i>
                                                             </NavLink>
-                                                            <NavLink
-                                                                to={`/classes-edit/${item.slug}`}
-                                                                className="btn btn-sm bg-danger-light"
-                                                            >
+                                                            <NavLink to={`/classes-edit/${item.slug}`} className="btn btn-sm bg-danger-light">
                                                                 <i className="feather-edit"></i>
                                                             </NavLink>
-                                                            <NavLink
-                                                                onClick={() =>
-                                                                    handleDeleteClass(
-                                                                        item.id
-                                                                    )
-                                                                }
-                                                                className="btn btn-sm bg-danger-light"
-                                                            >
+                                                            <NavLink onClick={() => handleDeleteClass(item.id)} className="btn btn-sm bg-danger-light">
                                                                 <i className="feather-trash"></i>
                                                             </NavLink>
                                                         </div>
@@ -241,50 +200,25 @@ function Classes_List() {
                     <div className="col">
                         <ul className="pagination mb-4">
                             <li className="page-item">
-                                <button
-                                    className="page-link"
-                                    onClick={() => paginate(currentPage - 1)}
-                                    disabled={currentPage === 1}
-                                >
+                                <button className="page-link" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
                                     Previous
                                 </button>
                             </li>
 
                             {Array.from(
                                 {
-                                    length: Math.ceil(
-                                        classes.length / classesPerPage
-                                    ),
+                                    length: Math.ceil(classes.length / classesPerPage),
                                 },
                                 (_, i) => (
-                                    <li
-                                        key={i}
-                                        className={`page-item ${
-                                            i + 1 === currentPage
-                                                ? "active"
-                                                : ""
-                                        }`}
-                                    >
-                                        <button
-                                            className="page-link"
-                                            onClick={() => paginate(i + 1)}
-                                        >
+                                    <li key={i} className={`page-item ${i + 1 === currentPage ? "active" : ""}`}>
+                                        <button className="page-link" onClick={() => paginate(i + 1)}>
                                             {i + 1}
                                         </button>
                                     </li>
                                 )
                             )}
                             <li className="page-item">
-                                <button
-                                    className="page-link"
-                                    onClick={() => paginate(currentPage + 1)}
-                                    disabled={
-                                        currentPage ===
-                                        Math.ceil(
-                                            classes.length / classesPerPage
-                                        )
-                                    }
-                                >
+                                <button className="page-link" onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(classes.length / classesPerPage)}>
                                     Next
                                 </button>
                             </li>

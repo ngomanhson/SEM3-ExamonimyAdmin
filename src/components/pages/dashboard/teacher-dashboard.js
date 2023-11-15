@@ -1,8 +1,18 @@
+import { useEffect, useState } from "react";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import Loading from "../../layouts/loading";
 function Teacher_Dashboard() {
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    });
     return (
         <>
+            {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Dashboard | Examonimy</title>
             </Helmet>
@@ -11,16 +21,12 @@ function Teacher_Dashboard() {
                     <div className="row">
                         <div className="col-sm-12">
                             <div className="page-sub-header">
-                                <h3 className="page-title">
-                                    Welcome Jonathan!
-                                </h3>
+                                <h3 className="page-title">Welcome Jonathan!</h3>
                                 <ul className="breadcrumb">
                                     <li className="breadcrumb-item">
                                         <a href="index.html">Home</a>
                                     </li>
-                                    <li className="breadcrumb-item active">
-                                        Teacher
-                                    </li>
+                                    <li className="breadcrumb-item active">Teacher</li>
                                 </ul>
                             </div>
                         </div>
@@ -37,10 +43,7 @@ function Teacher_Dashboard() {
                                         <h3>04/06</h3>
                                     </div>
                                     <div className="db-icon">
-                                        <img
-                                            src="assets/img/icons/teacher-icon-01.svg"
-                                            alt="Dashboard Icon"
-                                        />
+                                        <img src="assets/img/icons/teacher-icon-01.svg" alt="Dashboard Icon" />
                                     </div>
                                 </div>
                             </div>
@@ -55,10 +58,7 @@ function Teacher_Dashboard() {
                                         <h3>40/60</h3>
                                     </div>
                                     <div className="db-icon">
-                                        <img
-                                            src="assets/img/icons/dash-icon-01.svg"
-                                            alt="Dashboard Icon"
-                                        />
+                                        <img src="assets/img/icons/dash-icon-01.svg" alt="Dashboard Icon" />
                                     </div>
                                 </div>
                             </div>
@@ -73,10 +73,7 @@ function Teacher_Dashboard() {
                                         <h3>30/50</h3>
                                     </div>
                                     <div className="db-icon">
-                                        <img
-                                            src="assets/img/icons/teacher-icon-02.svg"
-                                            alt="Dashboard Icon"
-                                        />
+                                        <img src="assets/img/icons/teacher-icon-02.svg" alt="Dashboard Icon" />
                                     </div>
                                 </div>
                             </div>
@@ -91,10 +88,7 @@ function Teacher_Dashboard() {
                                         <h3>15/20</h3>
                                     </div>
                                     <div className="db-icon">
-                                        <img
-                                            src="assets/img/icons/teacher-icon-03.svg"
-                                            alt="Dashboard Icon"
-                                        />
+                                        <img src="assets/img/icons/teacher-icon-03.svg" alt="Dashboard Icon" />
                                     </div>
                                 </div>
                             </div>
@@ -110,15 +104,11 @@ function Teacher_Dashboard() {
                                     <div className="card-header">
                                         <div className="row align-items-center">
                                             <div className="col-6">
-                                                <h5 className="card-title">
-                                                    Upcoming Lesson
-                                                </h5>
+                                                <h5 className="card-title">Upcoming Lesson</h5>
                                             </div>
                                             <div className="col-6">
                                                 <span className="float-end view-link">
-                                                    <a href="#">
-                                                        View All Courses
-                                                    </a>
+                                                    <a href="#">View All Courses</a>
                                                 </span>
                                             </div>
                                         </div>
@@ -130,38 +120,26 @@ function Teacher_Dashboard() {
                                                     <tr>
                                                         <td>
                                                             <div className="date">
-                                                                <b>
-                                                                    Lessons 30
-                                                                </b>
-                                                                <p>
-                                                                    3.1 Ipsuum
-                                                                    dolor
-                                                                </p>
+                                                                <b>Lessons 30</b>
+                                                                <p>3.1 Ipsuum dolor</p>
                                                                 <ul className="teacher-date-list">
                                                                     <li>
                                                                         <i className="fas fa-calendar-alt me-2"></i>
-                                                                        Sep 5,
-                                                                        2022
+                                                                        Sep 5, 2022
                                                                     </li>
                                                                     <li>|</li>
                                                                     <li>
                                                                         <i className="fas fa-clock me-2"></i>
-                                                                        09:00 -
-                                                                        10:00 am
+                                                                        09:00 - 10:00 am
                                                                     </li>
                                                                 </ul>
                                                             </div>
                                                         </td>
                                                         <td>
                                                             <div className="lesson-confirm">
-                                                                <a href="#">
-                                                                    Confirmed
-                                                                </a>
+                                                                <a href="#">Confirmed</a>
                                                             </div>
-                                                            <button
-                                                                type="submit"
-                                                                className="btn btn-info"
-                                                            >
+                                                            <button type="submit" className="btn btn-info">
                                                                 Reschedule
                                                             </button>
                                                         </td>
@@ -169,38 +147,26 @@ function Teacher_Dashboard() {
                                                     <tr>
                                                         <td>
                                                             <div className="date">
-                                                                <b>
-                                                                    Lessons 30
-                                                                </b>
-                                                                <p>
-                                                                    3.1 Ipsuum
-                                                                    dolor
-                                                                </p>
+                                                                <b>Lessons 30</b>
+                                                                <p>3.1 Ipsuum dolor</p>
                                                                 <ul className="teacher-date-list">
                                                                     <li>
                                                                         <i className="fas fa-calendar-alt me-2"></i>
-                                                                        Sep 5,
-                                                                        2022
+                                                                        Sep 5, 2022
                                                                     </li>
                                                                     <li>|</li>
                                                                     <li>
                                                                         <i className="fas fa-clock me-2"></i>
-                                                                        09:00 -
-                                                                        10:00 am
+                                                                        09:00 - 10:00 am
                                                                     </li>
                                                                 </ul>
                                                             </div>
                                                         </td>
                                                         <td>
                                                             <div className="lesson-confirm">
-                                                                <a href="#">
-                                                                    Confirmed
-                                                                </a>
+                                                                <a href="#">Confirmed</a>
                                                             </div>
-                                                            <button
-                                                                type="submit"
-                                                                className="btn btn-info"
-                                                            >
+                                                            <button type="submit" className="btn btn-info">
                                                                 Reschedule
                                                             </button>
                                                         </td>
@@ -216,18 +182,13 @@ function Teacher_Dashboard() {
                                     <div className="card-header">
                                         <div className="row align-items-center">
                                             <div className="col-12">
-                                                <h5 className="card-title">
-                                                    Semester Progress
-                                                </h5>
+                                                <h5 className="card-title">Semester Progress</h5>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="dash-widget">
                                         <div className="circle-bar circle-bar1">
-                                            <div
-                                                className="circle-graph1"
-                                                data-percent="50"
-                                            >
+                                            <div className="circle-graph1" data-percent="50">
                                                 <div className="progress-less">
                                                     <b>55/60</b>
                                                     <p>Lesson Progressed</p>
@@ -244,9 +205,7 @@ function Teacher_Dashboard() {
                                     <div className="card-header">
                                         <div className="row align-items-center">
                                             <div className="col-6">
-                                                <h5 className="card-title">
-                                                    Teaching Activity
-                                                </h5>
+                                                <h5 className="card-title">Teaching Activity</h5>
                                             </div>
                                             <div className="col-6">
                                                 <ul className="chart-list-out">
@@ -275,9 +234,7 @@ function Teacher_Dashboard() {
                             <div className="col-12 col-lg-12 col-xl-12 d-flex">
                                 <div className="card flex-fill comman-shadow">
                                     <div className="card-header d-flex align-items-center">
-                                        <h5 className="card-title">
-                                            Teaching History
-                                        </h5>
+                                        <h5 className="card-title">Teaching History</h5>
                                         <ul className="chart-list-out student-ellips">
                                             <li className="star-menus">
                                                 <a href="javascript:;">
@@ -302,22 +259,17 @@ function Teacher_Dashboard() {
                                                         <ul className="teacher-date-list">
                                                             <li>
                                                                 <i className="fas fa-calendar-alt me-2"></i>
-                                                                September 5,
-                                                                2022
+                                                                September 5, 2022
                                                             </li>
                                                             <li>|</li>
                                                             <li>
                                                                 <i className="fas fa-clock me-2"></i>
-                                                                09:00 am - 10:00
-                                                                am (60 Minutes)
+                                                                09:00 am - 10:00 am (60 Minutes)
                                                             </li>
                                                         </ul>
                                                     </div>
                                                     <div className="activity-btns ms-auto">
-                                                        <button
-                                                            type="submit"
-                                                            className="btn btn-info"
-                                                        >
+                                                        <button type="submit" className="btn btn-info">
                                                             In Progress
                                                         </button>
                                                     </div>
@@ -330,22 +282,17 @@ function Teacher_Dashboard() {
                                                         <ul className="teacher-date-list">
                                                             <li>
                                                                 <i className="fas fa-calendar-alt me-2"></i>
-                                                                September 5,
-                                                                2022
+                                                                September 5, 2022
                                                             </li>
                                                             <li>|</li>
                                                             <li>
                                                                 <i className="fas fa-clock me-2"></i>
-                                                                09:00 am - 10:00
-                                                                am (60 Minutes)
+                                                                09:00 am - 10:00 am (60 Minutes)
                                                             </li>
                                                         </ul>
                                                     </div>
                                                     <div className="activity-btns ms-auto">
-                                                        <button
-                                                            type="submit"
-                                                            className="btn btn-info"
-                                                        >
+                                                        <button type="submit" className="btn btn-info">
                                                             Completed
                                                         </button>
                                                     </div>
@@ -358,22 +305,17 @@ function Teacher_Dashboard() {
                                                         <ul className="teacher-date-list">
                                                             <li>
                                                                 <i className="fas fa-calendar-alt me-2"></i>
-                                                                September 5,
-                                                                2022
+                                                                September 5, 2022
                                                             </li>
                                                             <li>|</li>
                                                             <li>
                                                                 <i className="fas fa-clock me-2"></i>
-                                                                09:00 am - 10:00
-                                                                am (60 Minutes)
+                                                                09:00 am - 10:00 am (60 Minutes)
                                                             </li>
                                                         </ul>
                                                     </div>
                                                     <div className="activity-btns ms-auto">
-                                                        <button
-                                                            type="submit"
-                                                            className="btn btn-info"
-                                                        >
+                                                        <button type="submit" className="btn btn-info">
                                                             In Progress
                                                         </button>
                                                     </div>
@@ -388,10 +330,7 @@ function Teacher_Dashboard() {
                     <div className="col-12 col-lg-12 col-xl-4 d-flex">
                         <div className="card flex-fill comman-shadow">
                             <div className="card-body">
-                                <div
-                                    id="calendar-doctor"
-                                    className="calendar-container"
-                                ></div>
+                                <div id="calendar-doctor" className="calendar-container"></div>
                                 <div className="calendar-info calendar-info1">
                                     <div className="up-come-header">
                                         <h2>Upcoming Events</h2>
