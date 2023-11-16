@@ -5,7 +5,9 @@ import url from "../../../services/url";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { format } from "date-fns";
+import { useJwt } from "react-jwt";
 import Layout from "../../../layouts/layouts";
+import Loading from "../../../layouts/loading";
 import { Helmet } from "react-helmet";
 function Test_List() {
     const { id } = useParams();
@@ -16,6 +18,14 @@ function Test_List() {
     const maxInitialStudents = 2;
     const [currentPage, setCurrentPage] = useState(1);
     const [testsPerPage] = useState(10);
+    const [userRole, setUserRole] = useState(null);
+    const { isExpired, isInvalid } = useJwt();
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    }, []);
     //in ra danh sách bài test
     const loadTestList = async () => {
         try {
@@ -24,9 +34,7 @@ function Test_List() {
             const studentAvatarData = {};
             for (const test of response.data) {
                 const slug = test.slug; // Lấy slug của bài test từ dữ liệu
-                const studentListResponse = await api.get(
-                    url.STUDENT.TEST_SLUG.replace("{}", slug)
-                );
+                const studentListResponse = await api.get(url.STUDENT.TEST_SLUG.replace("{}", slug));
                 studentAvatarData[slug] = studentListResponse.data;
             }
             setStudentAvatars(studentAvatarData);
@@ -64,12 +72,25 @@ function Test_List() {
     const currentTests = tests.slice(indexOfFirstTest, indexOfLastTest);
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+    const fetchUserRole = async () => {
+        const token = localStorage.getItem("accessToken");
+        try {
+            const decodedToken = JSON.parse(atob(token.split(".")[1]));
+            const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+            setUserRole(userRole);
+        } catch (error) {
+            console.error("Error loading user role:", error);
+        }
+    };
+
     useEffect(() => {
         loadTestList();
         fetchExamNames();
+        fetchUserRole();
     }, []);
     return (
         <>
+            {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Test | Examonimy</title>
             </Helmet>
@@ -88,20 +109,15 @@ function Test_List() {
                             <div className="card-body">
                                 <div id="notification-container"></div>
 
-                                <div className="page-header">
-                                    <div className="row align-items-center">
-                                        <h5 class="card-title">
-                                            List of tests
-                                            <NavLink
-                                                to={`/test-create`}
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#signup-modal"
-                                                className="btn btn-primary float-sm-end m-l-10"
-                                            >
+                                <div className="row align-items-center">
+                                    <h5 className="card-title">
+                                        List of tests
+                                        {userRole === "Exam Administrator" || userRole === "Super Admin" ? (
+                                            <NavLink to={`/test-create`} data-bs-toggle="modal" data-bs-target="#signup-modal" className="btn btn-primary float-sm-end m-l-10">
                                                 Add New Test
                                             </NavLink>
-                                        </h5>
-                                    </div>
+                                        ) : null}
+                                    </h5>
                                 </div>
 
                                 <div className="table-responsive">
@@ -116,142 +132,58 @@ function Test_List() {
                                                 <th>Start Date Time</th>
                                                 <th>End Date Time</th>
                                                 <th>Past Marks</th>
-                                                <th>Status</th>
-                                                <th className="text-end">
-                                                    Action
-                                                </th>
+                                                <th className="text-end">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {currentTests.map((item, index) => {
-                                                const isEditable = canEditTest(
-                                                    new Date(item.startDate)
-                                                );
+                                                const isEditable = canEditTest(new Date(item.startDate));
+                                                const testViewLink = item.type_test === 0 ? `/test-view/${item.slug}` : `/test-view-essay/${item.slug}`;
                                                 return (
                                                     <tr>
                                                         <td>{index + 1}</td>
                                                         <td>{item.name}</td>
-                                                        <td>
-                                                            {item.type_test ===
-                                                            0
-                                                                ? "Multiple Choice"
-                                                                : "Essay Test"}
-                                                        </td>
-                                                        <td>
-                                                            {
-                                                                examNames[
-                                                                    item.exam_id
-                                                                ]
-                                                            }
-                                                        </td>
+                                                        <td>{item.type_test === 0 ? "Multiple Choice" : "Essay Test"}</td>
+                                                        <td>{examNames[item.exam_id]}</td>
                                                         <td>
                                                             <div className="avatar-group">
-                                                                {studentAvatars[
-                                                                    item.slug
-                                                                ] &&
-                                                                    studentAvatars[
-                                                                        item
-                                                                            .slug
-                                                                    ]
-                                                                        .slice(
-                                                                            0,
-                                                                            maxInitialStudents
-                                                                        )
-                                                                        .map(
-                                                                            (
-                                                                                student
-                                                                            ) => (
-                                                                                <div
-                                                                                    className="avatar"
-                                                                                    key={
-                                                                                        student.id
-                                                                                    }
-                                                                                >
-                                                                                    <img
-                                                                                        className="avatar-img rounded-circle border border-white"
-                                                                                        src={
-                                                                                            student.avatar
-                                                                                        }
-                                                                                    />
-                                                                                </div>
-                                                                            )
-                                                                        )}
-                                                                {studentAvatars[
-                                                                    item.slug
-                                                                ] &&
-                                                                    studentAvatars[
-                                                                        item
-                                                                            .slug
-                                                                    ].length >
-                                                                        maxInitialStudents && (
-                                                                        <div className="avatar">
-                                                                            <span className="avatar-title rounded-circle border border-white">
-                                                                                +
-                                                                                {studentAvatars[
-                                                                                    item
-                                                                                        .slug
-                                                                                ]
-                                                                                    .length -
-                                                                                    maxInitialStudents}
-                                                                            </span>
+                                                                {studentAvatars[item.slug] &&
+                                                                    studentAvatars[item.slug].slice(0, maxInitialStudents).map((student) => (
+                                                                        <div className="avatar" key={student.id}>
+                                                                            <img className="avatar-img rounded-circle border border-white" src={student.avatar} />
                                                                         </div>
-                                                                    )}
+                                                                    ))}
+                                                                {studentAvatars[item.slug] && studentAvatars[item.slug].length > maxInitialStudents && (
+                                                                    <div className="avatar">
+                                                                        <span className="avatar-title rounded-circle border border-white">
+                                                                            +{studentAvatars[item.slug].length - maxInitialStudents}
+                                                                        </span>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </td>
-                                                        <td>
-                                                            {format(
-                                                                new Date(
-                                                                    item.startDate
-                                                                ),
-                                                                "yyyy-MM-dd HH:mm"
-                                                            )}
-                                                        </td>
-                                                        <td>
-                                                            {format(
-                                                                new Date(
-                                                                    item.endDate
-                                                                ),
-                                                                "yyyy-MM-dd HH:mm"
-                                                            )}
-                                                        </td>
-
+                                                        <td>{format(new Date(item.startDate), "yyyy-MM-dd HH:mm")}</td>
+                                                        <td>{format(new Date(item.endDate), "yyyy-MM-dd HH:mm")}</td>
                                                         <td>
                                                             {item.past_marks}
                                                             /100
                                                         </td>
-                                                        <td>
-                                                            {item.status === 0
-                                                                ? "It's not time to take the test yet"
-                                                                : "Test time is over"}
-                                                        </td>
                                                         <td className="text-end">
                                                             <div className="actions">
-                                                                <NavLink
-                                                                    to={`/test-view/${item.slug}`}
-                                                                    className="btn btn-sm bg-success-light me-2"
-                                                                >
+                                                                <NavLink to={testViewLink} className="btn btn-sm bg-success-light me-2">
                                                                     <i className="feather-eye"></i>
                                                                 </NavLink>
                                                                 {isEditable ? (
-                                                                    <NavLink
-                                                                        to={`/test-edit/${item.slug}`}
-                                                                        className="btn btn-sm bg-danger-light"
-                                                                    >
+                                                                    <NavLink to={`/test-edit/${item.slug}`} className="btn btn-sm bg-danger-light">
                                                                         <i className="feather-edit"></i>
                                                                     </NavLink>
                                                                 ) : (
                                                                     <NavLink
                                                                         onClick={() =>
-                                                                            toast.warning(
-                                                                                "This test cannot be edited because this test is being taken or has already been taken!",
-                                                                                {
-                                                                                    position:
-                                                                                        toast
-                                                                                            .POSITION
-                                                                                            .TOP_RIGHT,
-                                                                                    autoClose: 3000,
-                                                                                }
-                                                                            )
+                                                                            toast.warning("This test cannot be edited because this test is being taken or has already been taken!", {
+                                                                                position: toast.POSITION.TOP_RIGHT,
+                                                                                autoClose: 3000,
+                                                                            })
                                                                         }
                                                                         className="btn btn-sm bg-danger-light"
                                                                     >
@@ -275,48 +207,25 @@ function Test_List() {
                     <div className="col">
                         <ul className="pagination mb-4">
                             <li className="page-item">
-                                <button
-                                    className="page-link"
-                                    onClick={() => paginate(currentPage - 1)}
-                                    disabled={currentPage === 1}
-                                >
+                                <button className="page-link" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
                                     Previous
                                 </button>
                             </li>
 
                             {Array.from(
                                 {
-                                    length: Math.ceil(
-                                        tests.length / testsPerPage
-                                    ),
+                                    length: Math.ceil(tests.length / testsPerPage),
                                 },
                                 (_, i) => (
-                                    <li
-                                        key={i}
-                                        className={`page-item ${
-                                            i + 1 === currentPage
-                                                ? "active"
-                                                : ""
-                                        }`}
-                                    >
-                                        <button
-                                            className="page-link"
-                                            onClick={() => paginate(i + 1)}
-                                        >
+                                    <li key={i} className={`page-item ${i + 1 === currentPage ? "active" : ""}`}>
+                                        <button className="page-link" onClick={() => paginate(i + 1)}>
                                             {i + 1}
                                         </button>
                                     </li>
                                 )
                             )}
                             <li className="page-item">
-                                <button
-                                    className="page-link"
-                                    onClick={() => paginate(currentPage + 1)}
-                                    disabled={
-                                        currentPage ===
-                                        Math.ceil(tests.length / testsPerPage)
-                                    }
-                                >
+                                <button className="page-link" onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(tests.length / testsPerPage)}>
                                     Next
                                 </button>
                             </li>
@@ -324,37 +233,21 @@ function Test_List() {
                     </div>
                 </div>
 
-                <div
-                    id="signup-modal"
-                    class="modal fade"
-                    tabindex="-1"
-                    role="dialog"
-                    aria-hidden="true"
-                >
+                <div id="signup-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-body">
                                 <div class="text-center mt-2 mb-4">
                                     <div class="auth-logo">
-                                        <a
-                                            href="index.html"
-                                            class="logo logo-dark"
-                                        >
+                                        <a href="index.html" class="logo logo-dark">
                                             <span class="logo-lg">
-                                                <img
-                                                    src="assets/img/logo.png"
-                                                    alt
-                                                    height="42"
-                                                />
+                                                <img src="assets/img/logo.png" alt height="42" />
                                             </span>
                                         </a>
                                     </div>
                                 </div>
                                 <div class="text-center mt-2 mb-4">
-                                    <h6>
-                                        Do you want to create a multiple choice
-                                        or essay test?
-                                    </h6>
+                                    <h6>Do you want to create a multiple choice or essay test?</h6>
                                 </div>
                                 <div class="text-center mt-2 mb-4">
                                     <NavLink
@@ -363,10 +256,7 @@ function Test_List() {
                                             color: "white",
                                         }}
                                     >
-                                        <button
-                                            class="btn btn-primary"
-                                            data-bs-dismiss="modal"
-                                        >
+                                        <button class="btn btn-primary" data-bs-dismiss="modal">
                                             Multiple choice
                                         </button>
                                     </NavLink>
@@ -393,7 +283,6 @@ function Test_List() {
                         </div>
                     </div>
                 </div>
-
                 <ToastContainer />
             </Layout>
         </>

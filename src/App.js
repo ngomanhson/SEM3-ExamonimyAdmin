@@ -61,165 +61,62 @@ function App() {
         <div className="App">
             <Routes>
                 {/* start route dashboard */}
-                <Route
-                    path="/"
-                    element={<ProtectedRoute element={<Admin_Dashboard />} />}
-                ></Route>
-                <Route
-                    path="/teacher-dashboard"
-                    element={<ProtectedRoute element={<Teacher_Dashboard />} />}
-                ></Route>
+                <Route path="/" element={<ProtectedRoute element={<Admin_Dashboard />} />}></Route>
+                <Route path="/teacher-dashboard" element={<ProtectedRoute element={<Teacher_Dashboard />} />}></Route>
                 {/* end route dashboard */}
 
                 {/* star route exam */}
-                <Route
-                    path="/exam-list"
-                    element={<ProtectedRoute element={<Exam_List />} />}
-                ></Route>
-                <Route
-                    path="/exam-create"
-                    element={<ProtectedRoute element={<Exam_Create />} />}
-                ></Route>
-                <Route
-                    path="/exam-edit/:slug"
-                    element={<ProtectedRoute element={<Exam_Edit />} />}
-                ></Route>
-                <Route
-                    path="/test-of-exam-list/:id"
-                    element={<Test_Of_Exam_List />}
-                ></Route>
-                <Route
-                    path="/test-list"
-                    element={<ProtectedRoute element={<Test_List />} />}
-                ></Route>
-                <Route
-                    path="/test-view/:slug"
-                    element={<ProtectedRoute element={<Test_View />} />}
-                ></Route>
-                <Route
-                    path="/test-view-essay/:slug"
-                    element={<ProtectedRoute element={<Test_View_Essay />} />}
-                ></Route>
-                <Route
-                    path="/test-create"
-                    element={<ProtectedRoute element={<Test_Create />} />}
-                ></Route>
-                <Route
-                    path="/test-edit/:slug"
-                    element={<ProtectedRoute element={<Test_Edit />} />}
-                ></Route>
-                <Route
-                    path="/test-excel"
-                    element={<ProtectedRoute element={<Test_Excel_Create />} />}
-                ></Route>
-                <Route
-                    path="/test-available"
-                    element={<ProtectedRoute element={<Test_Avaliable />} />}
-                ></Route>
-                <Route
-                    path="/test-essay-create"
-                    element={<ProtectedRoute element={<Test_Essay_Create />} />}
-                ></Route>
+                <Route path="/exam-list" element={<ProtectedRoute element={<Exam_List />} />}></Route>
+                <Route path="/exam-create" element={<ProtectedRoute element={<Exam_Create />} />}></Route>
+                <Route path="/exam-edit/:slug" element={<ProtectedRoute element={<Exam_Edit />} />}></Route>
+                <Route path="/test-of-exam-list/:id" element={<Test_Of_Exam_List />}></Route>
+                <Route path="/test-list" element={<ProtectedRoute element={<Test_List />} />}></Route>
+                <Route path="/test-view/:slug" element={<ProtectedRoute element={<Test_View />} />}></Route>
+                <Route path="/test-view-essay/:slug" element={<ProtectedRoute element={<Test_View_Essay />} />}></Route>
+                <Route path="/test-create" element={<ProtectedRoute element={<Test_Create />} />}></Route>
+                <Route path="/test-edit/:slug" element={<ProtectedRoute element={<Test_Edit />} />}></Route>
+                <Route path="/test-excel" element={<ProtectedRoute element={<Test_Excel_Create />} />}></Route>
+                <Route path="/test-available" element={<ProtectedRoute element={<Test_Avaliable />} />}></Route>
+                <Route path="/test-essay-create" element={<ProtectedRoute element={<Test_Essay_Create />} />}></Route>
                 {/* end route exam */}
 
                 {/* start route classes */}
-                <Route
-                    path="/classes-list"
-                    element={<ProtectedRoute element={<Classes_List />} />}
-                ></Route>
-                <Route
-                    path="/class-create"
-                    element={<ProtectedRoute element={<Classes_Create />} />}
-                ></Route>
-                <Route
-                    path="/classes-edit/:slug"
-                    element={<ProtectedRoute element={<Classes_Edit />} />}
-                ></Route>
-                <Route
-                    path="/student-of-class-list/:id"
-                    element={
-                        <ProtectedRoute element={<Student_Of_Class_List />} />
-                    }
-                ></Route>
+                <Route path="/classes-list" element={<ProtectedRoute element={<Classes_List />} />}></Route>
+                <Route path="/class-create" element={<ProtectedRoute element={<Classes_Create />} />}></Route>
+                <Route path="/classes-edit/:slug" element={<ProtectedRoute element={<Classes_Edit />} />}></Route>
+                <Route path="/student-of-class-list/:id" element={<ProtectedRoute element={<Student_Of_Class_List />} />}></Route>
                 {/* end route course */}
 
                 {/* start route course */}
-                <Route
-                    path="/course-list"
-                    element={<ProtectedRoute element={<Course_List />} />}
-                ></Route>
-                <Route
-                    path="/course-create"
-                    element={<ProtectedRoute element={<Course_Create />} />}
-                ></Route>
-                <Route
-                    path="/course-class-create"
-                    element={
-                        <ProtectedRoute element={<Course_Class_Create />} />
-                    }
-                ></Route>
+                <Route path="/course-list" element={<ProtectedRoute element={<Course_List />} />}></Route>
+                <Route path="/course-create" element={<ProtectedRoute element={<Course_Create />} />}></Route>
+                <Route path="/course-class-create" element={<ProtectedRoute element={<Course_Class_Create />} />}></Route>
                 {/* end route course */}
 
                 {/* start route teacher */}
-                <Route
-                    path="/teacher-list"
-                    element={<ProtectedRoute element={<Teacher_List />} />}
-                ></Route>
-                <Route
-                    path="/teacher-create"
-                    element={<ProtectedRoute element={<Teacher_Create />} />}
-                ></Route>
+                <Route path="/teacher-list" element={<ProtectedRoute element={<Teacher_List />} />}></Route>
+                <Route path="/teacher-create" element={<ProtectedRoute element={<Teacher_Create />} />}></Route>
                 {/* end route teacher */}
 
                 {/* start route student */}
                 <Route path="/student-list" element={<Student_List />}></Route>
-                <Route
-                    path="/student-create"
-                    element={<ProtectedRoute element={<Student_Create />} />}
-                ></Route>
-                <Route
-                    path="/student-edit/:student_code"
-                    element={<ProtectedRoute element={<Student_Edit />} />}
-                ></Route>
-                <Route
-                    path="/student-deleteat"
-                    element={<ProtectedRoute element={<Student_DeleteAt />} />}
-                ></Route>
+                <Route path="/student-create" element={<ProtectedRoute element={<Student_Create />} />}></Route>
+                <Route path="/student-edit/:student_code" element={<ProtectedRoute element={<Student_Edit />} />}></Route>
+                <Route path="/student-deleteat" element={<ProtectedRoute element={<Student_DeleteAt />} />}></Route>
                 {/* end route student */}
 
                 {/* start route blog */}
-                <Route
-                    path="/blog-list"
-                    element={<ProtectedRoute element={<Blog_List />} />}
-                ></Route>
-                <Route
-                    path="/blog-create"
-                    element={<ProtectedRoute element={<Blog_Create />} />}
-                ></Route>
+                <Route path="/blog-list" element={<ProtectedRoute element={<Blog_List />} />}></Route>
+                <Route path="/blog-create" element={<ProtectedRoute element={<Blog_Create />} />}></Route>
                 {/* end route blog */}
-                <Route
-                    path="/profile"
-                    element={<ProtectedRoute element={<Profile />} />}
-                ></Route>
-                <Route
-                    path="/login"
-                    element={<ProtectedLoginRoute element={<Login />} />}
-                />
+                <Route path="/profile" element={<ProtectedRoute element={<Profile />} />}></Route>
+                <Route path="/login" element={<ProtectedLoginRoute element={<Login />} />} />
 
-                <Route
-                    path="/forgot-password"
-                    element={<ProtectedLoginRoute element={<ForgotPassword />} />}
-                />
+                <Route path="/forgot-password" element={<ProtectedLoginRoute element={<ForgotPassword />} />} />
 
-                <Route
-                    path="/reset-password/:resetToken"
-                    element={<ProtectedLoginRoute element={<ResetPassword />} />}
-                />
+                <Route path="/reset-password/:resetToken" element={<ProtectedLoginRoute element={<ResetPassword />} />} />
 
-                <Route 
-                    path="*" 
-                    element={<ProtectedRoute element={<NotFound />} />} 
-                />
+                <Route path="*" element={<ProtectedRoute element={<NotFound />} />} />
             </Routes>
         </div>
     );
