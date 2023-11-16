@@ -64,18 +64,14 @@ function Test_View() {
     //lấy danh sách sinh viên của bài test
     const fetchStudentList = async () => {
         try {
-            const response = await api.get(
-                url.STUDENT.TEST_SLUG.replace("{}", slug)
-            );
+            const response = await api.get(url.STUDENT.TEST_SLUG.replace("{}", slug));
             setStudentList(response.data);
         } catch (error) {}
     };
     //lấy danh sách câu hỏi của bài test
     const fetchQuestionList = async () => {
         try {
-            const response = await api.get(
-                url.TESTQUESTION.LIST.replace("{}", slug)
-            );
+            const response = await api.get(url.TESTQUESTION.LIST.replace("{}", slug));
             setQuestionList(response.data);
         } catch (error) {}
     };
@@ -98,10 +94,7 @@ function Test_View() {
     const studentsPerPage = 8;
     const indexOfLastStudent = currentPage * studentsPerPage;
     const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-    const currentStudents = studentList.slice(
-        indexOfFirstStudent,
-        indexOfLastStudent
-    );
+    const currentStudents = studentList.slice(indexOfFirstStudent, indexOfLastStudent);
     const paginate = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
@@ -119,10 +112,7 @@ function Test_View() {
                             </div>
                             <div class="personal-activity">
                                 <div class="personal-icons">
-                                    <img
-                                        src="assets/img/icons/buliding-icon.svg"
-                                        alt
-                                    />
+                                    <img src="assets/img/icons/buliding-icon.svg" alt />
                                 </div>
                                 <div class="views-personal">
                                     <h4>Name Test</h4>
@@ -136,11 +126,7 @@ function Test_View() {
                                 </div>
                                 <div class="views-personal">
                                     <h4>Type Test</h4>
-                                    <h5>
-                                        {testData.type_test === 0
-                                            ? "Multiple Choice"
-                                            : "Essay Test"}
-                                    </h5>
+                                    <h5>{testData.type_test === 0 ? "Multiple Choice" : "Essay Test"}</h5>
                                 </div>
                             </div>
                             <div class="personal-activity"></div>
@@ -162,11 +148,7 @@ function Test_View() {
                                     <h4>Start Date Time</h4>
                                     <h5>
                                         <ul className="teacher-date-list">
-                                            <li>
-                                                {formatDateTime(
-                                                    testData.startDate
-                                                )}
-                                            </li>
+                                            <li>{formatDateTime(testData.startDate)}</li>
                                         </ul>
                                     </h5>
                                 </div>
@@ -180,11 +162,7 @@ function Test_View() {
                                     <h4>End Date Time</h4>
                                     <h5>
                                         <ul className="teacher-date-list">
-                                            <li>
-                                                {formatDateTime(
-                                                    testData.endDate
-                                                )}
-                                            </li>
+                                            <li>{formatDateTime(testData.endDate)}</li>
                                         </ul>
                                     </h5>
                                 </div>
@@ -231,80 +209,29 @@ function Test_View() {
                                             <tr>
                                                 <th>ST Code</th>
                                                 <th>Name</th>
-                                                <th className="text-center">
-                                                    Finished At
-                                                </th>
-                                                <th className="text-center">
-                                                    Marks
-                                                </th>
-                                                <th className="text-center">
-                                                    Status
-                                                </th>
-                                                <th className="text-end">
-                                                    Detail
-                                                </th>
+                                                <th className="text-center">Finished At</th>
+                                                <th className="text-center">Marks</th>
+                                                <th className="text-center">Status</th>
+                                                <th className="text-end">Detail</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {currentStudents.map((student) => {
-                                                const grade =
-                                                    studentGrades.find(
-                                                        (grade) =>
-                                                            grade.student_id ===
-                                                                student.id &&
-                                                            grade.test_id ===
-                                                                testData.id
-                                                    );
+                                                const grade = studentGrades.find((grade) => grade.student_id === student.id && grade.test_id === testData.id);
                                                 return (
                                                     <tr key={student.id}>
                                                         <td className="text-nowrap">
-                                                            <div>
-                                                                {
-                                                                    student.student_code
-                                                                }
-                                                            </div>
+                                                            <div>{student.student_code}</div>
                                                         </td>
                                                         <td className="text-nowrap">
-                                                            <img
-                                                                className="rounded-circle"
-                                                                src={
-                                                                    student.avatar
-                                                                }
-                                                                width="25"
-                                                                alt={
-                                                                    student.fullname
-                                                                }
-                                                            />
+                                                            <img className="rounded-circle" src={student.avatar} width="25" alt={student.fullname} />
                                                             {student.fullname}
                                                         </td>
-                                                        <td className="text-center">
-                                                            {grade
-                                                                ? grade.finishedAt
-                                                                    ? formatDateTime(
-                                                                          grade.finishedAt
-                                                                      )
-                                                                    : "This student haven't taken the test!"
-                                                                : "-"}
-                                                        </td>
-                                                        <td className="text-center">
-                                                            {grade
-                                                                ? grade.score.toFixed(
-                                                                      2
-                                                                  )
-                                                                : "-"}
-                                                        </td>
-                                                        <td className="text-center">
-                                                            {grade
-                                                                ? grade.status ===
-                                                                  1
-                                                                    ? "Passed"
-                                                                    : "Fail"
-                                                                : "-"}
-                                                        </td>
+                                                        <td className="text-center">{grade ? (grade.finishedAt ? formatDateTime(grade.finishedAt) : "This student haven't taken the test!") : "-"}</td>
+                                                        <td className="text-center">{grade && grade.score !== null ? grade.score.toFixed(2) : "No data"}</td>
+                                                        <td className="text-center">{grade ? (grade.status === 1 ? "Passed" : "Fail") : "-"}</td>
                                                         <td className="text-end">
-                                                            <span className="badge badge-soft-info">
-                                                                View
-                                                            </span>
+                                                            <span className="badge badge-soft-info">View</span>
                                                         </td>
                                                     </tr>
                                                 );
@@ -313,34 +240,14 @@ function Test_View() {
                                     </table>
                                 </div>
                                 <div className="row">
-                                    <div
-                                        className="col d-flex justify-content-end"
-                                        style={{ marginTop: "10px" }}
-                                    >
+                                    <div className="col d-flex justify-content-end" style={{ marginTop: "10px" }}>
                                         <ul className="pagination mb-4">
                                             <li className="page-item">
-                                                <button
-                                                    className="page-link"
-                                                    onClick={() =>
-                                                        paginate(
-                                                            currentPage - 1
-                                                        )
-                                                    }
-                                                    disabled={currentPage === 1}
-                                                >
+                                                <button className="page-link" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
                                                     Previous
                                                 </button>
                                             </li>
-                                            <button
-                                                className="page-link"
-                                                onClick={() =>
-                                                    paginate(currentPage + 1)
-                                                }
-                                                disabled={
-                                                    indexOfLastStudent >=
-                                                    studentList.length
-                                                }
-                                            >
+                                            <button className="page-link" onClick={() => paginate(currentPage + 1)} disabled={indexOfLastStudent >= studentList.length}>
                                                 Next
                                             </button>
                                         </ul>
@@ -373,66 +280,32 @@ function Test_View() {
                                         </thead>
                                         <tbody>
                                             {questionList.map((item, index) => {
-                                                const truncatedTitle =
-                                                    item.title.length > 20
-                                                        ? `${item.title.substring(
-                                                              0,
-                                                              20
-                                                          )}...`
-                                                        : item.title;
+                                                const truncatedTitle = item.title.length > 20 ? `${item.title.substring(0, 20)}...` : item.title;
 
                                                 return (
                                                     <tr key={item.id}>
                                                         <td>{index + 1}</td>
-                                                        <td
-                                                            className="line-clamp"
-                                                            data-fulltext={
-                                                                item.title
-                                                            }
-                                                        >
+                                                        <td className="line-clamp" data-fulltext={item.title}>
                                                             {truncatedTitle}
                                                         </td>
-                                                        {item.answers.map(
-                                                            (answer) => {
-                                                                const truncatedContent =
-                                                                    answer
-                                                                        .content
-                                                                        .length >
-                                                                    10
-                                                                        ? `${answer.content.substring(
-                                                                              0,
-                                                                              10
-                                                                          )}...`
-                                                                        : answer.content;
+                                                        {item.answers.map((answer) => {
+                                                            const truncatedContent = answer.content.length > 10 ? `${answer.content.substring(0, 10)}...` : answer.content;
 
-                                                                return (
-                                                                    <td
-                                                                        key={
-                                                                            answer.id
-                                                                        }
-                                                                        className="line-clamp"
-                                                                        data-fulltext={
-                                                                            answer.content
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            truncatedContent
-                                                                        }
-                                                                        {answer.status ===
-                                                                            1 && (
-                                                                            <i
-                                                                                className="feather-check-circle"
-                                                                                style={{
-                                                                                    marginLeft:
-                                                                                        "5px",
-                                                                                    color: "green",
-                                                                                }}
-                                                                            ></i>
-                                                                        )}
-                                                                    </td>
-                                                                );
-                                                            }
-                                                        )}
+                                                            return (
+                                                                <td key={answer.id} className="line-clamp" data-fulltext={answer.content}>
+                                                                    {truncatedContent}
+                                                                    {answer.status === 1 && (
+                                                                        <i
+                                                                            className="feather-check-circle"
+                                                                            style={{
+                                                                                marginLeft: "5px",
+                                                                                color: "green",
+                                                                            }}
+                                                                        ></i>
+                                                                    )}
+                                                                </td>
+                                                            );
+                                                        })}
                                                         {/* <td>%</td> */}
                                                     </tr>
                                                 );

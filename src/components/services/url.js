@@ -1,5 +1,8 @@
 const url = {
     BASE_URL: "https://localhost:7218/api",
+    MENU: {
+        LIST: "/Menu",
+    },
     AUTH: {
         PROFILE: "/Auth/staff/profile",
         LOGIN: "/Auth/staff-login",
@@ -66,6 +69,8 @@ const url = {
     },
     ANSWER: {
         QUESTION_ID: "/answer/get-by-questionId",
+        ANSWERFORSTUDENT: "/answersForStudent",
+        SCORING: "/answersForStudent/scoring-essay",
     },
 };
 export default url;

@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
+import { NavLink } from "react-router-dom";
 function Course_List() {
     const [courses, setCourses] = useState([]);
     const [courseCodes, setCourseCodes] = useState([]);
@@ -96,9 +97,9 @@ function Course_List() {
                                             <a href="#" className="btn btn-outline-primary me-2">
                                                 <i className="fas fa-download"></i> Download
                                             </a>
-                                            <a href="add-subject.html" className="btn btn-primary">
+                                            <NavLink to="/course-create" className="btn btn-primary">
                                                 <i className="fas fa-plus"></i>
-                                            </a>
+                                            </NavLink>
                                         </div>
                                     </div>
                                 </div>
