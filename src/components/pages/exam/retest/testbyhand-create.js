@@ -1,23 +1,23 @@
-import Select from "react-select";
 import { NavLink } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
-import makeAnimated from "react-select/animated";
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
 import url from "../../../services/url";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
+import Question_Create from "./question-create";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 import Layout from "../../../layouts/layouts";
 import { Helmet } from "react-helmet";
-function Test_Avaliable() {
+function TestByHand_Create() {
     const animatedComponents = makeAnimated();
     const [isClearable, setIsClearable] = useState(true);
     const [isSearchable, setIsSearchable] = useState(true);
-    const [selectedClass, setSelectedClass] = useState(null);
-    const [selectedStudents, setSelectedStudents] = useState([]);
     const [exam, setExams] = useState([]);
-    const [classes, setClasses] = useState([]);
-    const [students, setStudents] = useState([]);
+    const [examName, setExamName] = useState([]);
+    const [isQuestionsAdded, setIsQuestionsAdded] = useState(false);
+    const [questionCount, setQuestionCount] = useState(0);
     const today = new Date();
     const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, "0");
@@ -26,11 +26,7 @@ function Test_Avaliable() {
     const todayDateTimeLocal = `${year}-${month}-${day}T${currentTime}`; //chỉ cho người dùng chọn từ ngay hôm nay trở đi
     const navigate = useNavigate();
     const [nameExistsError, setNameExistsError] = useState("");
-    const selectAllOption = {
-        value: "select_all",
-        label: "Select All Students",
-    };
-    const allStudentsOptions = [selectAllOption, ...students];
+    const [studentExistsError, setStudentExistsError] = useState("");
     const [formTest, setFormTest] = useState({
         name: "",
         exam_id: "",
@@ -38,7 +34,7 @@ function Test_Avaliable() {
         endDate: "",
         past_marks: "",
         total_marks: 100,
-        studentTds: [],
+        questions: [],
         created_by: 1,
     });
     const clearForm = () => {
@@ -49,11 +45,33 @@ function Test_Avaliable() {
             endDate: "",
             past_marks: "",
             total_marks: 100,
-            studentTds: [],
+            questions: [],
             created_by: 1,
         });
-        setSelectedStudents([]);
     };
+    const clearQuestionsInLocalStorage = () => {
+        //xoá câu hỏi trong localStorage khi thêm bài thi thành công
+        localStorage.removeItem("questions");
+    };
+    //XỬ LÝ XOÁ CÂU HỎI KHI NGƯỜI DÙNG LOAD LẠI TRANG HOẶC CHUYỂN SANG COMPONENT KHÁC
+    useEffect(() => {
+        window.addEventListener("beforeunload", handlePageUnload);
+        return () => {
+            window.removeEventListener("beforeunload", handlePageUnload);
+            if (isQuestionsAdded) {
+                clearQuestionsInLocalStorage();
+            }
+        };
+    }, [isQuestionsAdded]);
+    const handlePageUnload = () => {
+        localStorage.removeItem("questions");
+    };
+    const updateFormTestWithQuestions = (updatedQuestions) => {
+        setFormTest({ ...formTest, questions: updatedQuestions });
+        setQuestionCount(updatedQuestions.length);
+        setIsQuestionsAdded(true);
+    };
+
     const [errors, setErrors] = useState({});
     const validateForm = () => {
         //validate cho thông tin bài test
@@ -88,13 +106,7 @@ function Test_Avaliable() {
             newErrors.startDate = "Start Date must be before End Date";
             valid = false;
         }
-        if (selectedStudents.length === 0) {
-            newErrors.studentTds = "Please choose students";
-            valid = false;
-        } else {
-            const selectedStudentIds = selectedStudents.map((option) => option.value);
-            setFormTest({ ...formTest, studentTds: selectedStudentIds });
-        }
+
         if (formTest.past_marks === "") {
             newErrors.past_marks = "Please choose past marks";
             valid = false;
@@ -102,71 +114,37 @@ function Test_Avaliable() {
         setErrors(newErrors);
         return valid;
     };
+
     //hiển thị select exam
+    useEffect(() => {
+        const fetchexamName = async () => {
+            try {
+                const response = await api.get(url.EXAM.LIST);
+                setExamName(response.data);
+            } catch (error) {}
+        };
+        fetchexamName();
+    }, []);
     useEffect(() => {
         const fetchExams = async () => {
             try {
-                const response = await api.get(url.EXAM.LIST);
-                const examData = response.data.map((exam) => ({
-                    value: exam.id,
-                    label: exam.name,
+                const response = await api.get(url.RETEST.LIST);
+                const examData = response.data.data.map((exam) => ({
+                    value: exam.exam_id,
+                    label: exam.exam_id,
+                    examName: examName.find((e) => e.id === exam.exam_id)?.name || "Unknown Exam",
                 }));
-                setExams(examData);
+
+                //kiểm tra nếu trùng exam thì hiển thị 1 cái
+                const uniqueExams = examData.filter((exam, index, self) => index === self.findIndex((e) => e.label === exam.label));
+                setExams(uniqueExams);
             } catch (error) {}
         };
         fetchExams();
-    }, []);
+    }, [examName]);
     const optionsExam = exam;
     const handleChangeExam = (selectedOption) => {
         setFormTest({ ...formTest, exam_id: selectedOption.value });
-    };
-    //hiển thị danh sách lớp học
-    useEffect(() => {
-        const fetchClasses = async () => {
-            try {
-                const response = await api.get(url.CLASS.LIST);
-                const classData = response.data.map((cls) => ({
-                    value: cls.id,
-                    label: cls.name,
-                }));
-                setClasses(classData);
-            } catch (error) {}
-        };
-        fetchClasses();
-    }, []);
-    const OptionsClasses = classes;
-    //hiển thị danh sách sinh viên theo lớp học đã được chọn
-    useEffect(() => {
-        if (selectedClass) {
-            const fetchStudentsByClass = async () => {
-                try {
-                    const response = await api.get(`${url.STUDENT.CLASS_ID}?classId=${selectedClass.value}`);
-                    const studentData = response.data.map((std) => ({
-                        value: std.id,
-                        label: std.fullname,
-                    }));
-                    setStudents(studentData);
-                } catch (error) {}
-            };
-            fetchStudentsByClass();
-        }
-    }, [selectedClass]);
-    const handleClassChange = (selectedOption) => {
-        setSelectedClass(selectedOption);
-        setSelectedStudents([]);
-    };
-    const handleStudentChange = (selectedOption) => {
-        //xử lý các phần chọn sinh viên bao gồm cả select all
-        if (selectedOption.some((option) => option.value === "select_all")) {
-            const allStudents = students.map((student) => ({
-                value: student.value,
-                label: student.label,
-            }));
-            setSelectedStudents(allStudents);
-        } else {
-            setSelectedStudents(selectedOption);
-        }
-        setFormTest({ ...formTest, studentTds: selectedOption.value });
     };
 
     //xử lý tạo bài thi
@@ -175,6 +153,22 @@ function Test_Avaliable() {
         const formValidationResult = validateForm();
         if (!formValidationResult) {
             toast.error("You have not completely filled in the Test information", {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 3000,
+            });
+            return;
+        }
+        if (!isQuestionsAdded) {
+            //kiểm tra nếu chưa thêm câu hỏi nào
+            toast.error("You must add questions before creating a test", {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 3000,
+            });
+            return;
+        }
+        if (questionCount < 16) {
+            //kiểm tra phải thêm đủ 16 câu hỏi
+            toast.error("You need to add at least 16 questions", {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 3000,
             });
@@ -189,11 +183,12 @@ function Test_Avaliable() {
                 past_marks: formTest.past_marks,
                 total_marks: formTest.total_marks,
                 created_by: formTest.created_by,
-                studentIds: selectedStudents.map((student) => student.value),
+                questions: formTest.questions,
             };
-            const rs = await api.post(url.TEST.CREATE_MULTIPLE_AUTO, data);
+            const rs = await api.post(url.TEST.CREATE_MULTIPLE_RETAKE, data);
             const createdExamId = rs.data.exam_id;
             clearForm();
+            clearQuestionsInLocalStorage();
             toast.success("Create Test Successfully", {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 3000,
@@ -210,8 +205,18 @@ function Test_Avaliable() {
                 });
             } else {
             }
-            // console.error("Error creating test:", error);
-            // console.error("Response data:", error.response.data);
+            if (error.response.status === 400 && error.response.data.message === "No students registered to retake the exam") {
+                setStudentExistsError("There are currently no students registered to retake this exam, please choose another exam!");
+                toast.error("There are currently no students registered to retake this exam, please choose another exam!", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
+            } else {
+            }
+            toast.error("Unable to re-create test, please try again!", {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 3000,
+            });
         }
     };
 
@@ -219,17 +224,18 @@ function Test_Avaliable() {
         const { name, value } = e.target;
         setFormTest({ ...formTest, [name]: value });
         setNameExistsError("");
+        setStudentExistsError("");
     };
     return (
         <>
             <Helmet>
-                <title>Test | Examonimy</title>
+                <title>Retest | Examonimy</title>
             </Helmet>
             <Layout>
                 <div className="page-header">
-                    <div className="row">
+                    <div className="row align-items-center">
                         <div className="col">
-                            <h3 className="page-title">Create Test Multiple Choice</h3>
+                            <h3 className="page-title">Create a retest multiple choice</h3>
                         </div>
                     </div>
                 </div>
@@ -237,22 +243,22 @@ function Test_Avaliable() {
                 <div className="row">
                     <div class="col-md-9">
                         <ul class="list-links mb-4">
-                            <li>
-                                <NavLink to="/test-create">Create your own questions</NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/test-excel">With excel files</NavLink>
-                            </li>
                             <li class="active">
-                                <NavLink to="">With questions available</NavLink>
+                                <NavLink to="">Create your own questions</NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/retest-excel-create">With excel files</NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/retest-avaliable-create">With questions available</NavLink>
                             </li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit}>
+                    <div class="row">
+                        <div class="col-md-6">
                             <div class="card">
                                 <div class="card-header">
                                     <h5 class="card-title">Test Information</h5>
@@ -273,32 +279,10 @@ function Test_Avaliable() {
                                             value={optionsExam.find((option) => option.value === formTest.exam_id)}
                                             onChange={handleChangeExam}
                                             placeholder="Select Exam"
+                                            getOptionLabel={(option) => option.examName}
                                         />
                                         {errors.exam_id && <div className="text-danger">{errors.exam_id}</div>}
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Class</label>
-                                        <Select
-                                            isSearchable={isSearchable}
-                                            isClearable={isClearable}
-                                            options={OptionsClasses}
-                                            onChange={handleClassChange}
-                                            placeholder="Select class to select students"
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Student</label>
-                                        <Select
-                                            closeMenuOnSelect={false}
-                                            components={animatedComponents}
-                                            isMulti
-                                            options={allStudentsOptions}
-                                            onChange={handleStudentChange}
-                                            value={selectedStudents}
-                                            name="studentIds"
-                                            placeholder="Select Student..."
-                                        />
-                                        {errors.studentTds && <div className="text-danger">{errors.studentTds}</div>}
+                                        {studentExistsError && <div className="text-danger">{studentExistsError}</div>}
                                     </div>
                                     <div class="form-group">
                                         <label>Start Date Time</label>
@@ -342,82 +326,14 @@ function Test_Avaliable() {
                                     </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                    <div className="col-xl-6">
-                        <div className="card bg-white">
-                            <div class="card-header">
-                                <h5 class="card-title">Test Question</h5>
-                            </div>
-                            <div className="card-body">
-                                <div class="row">
-                                    <div class="col-md-10">
-                                        <h5>Question</h5>
-                                    </div>
-                                    <div class="col-md-2"></div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="vertical-scroll scroll-demo">
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                height: "100%",
-                                            }}
-                                        >
-                                            <p
-                                                style={{
-                                                    fontSize: "20px",
-                                                    color: "#8F9BBA",
-                                                }}
-                                            >
-                                                Questions will be added randomly from the system !!!
-                                            </p>
-                                        </div>
-                                        {/* <div className="row">
-                                        <div className="col-md-10">
-                                            <div className="invoice-terms">
-                                                <h6>
-                                                    1.
-                                                    <span>
-                                                        Ten cua cau hoi
-                                                    </span>{" "}
-                                                    <span
-                                                        style={{
-                                                            fontSize: "15px",
-                                                            color: "#8F9BBA",
-                                                        }}
-                                                    >
-                                                        (Easy, 4.5 score)
-                                                    </span>
-                                                </h6>
-                                                <p className="mb-1">
-                                                    A - <span>dap an a</span>
-                                                </p>
-                                                <p className="mb-1 text-primary">
-                                                    B - <span>dap an b</span>
-                                                    <i className="fa fa-check"></i>
-                                                </p>
-                                                <p className="mb-1">
-                                                    C - <span>dap an c</span>
-                                                </p>
-                                                <p className="mb-1">
-                                                    D - <span>dap an d</span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-2"></div>
-                                    </div> */}
-                                    </div>
-                                </div>
-                            </div>
                         </div>
+
+                        <Question_Create onQuestionAdded={updateFormTestWithQuestions} />
+                        <ToastContainer />
                     </div>
-                    <ToastContainer />
-                </div>
+                </form>
             </Layout>
         </>
     );
 }
-export default Test_Avaliable;
+export default TestByHand_Create;

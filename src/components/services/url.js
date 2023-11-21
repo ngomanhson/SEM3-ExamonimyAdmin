@@ -52,8 +52,11 @@ const url = {
     TEST: {
         LIST: "/test",
         CREATE_MULTIPLE: "/test/multiple-choice-by-hand",
+        CREATE_MULTIPLE_RETAKE: "/test/multiple-choice-by-hand/retake",
         CREATE_MULTIPLE_EXCEL: "/test/multiple-choice-by-excel-file",
+        CREATE_MULTIPLE_EXCEL_RETAKE: "/test/multiple-choice-by-excel-file/retake",
         CREATE_MULTIPLE_AUTO: "/test/multiple-choice-by-auto",
+        CREATE_MULTIPLE_AUTO_RETAKE: "/test/multiple-choice-by-auto/retake",
         CREATE_ESSAY: "/test/essay-by-hand",
         EDIT: "/test",
         DELETE: "/test",
@@ -71,6 +74,10 @@ const url = {
         QUESTION_ID: "/answer/get-by-questionId",
         ANSWERFORSTUDENT: "/answersForStudent",
         SCORING: "/answersForStudent/scoring-essay",
+    },
+    RETEST: {
+        LIST: "RegisterExam",
+        CONFIRM: "RegisterExam/approve-register",
     },
 };
 export default url;
