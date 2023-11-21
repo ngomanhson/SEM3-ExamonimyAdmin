@@ -62,6 +62,8 @@ function Test_View_Essay() {
 
     //hien thi ten exam
     useEffect(() => {
+        const userToken = localStorage.getItem("accessToken");
+        api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
         api.get(url.EXAM.LIST)
             .then((response) => {
                 setExamName(response.data);
@@ -134,7 +136,9 @@ function Test_View_Essay() {
     //xử lý chấm điểm sinh viên
     const submitScore = async () => {
         const adminToken = localStorage.getItem("accessToken");
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.post(
                 url.ANSWER.SCORING,
                 {

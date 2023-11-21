@@ -6,12 +6,15 @@ import { NavLink } from "react-router-dom";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
+import { useNavigate } from "react-router-dom";
 function Student_List() {
+    const [userRole, setUserRole] = useState(null);
     const [students, setStudents] = useState([]);
     const [classNames, setClassNames] = useState({});
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [studentsPerPage] = useState(20);
+    const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
 
@@ -23,7 +26,9 @@ function Student_List() {
 
     //hiển thị danh sách sinh viên
     const loadStudents = async () => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.get(url.STUDENT.LIST);
             // Filter out students with deleteAt not equal to null
             const filteredStudents = response.data.filter((student) => student.deleteAt === null);
@@ -35,7 +40,9 @@ function Student_List() {
 
     //hiển thị tên lớp học
     const fetchClassNames = async () => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.get(url.CLASS.LIST);
             const classData = response.data.reduce((acc, curr) => {
                 acc[curr.id] = curr.name;
@@ -51,7 +58,9 @@ function Student_List() {
     const handleDeleteStudent = async (id) => {
         const confirmed = window.confirm("Are you sure you want to delete this student?");
         if (confirmed) {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 await api.delete(`${url.STUDENT.DELETE}?id=${id}`);
                 setStudents((prevStudents) => prevStudents.filter((student) => student.id !== id));
             } catch (error) {
@@ -59,6 +68,26 @@ function Student_List() {
             }
         }
     };
+
+    //kiểm tra role
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
 
     //paginate
     const indexOfLastStudent = currentPage * studentsPerPage;

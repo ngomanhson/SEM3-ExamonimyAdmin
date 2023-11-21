@@ -6,9 +6,12 @@ import { NavLink } from "react-router-dom";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
+import { useNavigate } from "react-router-dom";
 function Teacher_List() {
     const [teacher, setTeacher] = useState([]);
     const [error, setError] = useState(null);
+    const [userRole, setUserRole] = useState(null);
+    const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
 
@@ -39,6 +42,25 @@ function Teacher_List() {
             }
         }
     };
+    //kiểm tra role
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher" || userRole === "Staff") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
     useEffect(() => {
         loadTeacher();
     }, []);

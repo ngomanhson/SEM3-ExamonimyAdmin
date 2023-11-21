@@ -9,6 +9,7 @@ import { useJwt } from "react-jwt";
 import Layout from "../../../layouts/layouts";
 import Loading from "../../../layouts/loading";
 import { Helmet } from "react-helmet";
+import { useNavigate } from "react-router-dom";
 function Test_List() {
     const { id } = useParams();
     const [tests, setTests] = useState([]);
@@ -21,6 +22,7 @@ function Test_List() {
     const [userRole, setUserRole] = useState(null);
     const { isExpired, isInvalid } = useJwt();
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
     useEffect(() => {
         setTimeout(() => {
             setLoading(false);
@@ -28,7 +30,9 @@ function Test_List() {
     }, []);
     //in ra danh sách bài test
     const loadTestList = async () => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.get(url.TEST.LIST);
             //lấy ảnh của sinh viên qua slug của bài test
             const studentAvatarData = {};
@@ -40,14 +44,18 @@ function Test_List() {
             setStudentAvatars(studentAvatarData);
             setTests(response.data);
         } catch (error) {
-            console.error("Error creating test:", error);
-            console.error("Response data:", error.response.data);
+            if (error.response.status === 403) {
+                navigate("/404");
+                return;
+            }
         }
     };
 
     // hiển thị tên kì thi
     const fetchExamNames = async () => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.get(url.EXAM.LIST);
             const examData = response.data.reduce((acc, curr) => {
                 acc[curr.id] = curr.name;
@@ -87,7 +95,7 @@ function Test_List() {
         loadTestList();
         fetchExamNames();
         fetchUserRole();
-    }, []);
+    }, [navigate]);
     return (
         <>
             {loading ? <Loading /> : ""}

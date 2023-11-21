@@ -4,8 +4,11 @@ import url from "../../services/url";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
+import { useNavigate } from "react-router-dom";
 function Teacher_Create() {
+    const [userRole, setUserRole] = useState(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         setTimeout(() => {
@@ -195,6 +198,26 @@ function Teacher_Create() {
         setShowPassword(!showPassword);
     };
     const passwordInputType = showPassword ? "text" : "password";
+
+    //kiểm tra role
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher" || userRole === "Staff") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
     return (
         <>
             {loading ? <Loading /> : ""}

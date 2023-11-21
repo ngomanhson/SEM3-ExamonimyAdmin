@@ -85,7 +85,9 @@ function Classes_Edit() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const rs = await api.put(`${url.CLASS.EDIT}?id=${classData.id}`, classData);
                 showNotification("success", "Class updated successfully!");
             } catch (error) {

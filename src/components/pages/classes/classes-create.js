@@ -4,8 +4,11 @@ import url from "../../services/url";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
+import { useNavigate } from "react-router-dom";
 function Classes_Create() {
     const [loading, setLoading] = useState(true);
+    const [userRole, setUserRole] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         setTimeout(() => {
@@ -78,7 +81,9 @@ function Classes_Create() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const rs = await api.post(url.CLASS.CREATE, formClass);
                 showNotification("success", "Class created successfully!");
             } catch (error) {
@@ -108,6 +113,25 @@ function Classes_Create() {
         fetchTeachers();
     }, []);
 
+    //kiểm tra role
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher" || userRole === "Staff") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
     return (
         <>
             {loading ? <Loading /> : ""}

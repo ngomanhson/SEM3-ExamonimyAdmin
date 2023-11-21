@@ -4,6 +4,7 @@ import url from "../../services/url";
 import { NavLink } from "react-router-dom";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import { useNavigate } from "react-router-dom";
 import Loading from "../../layouts/loading";
 function Classes_List() {
     const [classes, setClasses] = useState([]);
@@ -11,7 +12,7 @@ function Classes_List() {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [classesPerPage] = useState(10);
-
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -22,7 +23,9 @@ function Classes_List() {
 
     //hiển thị danh sách lớp
     const loadClasses = async () => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.get(url.CLASS.LIST);
             setClasses(response.data);
         } catch (error) {
@@ -52,7 +55,9 @@ function Classes_List() {
     };
 
     const deleteClass = async (id) => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             await api.delete(`${url.CLASS.DELETE}?id=${id}`);
             setClasses(classes.filter((c) => c.id !== id));
         } catch (error) {
@@ -73,6 +78,27 @@ function Classes_List() {
             setError("Failed to fetch teacher names.");
         }
     };
+
+    //kiểm tra role
+    const [userRole, setUserRole] = useState(null);
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher" || userRole === "Staff") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
 
     //paginate
     const indexOfLastClass = currentPage * classesPerPage;

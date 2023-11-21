@@ -15,9 +15,7 @@ function Student_Of_Class_List() {
     //in ra danh sách sinh viên theo lớp
     const loadStudentsForClass = async (classId) => {
         try {
-            const response = await api.get(
-                `${url.STUDENT.CLASS_ID}?classId=${classId}`
-            );
+            const response = await api.get(`${url.STUDENT.CLASS_ID}?classId=${classId}`);
             setStudents(response.data);
         } catch (error) {
             setError("Failed to load students for this class.");
@@ -26,7 +24,9 @@ function Student_Of_Class_List() {
 
     // hiển thị tên lớp học
     const fetchClassNames = async () => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.get(url.CLASS.LIST);
             const classData = response.data.reduce((acc, curr) => {
                 acc[curr.id] = curr.name;
@@ -43,15 +43,13 @@ function Student_Of_Class_List() {
 
     // xử lý xoá sinh viên
     const handleDeleteStudent = async (id) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this student?"
-        );
+        const confirmed = window.confirm("Are you sure you want to delete this student?");
         if (confirmed) {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 await api.delete(`${url.STUDENT.DELETE}?id=${id}`);
-                setStudents((prevStudents) =>
-                    prevStudents.filter((student) => student.id !== id)
-                );
+                setStudents((prevStudents) => prevStudents.filter((student) => student.id !== id));
             } catch (error) {
                 console.error("Failed to delete student:", error);
             }
@@ -82,29 +80,17 @@ function Student_Of_Class_List() {
                     <div className="row">
                         <div className="col-lg-3 col-md-6">
                             <div className="form-group">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Search by ID ..."
-                                />
+                                <input type="text" className="form-control" placeholder="Search by ID ..." />
                             </div>
                         </div>
                         <div className="col-lg-3 col-md-6">
                             <div className="form-group">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Search by Name ..."
-                                />
+                                <input type="text" className="form-control" placeholder="Search by Name ..." />
                             </div>
                         </div>
                         <div className="col-lg-4 col-md-6">
                             <div className="form-group">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Search by Phone ..."
-                                />
+                                <input type="text" className="form-control" placeholder="Search by Phone ..." />
                             </div>
                         </div>
                         <div className="col-lg-2">
@@ -123,35 +109,19 @@ function Student_Of_Class_List() {
                                 <div className="page-header">
                                     <div className="row align-items-center">
                                         <div className="col">
-                                            <h3 className="page-title">
-                                                Student list of class{" "}
-                                                {className}
-                                            </h3>
+                                            <h3 className="page-title">Student list of class {className}</h3>
                                         </div>
                                         <div className="col-auto text-end float-end ms-auto download-grp">
-                                            <a
-                                                href=""
-                                                className="btn btn-outline-gray me-2 active"
-                                            >
+                                            <a href="" className="btn btn-outline-gray me-2 active">
                                                 <i className="feather-list"></i>
                                             </a>
-                                            <a
-                                                href=""
-                                                className="btn btn-outline-gray me-2"
-                                            >
+                                            <a href="" className="btn btn-outline-gray me-2">
                                                 <i className="feather-grid"></i>
                                             </a>
-                                            <a
-                                                href=""
-                                                className="btn btn-outline-primary me-2"
-                                            >
-                                                <i className="fas fa-download"></i>{" "}
-                                                Download
+                                            <a href="" className="btn btn-outline-primary me-2">
+                                                <i className="fas fa-download"></i> Download
                                             </a>
-                                            <NavLink
-                                                to="/student-create"
-                                                className="btn btn-primary"
-                                            >
+                                            <NavLink to="/student-create" className="btn btn-primary">
                                                 <i className="fas fa-plus"></i>
                                             </NavLink>
                                         </div>
@@ -164,11 +134,7 @@ function Student_Of_Class_List() {
                                             <tr>
                                                 <th>
                                                     <div className="form-check check-tables">
-                                                        <input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                            value="something"
-                                                        />
+                                                        <input className="form-check-input" type="checkbox" value="something" />
                                                     </div>
                                                 </th>
                                                 <th>Student Code</th>
@@ -179,9 +145,7 @@ function Student_Of_Class_List() {
                                                 <th>Gender</th>
                                                 <th>Address</th>
                                                 <th>Class</th>
-                                                <th className="text-end">
-                                                    Action
-                                                </th>
+                                                <th className="text-end">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -190,79 +154,33 @@ function Student_Of_Class_List() {
                                                     <tr>
                                                         <td>
                                                             <div className="form-check check-tables">
-                                                                <input
-                                                                    className="form-check-input"
-                                                                    type="checkbox"
-                                                                    value="something"
-                                                                />
+                                                                <input className="form-check-input" type="checkbox" value="something" />
                                                             </div>
                                                         </td>
-                                                        <td>
-                                                            {item.student_code}
-                                                        </td>
+                                                        <td>{item.student_code}</td>
                                                         <td>
                                                             <h2 className="table-avatar">
-                                                                <a
-                                                                    href="student-details.html"
-                                                                    className="avatar avatar-sm me-2"
-                                                                >
-                                                                    <img
-                                                                        className="avatar-img rounded-circle"
-                                                                        src={
-                                                                            item.avatar
-                                                                        }
-                                                                        alt="User Image"
-                                                                    />
+                                                                <a href="student-details.html" className="avatar avatar-sm me-2">
+                                                                    <img className="avatar-img rounded-circle" src={item.avatar} alt="User Image" />
                                                                 </a>
-                                                                <a href="student-details.html">
-                                                                    {
-                                                                        item.fullname
-                                                                    }
-                                                                </a>
+                                                                <a href="student-details.html">{item.fullname}</a>
                                                             </h2>
                                                         </td>
-                                                        <td>
-                                                            {format(
-                                                                new Date(
-                                                                    item.birthday
-                                                                ),
-                                                                "yyyy-MM-dd"
-                                                            )}
-                                                        </td>
+                                                        <td>{format(new Date(item.birthday), "yyyy-MM-dd")}</td>
                                                         <td>{item.email}</td>
                                                         <td>{item.phone}</td>
                                                         <td>{item.gender}</td>
                                                         <td>{item.address}</td>
-                                                        <td>
-                                                            {
-                                                                classNames[
-                                                                    item
-                                                                        .class_id
-                                                                ]
-                                                            }
-                                                        </td>
+                                                        <td>{classNames[item.class_id]}</td>
                                                         <td className="text-end">
                                                             <div className="actions">
-                                                                <a
-                                                                    href="javascript:;"
-                                                                    className="btn btn-sm bg-success-light me-2"
-                                                                >
+                                                                <a href="javascript:;" className="btn btn-sm bg-success-light me-2">
                                                                     <i className="feather-eye"></i>
                                                                 </a>
-                                                                <NavLink
-                                                                    to={`/student-edit/${item.id}`}
-                                                                    className="btn btn-sm bg-danger-light"
-                                                                >
+                                                                <NavLink to={`/student-edit/${item.id}`} className="btn btn-sm bg-danger-light">
                                                                     <i className="feather-edit"></i>
                                                                 </NavLink>
-                                                                <NavLink
-                                                                    onClick={() =>
-                                                                        handleDeleteStudent(
-                                                                            item.id
-                                                                        )
-                                                                    }
-                                                                    className="btn btn-sm bg-danger-light"
-                                                                >
+                                                                <NavLink onClick={() => handleDeleteStudent(item.id)} className="btn btn-sm bg-danger-light">
                                                                     <i className="feather-trash"></i>
                                                                 </NavLink>
                                                             </div>

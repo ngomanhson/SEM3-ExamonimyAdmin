@@ -10,6 +10,7 @@ import url from "../../../services/url";
 import Layout from "../../../layouts/layouts";
 import { Helmet } from "react-helmet";
 function Test_Excel_Create() {
+    const [userRole, setUserRole] = useState(null);
     const animatedComponents = makeAnimated();
     const [isClearable, setIsClearable] = useState(true);
     const [isSearchable, setIsSearchable] = useState(true);
@@ -110,7 +111,9 @@ function Test_Excel_Create() {
     //hiển thị select exam
     useEffect(() => {
         const fetchExams = async () => {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const response = await api.get(url.EXAM.LIST);
                 const examData = response.data.map((exam) => ({
                     value: exam.id,
@@ -128,7 +131,9 @@ function Test_Excel_Create() {
     //hiển thị danh sách lớp học
     useEffect(() => {
         const fetchClasses = async () => {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const response = await api.get(url.CLASS.LIST);
                 const classData = response.data.map((cls) => ({
                     value: cls.id,
@@ -185,6 +190,7 @@ function Test_Excel_Create() {
             });
             return;
         }
+        const userToken = localStorage.getItem("accessToken");
         try {
             const data = {
                 name: formTest.name,
@@ -197,6 +203,7 @@ function Test_Excel_Create() {
                 studentIds: selectedStudents.map((student) => student.value),
                 excelFile: formTest.excelFile,
             };
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const rs = await api.post(url.TEST.CREATE_MULTIPLE_EXCEL, data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -230,6 +237,26 @@ function Test_Excel_Create() {
             setFormTest({ ...formTest, excelFile: file });
         }
     };
+
+    //kiem tra rol
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
 
     const handleChange = (e, selectedOption) => {
         const { name, value } = e.target;

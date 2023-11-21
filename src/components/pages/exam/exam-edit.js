@@ -59,9 +59,7 @@ function Exam_Edit() {
     };
 
     const showNotification = (type, message) => {
-        const notificationContainer = document.getElementById(
-            "notification-container"
-        );
+        const notificationContainer = document.getElementById("notification-container");
         const notification = document.createElement("div");
         notification.className = `alert alert-${type}`;
         notification.textContent = message;
@@ -73,14 +71,13 @@ function Exam_Edit() {
     };
 
     useEffect(() => {
+        const userToken = localStorage.getItem("accessToken");
+        api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
         api.get(`${url.EXAM.DETAIL}?slug=${slug}`)
             .then((response) => {
                 const initialExamData = {
                     ...response.data,
-                    start_date: format(
-                        new Date(response.data.start_date),
-                        "yyyy-MM-dd"
-                    ),
+                    start_date: format(new Date(response.data.start_date), "yyyy-MM-dd"),
                 };
                 setExamData(initialExamData);
                 setIsLoading(false);
@@ -92,17 +89,13 @@ function Exam_Edit() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
+            const userToken = localStorage.getItem("accessToken");
             try {
-                const rs = await api.put(
-                    `${url.EXAM.EDIT}?id=${examData.id}`,
-                    examData
-                );
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
+                const rs = await api.put(`${url.EXAM.EDIT}?id=${examData.id}`, examData);
                 showNotification("success", "Exam updated successfully!");
             } catch (error) {
-                if (
-                    error.response.status === 400 &&
-                    error.response.data === "Exam name already exists"
-                ) {
+                if (error.response.status === 400 && error.response.data === "Exam name already exists") {
                     setNameExistsError("This exam name already exists");
                 } else {
                 }
@@ -113,7 +106,9 @@ function Exam_Edit() {
     //hiển thị select course
     useEffect(() => {
         const fetchCourses = async () => {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const response = await api.get(url.ClassCourse.LIST);
                 const courseData = response.data.data.map((course) => ({
                     value: course.id,
@@ -174,9 +169,7 @@ function Exam_Edit() {
                                     <div className="form-group">
                                         <label>
                                             Exam Name
-                                            <span className="login-danger">
-                                                *
-                                            </span>
+                                            <span className="login-danger">*</span>
                                         </label>
                                         <input
                                             className="form-control"
@@ -189,23 +182,13 @@ function Exam_Edit() {
                                                 })
                                             }
                                         />
-                                        {errors.name && (
-                                            <div className="text-danger">
-                                                {errors.name}
-                                            </div>
-                                        )}
-                                        {nameExistsError && (
-                                            <div className="text-danger">
-                                                {nameExistsError}
-                                            </div>
-                                        )}
+                                        {errors.name && <div className="text-danger">{errors.name}</div>}
+                                        {nameExistsError && <div className="text-danger">{nameExistsError}</div>}
                                     </div>
                                     <div className="form-group">
                                         <label>
                                             Exam Day
-                                            <span className="login-danger">
-                                                *
-                                            </span>
+                                            <span className="login-danger">*</span>
                                         </label>
                                         <input
                                             className="form-control"
@@ -219,67 +202,40 @@ function Exam_Edit() {
                                             }
                                             min={today}
                                         />
-                                        {errors.start_date && (
-                                            <div className="text-danger">
-                                                {errors.start_date}
-                                            </div>
-                                        )}
+                                        {errors.start_date && <div className="text-danger">{errors.start_date}</div>}
                                     </div>
                                     <div className="form-group">
                                         <label>
                                             Course
-                                            <span className="login-danger">
-                                                *
-                                            </span>
+                                            <span className="login-danger">*</span>
                                         </label>
                                         <Select
                                             options={optionsCourse}
                                             isSearchable={isSearchable}
                                             isClearable={isClearable}
-                                            value={optionsCourse.find(
-                                                (option) =>
-                                                    option.value ===
-                                                    examData.courseClass_id
-                                            )}
+                                            value={optionsCourse.find((option) => option.value === examData.courseClass_id)}
                                             onChange={handleChangeCourse}
                                         />
-                                        {errors.courseClass_id && (
-                                            <div className="text-danger">
-                                                {errors.courseClass_id}
-                                            </div>
-                                        )}
+                                        {errors.courseClass_id && <div className="text-danger">{errors.courseClass_id}</div>}
                                     </div>
                                     <div className="form-group">
                                         <label>
                                             Creator
-                                            <span className="login-danger">
-                                                *
-                                            </span>
+                                            <span className="login-danger">*</span>
                                         </label>
                                         <Select
                                             options={optionsCreator}
                                             isSearchable={isSearchable}
                                             isClearable={isClearable}
-                                            value={optionsCreator.find(
-                                                (option) =>
-                                                    option.value ===
-                                                    examData.created_by
-                                            )}
+                                            value={optionsCreator.find((option) => option.value === examData.created_by)}
                                             onChange={handleChangeCreator}
                                             placeholder="Select Creator"
                                         />
-                                        {errors.created_by && (
-                                            <div className="text-danger">
-                                                {errors.created_by}
-                                            </div>
-                                        )}
+                                        {errors.created_by && <div className="text-danger">{errors.created_by}</div>}
                                     </div>
                                     <div class="form-group"></div>
                                     <div className="text-end">
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary"
-                                        >
+                                        <button type="submit" className="btn btn-primary">
                                             Update
                                         </button>
                                     </div>

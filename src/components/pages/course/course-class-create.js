@@ -8,8 +8,10 @@ import api from "../../services/api";
 import url from "../../services/url";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import { useNavigate } from "react-router-dom";
 import Loading from "../../layouts/loading";
 function Course_Class_Create() {
+    const [userRole, setUserRole] = useState(null);
     const animatedComponents = makeAnimated();
     const [isClearable, setIsClearable] = useState(true);
     const [isSearchable, setIsSearchable] = useState(true);
@@ -21,6 +23,7 @@ function Course_Class_Create() {
     const day = today.getDate().toString().padStart(2, "0");
     const currentTime = "00:00";
     const todayDateTimeLocal = `${year}-${month}-${day}T${currentTime}`; //chỉ cho người dùng chọn từ ngay hôm nay trở đi
+    const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
 
@@ -70,7 +73,9 @@ function Course_Class_Create() {
     //hiển thị select course
     useEffect(() => {
         const fetchCourses = async () => {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const response = await api.get(url.COURSE.LIST);
                 const courseData = response.data.data.map((course) => ({
                     value: course.id,
@@ -99,7 +104,9 @@ function Course_Class_Create() {
     //hiển thị select classes
     useEffect(() => {
         const fetchClasses = async () => {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const response = await api.get(url.CLASS.LIST);
                 const classData = response.data.map((classes) => ({
                     value: classes.id,
@@ -128,7 +135,9 @@ function Course_Class_Create() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const rs = await api.post(url.ClassCourse.CREATE, formCourseClass);
                 toast.success("Add course with class successful.", {
                     position: toast.POSITION.TOP_RIGHT,
@@ -140,6 +149,26 @@ function Course_Class_Create() {
             }
         }
     };
+
+    //kiểm tra role
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher" || userRole === "Staff") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;

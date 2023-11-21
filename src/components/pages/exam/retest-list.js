@@ -7,15 +7,20 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect, useState } from "react";
 import { NavLink, Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 function Retest_List() {
+    const [userRole, setUserRole] = useState(null);
     const [retestExam, setRetestExam] = useState([]);
     const [examName, setExamName] = useState({});
     const [studentName, setStudentName] = useState({});
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     //hiển thị danh sách các kỳ thi
     const loadRetestExams = async () => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.get(url.RETEST.LIST);
             setRetestExam(response.data.data);
         } catch (error) {}
@@ -23,7 +28,9 @@ function Retest_List() {
 
     //hiển thị tên exam
     const fetchExamName = async () => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.get(url.EXAM.LIST);
             const examData = response.data.reduce((acc, curr) => {
                 acc[curr.id] = curr.name;
@@ -67,6 +74,7 @@ function Retest_List() {
             });
 
             if (isConfirmed.isConfirmed) {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const updateResponse = await api.put(
                     url.RETEST.CONFIRM,
                     {
@@ -90,6 +98,26 @@ function Retest_List() {
             }
         }
     };
+
+    //kiểm tra role
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
 
     useEffect(() => {
         loadRetestExams();

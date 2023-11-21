@@ -5,24 +5,40 @@ import { format } from "date-fns";
 import { NavLink } from "react-router-dom";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import Loading from "../../layouts/loading";
+import { useNavigate } from "react-router-dom";
 function Exam_List() {
+    const [userRole, setUserRole] = useState(null);
     const [exams, setExams] = useState([]);
     const [courseNames, setCourseNames] = useState({});
     const [error, setError] = useState(null);
-
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    }, []);
     //hiển thị danh sách các kỳ thi
     const loadExams = async () => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.get(url.EXAM.LIST);
             setExams(response.data);
         } catch (error) {
-            setError("Failed to load classes.");
+            if (error.response.status === 403) {
+                navigate("/404");
+                return;
+            }
         }
     };
 
     //hiển thị tên khoá học
     const fetchCourseNames = async () => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.get(url.ClassCourse.LIST);
             const courseNameMap = {};
             response.data.data.forEach((course) => {
@@ -53,7 +69,9 @@ function Exam_List() {
         }
     };
     const deleteExam = async (id) => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             await api.delete(`${url.EXAM.DELETE}?id=${id}`);
             setExams(exams.filter((c) => c.id !== id));
         } catch (error) {
@@ -61,12 +79,33 @@ function Exam_List() {
         }
     };
 
+    //kiểm tra role
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
+
     useEffect(() => {
         loadExams();
         fetchCourseNames();
-    }, []);
+    }, [navigate]);
     return (
         <>
+            {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Exam | Examonimy</title>
             </Helmet>

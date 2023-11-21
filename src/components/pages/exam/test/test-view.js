@@ -50,6 +50,8 @@ function Test_View() {
 
     //hien thi ten exam
     useEffect(() => {
+        const userToken = localStorage.getItem("accessToken");
+        api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
         api.get(url.EXAM.LIST)
             .then((response) => {
                 setExamName(response.data);

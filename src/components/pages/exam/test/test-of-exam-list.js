@@ -44,7 +44,9 @@ function Test_Of_Exam_List() {
 
     // hiển thị tên kì thi
     const fetchExamNames = async () => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.get(url.EXAM.LIST);
             const examData = response.data.reduce((acc, curr) => {
                 acc[curr.id] = curr.name;

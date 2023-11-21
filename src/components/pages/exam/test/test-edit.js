@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import Layout from "../../../layouts/layouts";
 import { Helmet } from "react-helmet";
 function Test_Edit() {
+    const [userRole, setUserRole] = useState(null);
     const { slug } = useParams();
     const [isLoading, setIsLoading] = useState(true);
     const animatedComponents = makeAnimated();
@@ -83,7 +84,9 @@ function Test_Edit() {
     //hiển thị select exam
     useEffect(() => {
         const fetchExams = async () => {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const response = await api.get(url.EXAM.LIST);
                 const examData = response.data.map((exam) => ({
                     value: exam.id,
@@ -112,10 +115,7 @@ function Test_Edit() {
         e.preventDefault();
         if (validateForm()) {
             try {
-                const rs = await api.put(
-                    `${url.TEST.EDIT}?id=${testData.id}`,
-                    testData
-                );
+                const rs = await api.put(`${url.TEST.EDIT}?id=${testData.id}`, testData);
                 toast.success("Update Test Successfully", {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 3000,
@@ -124,16 +124,33 @@ function Test_Edit() {
                     navigate(`/test-list`); //chuyển đến trang test-list
                 }, 3000);
             } catch (error) {
-                if (
-                    error.response.status === 400 &&
-                    error.response.data === "Class name already exists"
-                ) {
+                if (error.response.status === 400 && error.response.data === "Class name already exists") {
                     setNameExistsError("This test name already exists");
                 } else {
                 }
             }
         }
     };
+
+    //kiểm tra role
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
     return (
         <>
             <Helmet>
@@ -143,9 +160,7 @@ function Test_Edit() {
                 <div className="page-header">
                     <div className="row">
                         <div className="col">
-                            <h3 className="page-title">
-                                Edit Test Information
-                            </h3>
+                            <h3 className="page-title">Edit Test Information</h3>
                         </div>
                     </div>
                 </div>
@@ -155,9 +170,7 @@ function Test_Edit() {
                         <form onSubmit={handleSubmit}>
                             <div class="card">
                                 <div class="card-header">
-                                    <h5 class="card-title">
-                                        Edit Test Information
-                                    </h5>
+                                    <h5 class="card-title">Edit Test Information</h5>
                                 </div>
                                 <div class="card-body">
                                     <div className="form-group">
@@ -173,16 +186,8 @@ function Test_Edit() {
                                             }
                                             class="form-control"
                                         />
-                                        {errors.name && (
-                                            <div className="text-danger">
-                                                {errors.name}
-                                            </div>
-                                        )}
-                                        {nameExistsError && (
-                                            <div className="text-danger">
-                                                {nameExistsError}
-                                            </div>
-                                        )}
+                                        {errors.name && <div className="text-danger">{errors.name}</div>}
+                                        {nameExistsError && <div className="text-danger">{nameExistsError}</div>}
                                     </div>
                                     <div class="form-group">
                                         <label>Exam</label>
@@ -190,18 +195,10 @@ function Test_Edit() {
                                             options={optionsExam}
                                             isSearchable={isSearchable}
                                             isClearable={isClearable}
-                                            value={optionsExam.find(
-                                                (option) =>
-                                                    option.value ===
-                                                    testData.exam_id
-                                            )}
+                                            value={optionsExam.find((option) => option.value === testData.exam_id)}
                                             onChange={handleChangeExam}
                                         />
-                                        {errors.exam_id && (
-                                            <div className="text-danger">
-                                                {errors.exam_id}
-                                            </div>
-                                        )}
+                                        {errors.exam_id && <div className="text-danger">{errors.exam_id}</div>}
                                     </div>
                                     <div class="form-group">
                                         <label>Start Date Time</label>
@@ -217,11 +214,7 @@ function Test_Edit() {
                                             }
                                             min={todayDateTimeLocal}
                                         />
-                                        {errors.startDate && (
-                                            <div className="text-danger">
-                                                {errors.startDate}
-                                            </div>
-                                        )}
+                                        {errors.startDate && <div className="text-danger">{errors.startDate}</div>}
                                     </div>
                                     <div class="form-group">
                                         <label>End Date Time</label>
@@ -237,11 +230,7 @@ function Test_Edit() {
                                             }
                                             min={testData.startDate}
                                         />
-                                        {errors.endDate && (
-                                            <div className="text-danger">
-                                                {errors.endDate}
-                                            </div>
-                                        )}
+                                        {errors.endDate && <div className="text-danger">{errors.endDate}</div>}
                                     </div>
                                     <div className="form-group">
                                         <label>
@@ -266,35 +255,20 @@ function Test_Edit() {
                                                 })
                                             }
                                         >
-                                            <option value="">
-                                                Select pass score...
-                                            </option>
+                                            <option value="">Select pass score...</option>
                                             <option value="50">50</option>
                                             <option value="40">40</option>
                                             <option value="30">30</option>
                                             <option value="20">20</option>
                                         </select>
-                                        {errors.past_marks && (
-                                            <div className="text-danger">
-                                                {errors.past_marks}
-                                            </div>
-                                        )}
+                                        {errors.past_marks && <div className="text-danger">{errors.past_marks}</div>}
                                     </div>
                                     <div className="form-group">
                                         <label>Total Score</label>
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            value="100"
-                                            name="total_marks"
-                                            disabled
-                                        />
+                                        <input type="text" class="form-control" value="100" name="total_marks" disabled />
                                     </div>
                                     <div className="text-end">
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary"
-                                        >
+                                        <button type="submit" className="btn btn-primary">
                                             Update Test
                                         </button>
                                     </div>
