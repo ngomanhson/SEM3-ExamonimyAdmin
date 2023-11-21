@@ -34,9 +34,7 @@ function Exam_List() {
 
     //thông báo
     const showNotification = (type, message) => {
-        const notificationContainer = document.getElementById(
-            "notification-container"
-        );
+        const notificationContainer = document.getElementById("notification-container");
         const notification = document.createElement("div");
         notification.className = `alert alert-${type}`;
         notification.textContent = message;
@@ -49,9 +47,7 @@ function Exam_List() {
 
     //xử lý xoá kì thi
     const handleDeleteExam = (id) => {
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this exam?"
-        );
+        const confirmed = window.confirm("Are you sure you want to delete this exam?");
         if (confirmed) {
             deleteExam(id);
         }
@@ -61,10 +57,7 @@ function Exam_List() {
             await api.delete(`${url.EXAM.DELETE}?id=${id}`);
             setExams(exams.filter((c) => c.id !== id));
         } catch (error) {
-            showNotification(
-                "danger",
-                "The exam cannot be deleted because this exam has existing tests."
-            );
+            showNotification("danger", "The exam cannot be deleted because this exam has existing tests.");
         }
     };
 
@@ -98,16 +91,10 @@ function Exam_List() {
                                             <h3 className="page-title">Exam</h3>
                                         </div>
                                         <div className="col-auto text-end float-end ms-auto download-grp">
-                                            <a
-                                                href="#"
-                                                className="btn btn-outline-primary me-2"
-                                            >
+                                            <NavLink to="/retest-list" className="btn btn-outline-primary me-2">
                                                 Retest List
-                                            </a>
-                                            <NavLink
-                                                to="/exam-create"
-                                                className="btn btn-primary"
-                                            >
+                                            </NavLink>
+                                            <NavLink to="/exam-create" className="btn btn-primary">
                                                 <i className="fas fa-plus"></i>
                                             </NavLink>
                                         </div>
@@ -122,9 +109,7 @@ function Exam_List() {
                                                 <th>Name Exam</th>
                                                 <th>Course</th>
                                                 <th>Date</th>
-                                                <th className="text-end">
-                                                    Action
-                                                </th>
+                                                <th className="text-end">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -133,44 +118,17 @@ function Exam_List() {
                                                     <tr>
                                                         <td>{index + 1}</td>
                                                         <td>{item.name}</td>
-                                                        <td>
-                                                            {
-                                                                courseNames[
-                                                                    item
-                                                                        .courseClass_id
-                                                                ]
-                                                            }
-                                                        </td>
-                                                        <td>
-                                                            {format(
-                                                                new Date(
-                                                                    item.start_date
-                                                                ),
-                                                                "yyyy-MM-dd"
-                                                            )}
-                                                        </td>
+                                                        <td>{courseNames[item.courseClass_id]}</td>
+                                                        <td>{format(new Date(item.start_date), "yyyy-MM-dd")}</td>
                                                         <td className="text-end">
                                                             <div className="actions">
-                                                                <NavLink
-                                                                    to={`/test-of-exam-list/${item.id}`}
-                                                                    className="btn btn-sm bg-success-light me-2"
-                                                                >
+                                                                <NavLink to={`/test-of-exam-list/${item.id}`} className="btn btn-sm bg-success-light me-2">
                                                                     <i className="feather-eye"></i>
                                                                 </NavLink>
-                                                                <NavLink
-                                                                    to={`/exam-edit/${item.slug}`}
-                                                                    className="btn btn-sm bg-danger-light"
-                                                                >
+                                                                <NavLink to={`/exam-edit/${item.slug}`} className="btn btn-sm bg-danger-light">
                                                                     <i className="feather-edit"></i>
                                                                 </NavLink>
-                                                                <NavLink
-                                                                    onClick={() =>
-                                                                        handleDeleteExam(
-                                                                            item.id
-                                                                        )
-                                                                    }
-                                                                    className="btn btn-sm bg-danger-light"
-                                                                >
+                                                                <NavLink onClick={() => handleDeleteExam(item.id)} className="btn btn-sm bg-danger-light">
                                                                     <i className="feather-trash"></i>
                                                                 </NavLink>
                                                             </div>

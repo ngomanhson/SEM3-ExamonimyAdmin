@@ -112,7 +112,7 @@ function Test_List() {
                                 <div className="row align-items-center">
                                     <h5 className="card-title">
                                         List of tests
-                                        {userRole === "Exam Administrator" || userRole === "Super Admin" ? (
+                                        {userRole === "Staff" || userRole === "Super Admin" ? (
                                             <NavLink to={`/test-create`} data-bs-toggle="modal" data-bs-target="#signup-modal" className="btn btn-primary float-sm-end m-l-10">
                                                 Add New Test
                                             </NavLink>

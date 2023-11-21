@@ -120,9 +120,7 @@ function Test_Create() {
             newErrors.studentTds = "Please choose students";
             valid = false;
         } else {
-            const selectedStudentIds = selectedStudents.map(
-                (option) => option.value
-            );
+            const selectedStudentIds = selectedStudents.map((option) => option.value);
             setFormTest({ ...formTest, studentTds: selectedStudentIds });
         }
         if (formTest.past_marks === "") {
@@ -172,9 +170,7 @@ function Test_Create() {
         if (selectedClass) {
             const fetchStudentsByClass = async () => {
                 try {
-                    const response = await api.get(
-                        `${url.STUDENT.CLASS_ID}?classId=${selectedClass.value}`
-                    );
+                    const response = await api.get(`${url.STUDENT.CLASS_ID}?classId=${selectedClass.value}`);
                     const studentData = response.data.map((std) => ({
                         value: std.id,
                         label: std.fullname,
@@ -208,13 +204,10 @@ function Test_Create() {
         e.preventDefault();
         const formValidationResult = validateForm();
         if (!formValidationResult) {
-            toast.error(
-                "You have not completely filled in the Test information",
-                {
-                    position: toast.POSITION.TOP_RIGHT,
-                    autoClose: 3000,
-                }
-            );
+            toast.error("You have not completely filled in the Test information", {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 3000,
+            });
             return;
         }
         if (!isQuestionsAdded) {
@@ -257,11 +250,12 @@ function Test_Create() {
                 navigate(`/test-of-exam-list/${createdExamId}`); //chuyển đến trang test-list
             }, 3000);
         } catch (error) {
-            if (
-                error.response.status === 400 &&
-                error.response.data === "Class name already exists"
-            ) {
+            if (error.response.status === 400 && error.response.data.message === "Test name already exists") {
                 setNameExistsError("This test name already exists");
+                toast.error("This test name already exists", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
             } else {
             }
             // console.error("Error creating test:", error);
@@ -283,9 +277,7 @@ function Test_Create() {
                 <div className="page-header">
                     <div className="row">
                         <div className="col">
-                            <h3 className="page-title">
-                                Create Test Multiple Choice
-                            </h3>
+                            <h3 className="page-title">Create Test Multiple Choice</h3>
                         </div>
                     </div>
                 </div>
@@ -294,19 +286,13 @@ function Test_Create() {
                     <div class="col-md-9">
                         <ul class="list-links mb-4">
                             <li class="active">
-                                <NavLink to="">
-                                    Create your own questions
-                                </NavLink>
+                                <NavLink to="">Create your own questions</NavLink>
                             </li>
                             <li>
-                                <NavLink to="/test-excel">
-                                    With excel files
-                                </NavLink>
+                                <NavLink to="/test-excel">With excel files</NavLink>
                             </li>
                             <li>
-                                <NavLink to="/test-available">
-                                    With questions available
-                                </NavLink>
+                                <NavLink to="/test-available">With questions available</NavLink>
                             </li>
                         </ul>
                     </div>
@@ -322,24 +308,9 @@ function Test_Create() {
                                 <div class="card-body">
                                     <div className="form-group">
                                         <label>Name Test</label>
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value={formTest.name}
-                                            onChange={handleChange}
-                                            class="form-control"
-                                            placeholder="Enter Test Name"
-                                        />
-                                        {errors.name && (
-                                            <div className="text-danger">
-                                                {errors.name}
-                                            </div>
-                                        )}
-                                        {nameExistsError && (
-                                            <div className="text-danger">
-                                                {nameExistsError}
-                                            </div>
-                                        )}
+                                        <input type="text" name="name" value={formTest.name} onChange={handleChange} class="form-control" placeholder="Enter Test Name" />
+                                        {errors.name && <div className="text-danger">{errors.name}</div>}
+                                        {nameExistsError && <div className="text-danger">{nameExistsError}</div>}
                                     </div>
                                     <div class="form-group">
                                         <label>Exam</label>
@@ -347,19 +318,11 @@ function Test_Create() {
                                             options={optionsExam}
                                             isSearchable={isSearchable}
                                             isClearable={isClearable}
-                                            value={optionsExam.find(
-                                                (option) =>
-                                                    option.value ===
-                                                    formTest.exam_id
-                                            )}
+                                            value={optionsExam.find((option) => option.value === formTest.exam_id)}
                                             onChange={handleChangeExam}
                                             placeholder="Select Exam"
                                         />
-                                        {errors.exam_id && (
-                                            <div className="text-danger">
-                                                {errors.exam_id}
-                                            </div>
-                                        )}
+                                        {errors.exam_id && <div className="text-danger">{errors.exam_id}</div>}
                                     </div>
                                     <div className="form-group">
                                         <label>Class</label>
@@ -383,43 +346,17 @@ function Test_Create() {
                                             name="studentIds"
                                             placeholder="Select Student..."
                                         />
-                                        {errors.studentTds && (
-                                            <div className="text-danger">
-                                                {errors.studentTds}
-                                            </div>
-                                        )}
+                                        {errors.studentTds && <div className="text-danger">{errors.studentTds}</div>}
                                     </div>
                                     <div class="form-group">
                                         <label>Start Date Time</label>
-                                        <input
-                                            className="form-control"
-                                            type="datetime-local"
-                                            name="startDate"
-                                            value={formTest.startDate}
-                                            onChange={handleChange}
-                                            min={todayDateTimeLocal}
-                                        />
-                                        {errors.startDate && (
-                                            <div className="text-danger">
-                                                {errors.startDate}
-                                            </div>
-                                        )}
+                                        <input className="form-control" type="datetime-local" name="startDate" value={formTest.startDate} onChange={handleChange} min={todayDateTimeLocal} />
+                                        {errors.startDate && <div className="text-danger">{errors.startDate}</div>}
                                     </div>
                                     <div class="form-group">
                                         <label>End Date Time</label>
-                                        <input
-                                            className="form-control"
-                                            type="datetime-local"
-                                            name="endDate"
-                                            value={formTest.endDate}
-                                            onChange={handleChange}
-                                            min={formTest.startDate}
-                                        />
-                                        {errors.endDate && (
-                                            <div className="text-danger">
-                                                {errors.endDate}
-                                            </div>
-                                        )}
+                                        <input className="form-control" type="datetime-local" name="endDate" value={formTest.endDate} onChange={handleChange} min={formTest.startDate} />
+                                        {errors.endDate && <div className="text-danger">{errors.endDate}</div>}
                                     </div>
                                     <div className="form-group">
                                         <label>
@@ -433,41 +370,21 @@ function Test_Create() {
                                                 (Points to pass the test)
                                             </span>
                                         </label>
-                                        <select
-                                            className="form-control"
-                                            name="past_marks"
-                                            value={formTest.past_marks}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="">
-                                                Select pass score...
-                                            </option>
+                                        <select className="form-control" name="past_marks" value={formTest.past_marks} onChange={handleChange}>
+                                            <option value="">Select pass score...</option>
                                             <option value="50">50</option>
                                             <option value="40">40</option>
                                             <option value="30">30</option>
                                             <option value="20">20</option>
                                         </select>
-                                        {errors.past_marks && (
-                                            <div className="text-danger">
-                                                {errors.past_marks}
-                                            </div>
-                                        )}
+                                        {errors.past_marks && <div className="text-danger">{errors.past_marks}</div>}
                                     </div>
                                     <div className="form-group">
                                         <label>Total Score</label>
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            value="100"
-                                            name="total_marks"
-                                            disabled
-                                        />
+                                        <input type="text" class="form-control" value="100" name="total_marks" disabled />
                                     </div>
                                     <div className="text-end">
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary"
-                                        >
+                                        <button type="submit" className="btn btn-primary">
                                             Create Test
                                         </button>
                                     </div>
@@ -475,9 +392,7 @@ function Test_Create() {
                             </div>
                         </div>
 
-                        <Question_Create
-                            onQuestionAdded={updateFormTestWithQuestions}
-                        />
+                        <Question_Create onQuestionAdded={updateFormTestWithQuestions} />
                         <ToastContainer />
                     </div>
                 </form>

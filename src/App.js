@@ -34,6 +34,10 @@ import Test_View_Essay from "./components/pages/exam/test/test-view-essay";
 import ForgotPassword from "./components/pages/auth/forgot-password";
 import ResetPassword from "./components/pages/auth/reset-password";
 import NotFound from "./components/pages/other/not-found";
+import Retest_List from "./components/pages/exam/retest-list";
+import TestExcel_Create from "./components/pages/exam/retest/testexcel-create";
+import TestAvaliable_Create from "./components/pages/exam/retest/testavaliable-create";
+import TestByHand_Create from "./components/pages/exam/retest/testbyhand-create";
 function App() {
     const ProtectedRoute = ({ element }) => {
         const token = localStorage.getItem("accessToken");
@@ -79,6 +83,13 @@ function App() {
                 <Route path="/test-available" element={<ProtectedRoute element={<Test_Avaliable />} />}></Route>
                 <Route path="/test-essay-create" element={<ProtectedRoute element={<Test_Essay_Create />} />}></Route>
                 {/* end route exam */}
+
+                {/* start retest route */}
+                <Route path="/retest-list" element={<ProtectedRoute element={<Retest_List />} />}></Route>
+                <Route path="/retest-byhand-create" element={<ProtectedRoute element={<TestByHand_Create />} />}></Route>
+                <Route path="/retest-excel-create" element={<ProtectedRoute element={<TestExcel_Create />} />}></Route>
+                <Route path="/retest-avaliable-create" element={<ProtectedRoute element={<TestAvaliable_Create />} />}></Route>
+                {/* end retest route */}
 
                 {/* start route classes */}
                 <Route path="/classes-list" element={<ProtectedRoute element={<Classes_List />} />}></Route>
