@@ -6,9 +6,12 @@ import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 function Course_List() {
     const [courses, setCourses] = useState([]);
     const [courseCodes, setCourseCodes] = useState([]);
+    const [userRole, setUserRole] = useState(null);
+    const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
 
@@ -19,7 +22,9 @@ function Course_List() {
     });
 
     const loadCourses = async () => {
+        const userToken = localStorage.getItem("accessToken");
         try {
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const classCourseResponse = await api.get(url.ClassCourse.LIST);
             const classIds = classCourseResponse.data.data.map((item) => item.class_id);
             const courseResponse = await api.get(url.COURSE.LIST, {
@@ -39,6 +44,26 @@ function Course_List() {
     const getCourseCode = (courseId) => {
         return courseCodes[courseId] || "";
     };
+
+    //kiểm tra role
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher" || userRole === "Staff") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
 
     useEffect(() => {
         loadCourses();

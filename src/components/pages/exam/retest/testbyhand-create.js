@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../../../layouts/layouts";
 import { Helmet } from "react-helmet";
 function TestByHand_Create() {
+    const [userRole, setUserRole] = useState(null);
     const animatedComponents = makeAnimated();
     const [isClearable, setIsClearable] = useState(true);
     const [isSearchable, setIsSearchable] = useState(true);
@@ -118,7 +119,9 @@ function TestByHand_Create() {
     //hiển thị select exam
     useEffect(() => {
         const fetchexamName = async () => {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const response = await api.get(url.EXAM.LIST);
                 setExamName(response.data);
             } catch (error) {}
@@ -127,7 +130,9 @@ function TestByHand_Create() {
     }, []);
     useEffect(() => {
         const fetchExams = async () => {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const response = await api.get(url.RETEST.LIST);
                 const examData = response.data.data.map((exam) => ({
                     value: exam.exam_id,
@@ -174,6 +179,7 @@ function TestByHand_Create() {
             });
             return;
         }
+        const userToken = localStorage.getItem("accessToken");
         try {
             const data = {
                 name: formTest.name,
@@ -185,6 +191,7 @@ function TestByHand_Create() {
                 created_by: formTest.created_by,
                 questions: formTest.questions,
             };
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const rs = await api.post(url.TEST.CREATE_MULTIPLE_RETAKE, data);
             const createdExamId = rs.data.exam_id;
             clearForm();
@@ -219,6 +226,26 @@ function TestByHand_Create() {
             });
         }
     };
+
+    //kiểm tra role
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
 
     const handleChange = (e, selectedOption) => {
         const { name, value } = e.target;

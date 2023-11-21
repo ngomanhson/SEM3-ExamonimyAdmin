@@ -5,8 +5,11 @@ import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../layouts/loading";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function Student_Create() {
     const [loading, setLoading] = useState(true);
+    const [userRole, setUserRole] = useState(null);
 
     useEffect(() => {
         setTimeout(() => {
@@ -15,7 +18,6 @@ function Student_Create() {
     });
 
     const [formStudent, setFormStudent] = useState({
-        student_code: "",
         fullname: "",
         avatar: null,
         gender: "",
@@ -24,29 +26,17 @@ function Student_Create() {
         phone: "",
         address: "",
         class_id: "",
-        password: "",
     });
     const navigate = useNavigate();
     const [errors, setErrors] = useState({});
 
     const [classes, setClasses] = useState([]);
-    const [studentCodeExistsError, setStudentCodeExistsError] = useState("");
+    const [studentEmailExistsError, setStudentEmailExistsError] = useState("");
 
     // tạo các validate cho các input
     const validateForm = () => {
         let valid = true;
         const newErrors = {};
-
-        if (formStudent.student_code.trim() === "") {
-            newErrors.student_code = "Please enter student code";
-            valid = false;
-        } else if (formStudent.student_code.length < 3) {
-            newErrors.student_code = "The student code must be at least 3 characters";
-            valid = false;
-        } else if (formStudent.student_code.length > 100) {
-            newErrors.student_code = "Student code must be less than 100 characters";
-            valid = false;
-        }
 
         if (formStudent.fullname.trim() === "") {
             newErrors.fullname = "Please enter full name";
@@ -97,29 +87,8 @@ function Student_Create() {
             valid = false;
         }
 
-        if (formStudent.password.trim() === "") {
-            newErrors.password = "Please enter password";
-            valid = false;
-        } else if (formStudent.password.length < 6 || formStudent.password.length > 255) {
-            newErrors.password = "Password should be between 6 and 255 characters";
-            valid = false;
-        }
-
         setErrors(newErrors);
         return valid;
-    };
-
-    // hiển thị thông báo thêm sinh viên thành công
-    const showNotification = (type, message) => {
-        const notificationContainer = document.getElementById("notification-container");
-        const notification = document.createElement("div");
-        notification.className = `alert alert-${type}`;
-        notification.textContent = message;
-        notificationContainer.appendChild(notification);
-
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
     };
 
     //xử lý thêm sinh viên
@@ -130,34 +99,40 @@ function Student_Create() {
         const isFormValid = validateForm();
 
         if (isFormValid) {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const response = await api.post(url.STUDENT.CREATE, formStudent, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
 
-                // Show a success notification
                 if (response && response.data) {
-                    // Access the data property here
                     console.log(response.data);
-                    showNotification("success", "Student created successfully!");
+                    toast.success("Create Student Successfully", {
+                        position: toast.POSITION.TOP_RIGHT,
+                        autoClose: 3000,
+                    });
                 } else {
-                    // Handle the case where response or response.data is undefined
                     console.error("Response or response.data is undefined.");
                 }
-                navigate("/student-list");
+                setTimeout(() => {
+                    navigate("/student-list");
+                }, 3000);
             } catch (error) {
-                if (error.response) {
-                    const { status, data } = error.response;
-                    if (status === 400) {
-                        if (data === "Student code already exists") {
-                            setStudentCodeExistsError("Student code already exists");
-                        } else {
-                            setErrors(data); // Update errors state with validation errors
-                        }
-                    } else {
-                        console.error("Failed to create student:", error);
-                    }
+                if (error.response.status === 400 && error.response.data.message === "Student email already exists") {
+                    setStudentEmailExistsError("Student email already exists");
+                    toast.error("Student email already exists", {
+                        position: toast.POSITION.TOP_RIGHT,
+                        autoClose: 3000,
+                    });
+                } else {
                 }
+                toast.error("Unable to create student, please try again", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
+                console.error("Error creating test:", error);
+                console.error("Response data:", error.response.data);
             }
         }
     };
@@ -168,13 +143,15 @@ function Student_Create() {
             ...formStudent,
             [name]: name === "avatar" ? files[0] : value,
         });
-        setStudentCodeExistsError("");
+        setStudentEmailExistsError("");
     };
 
     //hiển thị select lớp học
     useEffect(() => {
         const fetchClasses = async () => {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const response = await api.get(url.CLASS.LIST);
                 setClasses(response.data);
             } catch (error) {}
@@ -182,24 +159,36 @@ function Student_Create() {
         fetchClasses();
     }, []);
 
-    //con mắt hiển thị password
-    const [showPassword, setShowPassword] = useState(false);
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-    };
-    const passwordInputType = showPassword ? "text" : "password";
     // hien thi avata sinh vien
     const renderStudentImage = () => {
         if (formStudent.avatar instanceof Blob) {
             return <img src={URL.createObjectURL(formStudent.avatar)} alt="Student Avatar" width="150" height="150" />;
         } else if (formStudent.avatar) {
-            // Nếu formStudent.avatar không phải là Blob, bạn có thể xử lý theo cách khác, ví dụ:
-            // Trường hợp này, bạn có thể hiển thị thông báo hoặc hiện tượng khác để báo hiệu lỗi.
             return <p className="text-danger">Invalid avatar data</p>;
         } else {
             return null;
         }
     };
+
+    //kiểm tra role
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
     return (
         <>
             {loading ? <Loading /> : ""}
@@ -232,25 +221,6 @@ function Student_Create() {
                                                     </a>
                                                 </span>
                                             </h5>
-                                        </div>
-                                        <div id="notification-container"></div>
-
-                                        <div className="col-12 col-sm-4">
-                                            <div className="form-group local-forms">
-                                                <label>
-                                                    Student Code <span className="login-danger">*</span>
-                                                </label>
-                                                <input
-                                                    className="form-control"
-                                                    type="text"
-                                                    name="student_code"
-                                                    value={formStudent.student_code}
-                                                    onChange={handleChange}
-                                                    placeholder="Enter Student Code"
-                                                />
-                                                {errors.student_code && <div className="text-danger">{errors.student_code}</div>}
-                                                {studentCodeExistsError && <div className="text-danger">{studentCodeExistsError}</div>}
-                                            </div>
                                         </div>
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
@@ -291,6 +261,7 @@ function Student_Create() {
                                                 </label>
                                                 <input className="form-control" type="email" name="email" value={formStudent.email} onChange={handleChange} placeholder="Enter Email Address" />
                                                 {errors.email && <div className="text-danger">{errors.email}</div>}
+                                                {studentEmailExistsError && <div className="text-danger">{studentEmailExistsError}</div>}
                                             </div>
                                         </div>
                                         <div className="col-12 col-sm-4">
@@ -338,34 +309,6 @@ function Student_Create() {
                                                 {errors.avatar && <div className="text-danger">{errors.avatar}</div>}
                                             </div>
                                         </div>
-
-                                        <div className="col-12">
-                                            <h5 className="form-title">
-                                                <span>Create login accounts for students</span>
-                                            </h5>
-                                        </div>
-                                        <div className="col-12 col-sm-4">
-                                            <div className="form-group local-forms password-input-container">
-                                                <label>
-                                                    Password <span className="login-danger">*</span>
-                                                </label>
-                                                <div className="password-input">
-                                                    <input
-                                                        type={passwordInputType}
-                                                        className="form-control"
-                                                        name="password"
-                                                        value={formStudent.password}
-                                                        onChange={handleChange}
-                                                        placeholder="Enter Password"
-                                                    />
-                                                    <span className={`password-toggle-icon ${showPassword ? "show" : "hide"}`} onClick={togglePasswordVisibility}>
-                                                        {showPassword ? <i className="fa fa-eye-slash"></i> : <i className="fa fa-eye"></i>}
-                                                    </span>
-                                                </div>
-                                                {errors.password && <div className="text-danger">{errors.password}</div>}
-                                            </div>
-                                        </div>
-
                                         <div className="col-12">
                                             <div className="student-submit">
                                                 <button type="submit" className="btn btn-primary">
@@ -379,6 +322,7 @@ function Student_Create() {
                         </div>
                     </div>
                 </div>
+                <ToastContainer />
             </Layout>
         </>
     );

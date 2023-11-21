@@ -122,26 +122,21 @@ function Student_Edit() {
     };
 
     //xử lý sửa sinh viên
-    //xử lý sửa sinh viên
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const isFormValid = await validateForm(); // Chờ hàm validateForm hoàn thành
+        const isFormValid = await validateForm();
 
         if (isFormValid) {
+            const userToken = localStorage.getItem("accessToken");
             try {
                 const formData = new FormData();
-                // Thêm dữ liệu sinh viên vào đối tượng FormData
                 for (const key in studentData) {
                     formData.append(key, studentData[key]);
                 }
-
-                const response = await api.put(
-                    url.STUDENT.EDIT,
-                    formData, // Sử dụng đối tượng FormData để gửi dữ liệu
-                    {
-                        headers: { "Content-Type": "multipart/form-data" },
-                    }
-                );
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
+                const response = await api.put(url.STUDENT.EDIT, formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
 
                 showNotification("success", "Successfully edited student information!");
                 // Sử dụng navigate để chuyển hướng đến "/student-list"
@@ -170,7 +165,9 @@ function Student_Edit() {
     //hiển thị select lớp học
     useEffect(() => {
         const fetchClasses = async () => {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const response = await api.get(url.CLASS.LIST);
                 setClasses(response.data);
             } catch (error) {}

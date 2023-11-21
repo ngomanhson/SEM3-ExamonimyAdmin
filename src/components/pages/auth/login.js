@@ -63,7 +63,20 @@ function Login() {
                 if (loginResponse.data.success) {
                     const token = loginResponse.data.data;
                     localStorage.setItem("accessToken", token);
-                    navigate("/");
+
+                    // Extract user role from the token
+                    const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                    const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+
+                    // Determine the redirect URL based on the user's role
+                    let redirectUrl = "/";
+                    if (userRole === "Staff") {
+                        redirectUrl = "/exam-list";
+                    } else if (userRole === "Teacher") {
+                        redirectUrl = "/teacher-dashboard";
+                    }
+
+                    navigate(redirectUrl);
                 } else {
                     setFormErrors({
                         email: "Invalid email or password.",
@@ -78,6 +91,7 @@ function Login() {
             }
         }
     };
+
     return (
         <>
             <Helmet>

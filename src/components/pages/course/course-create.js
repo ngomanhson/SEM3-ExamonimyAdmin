@@ -10,6 +10,7 @@ import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
 function Course_Create() {
     const navigate = useNavigate();
+    const [userRole, setUserRole] = useState(null);
 
     const [loading, setLoading] = useState(true);
 
@@ -66,7 +67,9 @@ function Course_Create() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
+            const userToken = localStorage.getItem("accessToken");
             try {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const rs = await api.post(url.COURSE.CREATE, formCourse);
                 toast.success("To successfully create a course, continue to choose the class for the course.", {
                     position: toast.POSITION.TOP_RIGHT,
@@ -83,6 +86,26 @@ function Course_Create() {
             }
         }
     };
+
+    //kiểm tra role
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+                setUserRole(userRole);
+
+                if (userRole === "Teacher" || userRole === "Staff") {
+                    navigate("/404");
+                }
+            } catch (error) {
+                console.error("Error loading user role:", error);
+            }
+        };
+
+        fetchUserRole();
+    }, [navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
