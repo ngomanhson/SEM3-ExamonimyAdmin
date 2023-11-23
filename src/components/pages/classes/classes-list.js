@@ -6,6 +6,7 @@ import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../layouts/loading";
+import NotFound from "../../pages/other/not-found";
 function Classes_List() {
     const [classes, setClasses] = useState([]);
     const [teacherNames, setTeacherNames] = useState({});
@@ -90,7 +91,7 @@ function Classes_List() {
                 setUserRole(userRole);
 
                 if (userRole === "Teacher" || userRole === "Staff") {
-                    navigate("/404");
+                    setError(true);
                 }
             } catch (error) {
                 console.error("Error loading user role:", error);
@@ -113,145 +114,151 @@ function Classes_List() {
     return (
         <>
             {loading ? <Loading /> : ""}
-            <Helmet>
-                <title>Class | Examonimy</title>
-            </Helmet>
-            <Layout>
-                <div className="page-header">
-                    <div className="row align-items-center">
-                        <div className="col">
-                            <h3 className="page-title">Classes List</h3>
+            {error ? (
+                <NotFound />
+            ) : (
+                <>
+                    <Helmet>
+                        <title>Class | Examonimy</title>
+                    </Helmet>
+                    <Layout>
+                        <div className="page-header">
+                            <div className="row align-items-center">
+                                <div className="col">
+                                    <h3 className="page-title">Classes List</h3>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <div className="student-group-form">
-                    <div className="row">
-                        <div className="col-lg-3 col-md-6">
-                            <div className="form-group">
-                                <input type="text" className="form-control" placeholder="Search by ID ..." />
-                            </div>
-                        </div>
-                        <div className="col-lg-3 col-md-6">
-                            <div className="form-group">
-                                <input type="text" className="form-control" placeholder="Search by Name ..." />
-                            </div>
-                        </div>
-                        <div className="col-lg-4 col-md-6">
-                            <div className="form-group">
-                                <input type="text" className="form-control" placeholder="Search by Room ..." />
-                            </div>
-                        </div>
-                        <div className="col-lg-2">
-                            <div className="search-student-btn">
-                                <button type="btn" className="btn btn-primary">
-                                    Search
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div className="col-sm-12">
-                        <div className="card card-table">
-                            <div className="card-body">
-                                <div className="page-header">
-                                    <div className="row align-items-center">
-                                        <div className="col">
-                                            <h3 className="page-title">Class</h3>
-                                        </div>
-                                        <div className="col-auto text-end float-end ms-auto download-grp">
-                                            <NavLink to="/class-create" className="btn btn-primary">
-                                                <i className="fas fa-plus"></i>
-                                            </NavLink>
-                                        </div>
+                        <div className="student-group-form">
+                            <div className="row">
+                                <div className="col-lg-3 col-md-6">
+                                    <div className="form-group">
+                                        <input type="text" className="form-control" placeholder="Search by ID ..." />
                                     </div>
                                 </div>
+                                <div className="col-lg-3 col-md-6">
+                                    <div className="form-group">
+                                        <input type="text" className="form-control" placeholder="Search by Name ..." />
+                                    </div>
+                                </div>
+                                <div className="col-lg-4 col-md-6">
+                                    <div className="form-group">
+                                        <input type="text" className="form-control" placeholder="Search by Room ..." />
+                                    </div>
+                                </div>
+                                <div className="col-lg-2">
+                                    <div className="search-student-btn">
+                                        <button type="btn" className="btn btn-primary">
+                                            Search
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                                <div id="notification-container"></div>
-
-                                <table className="table border-0 star-student table-hover table-center mb-0 datatable table-striped">
-                                    <thead className="student-thread">
-                                        <tr>
-                                            <th>
-                                                <div className="form-check check-tables">
-                                                    <input className="form-check-input" type="checkbox" value="something" />
+                        <div className="row">
+                            <div className="col-sm-12">
+                                <div className="card card-table">
+                                    <div className="card-body">
+                                        <div className="page-header">
+                                            <div className="row align-items-center">
+                                                <div className="col">
+                                                    <h3 className="page-title">Class</h3>
                                                 </div>
-                                            </th>
-                                            <th>Ordinal</th>
-                                            <th>Name</th>
-                                            <th>Room</th>
-                                            <th>Teacher</th>
-                                            <th className="text-end">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {currentClasses.map((item, index) => {
-                                            return (
+                                                <div className="col-auto text-end float-end ms-auto download-grp">
+                                                    <NavLink to="/class-create" className="btn btn-primary">
+                                                        <i className="fas fa-plus"></i>
+                                                    </NavLink>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="notification-container"></div>
+
+                                        <table className="table border-0 star-student table-hover table-center mb-0 datatable table-striped">
+                                            <thead className="student-thread">
                                                 <tr>
-                                                    <td>
+                                                    <th>
                                                         <div className="form-check check-tables">
                                                             <input className="form-check-input" type="checkbox" value="something" />
                                                         </div>
-                                                    </td>
-                                                    <td>{index + 1}</td>
-                                                    <td>{item.name}</td>
-                                                    <td>{item.room}</td>
-                                                    <td>{teacherNames[item.teacher_id]}</td>
-                                                    <td className="text-end">
-                                                        <div className="actions">
-                                                            <NavLink to={`/student-of-class-list/${item.id}`} className="btn btn-sm bg-success-light me-2">
-                                                                <i className="feather-eye"></i>
-                                                            </NavLink>
-                                                            <NavLink to={`/classes-edit/${item.slug}`} className="btn btn-sm bg-danger-light">
-                                                                <i className="feather-edit"></i>
-                                                            </NavLink>
-                                                            <NavLink onClick={() => handleDeleteClass(item.id)} className="btn btn-sm bg-danger-light">
-                                                                <i className="feather-trash"></i>
-                                                            </NavLink>
-                                                        </div>
-                                                    </td>
+                                                    </th>
+                                                    <th>Ordinal</th>
+                                                    <th>Name</th>
+                                                    <th>Room</th>
+                                                    <th>Teacher</th>
+                                                    <th className="text-end">Action</th>
                                                 </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
+                                            </thead>
+                                            <tbody>
+                                                {currentClasses.map((item, index) => {
+                                                    return (
+                                                        <tr>
+                                                            <td>
+                                                                <div className="form-check check-tables">
+                                                                    <input className="form-check-input" type="checkbox" value="something" />
+                                                                </div>
+                                                            </td>
+                                                            <td>{index + 1}</td>
+                                                            <td>{item.name}</td>
+                                                            <td>{item.room}</td>
+                                                            <td>{teacherNames[item.teacher_id]}</td>
+                                                            <td className="text-end">
+                                                                <div className="actions">
+                                                                    <NavLink to={`/student-of-class-list/${item.id}`} className="btn btn-sm bg-success-light me-2">
+                                                                        <i className="feather-eye"></i>
+                                                                    </NavLink>
+                                                                    <NavLink to={`/classes-edit/${item.slug}`} className="btn btn-sm bg-danger-light">
+                                                                        <i className="feather-edit"></i>
+                                                                    </NavLink>
+                                                                    <NavLink onClick={() => handleDeleteClass(item.id)} className="btn btn-sm bg-danger-light">
+                                                                        <i className="feather-trash"></i>
+                                                                    </NavLink>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div className="row">
-                    <div className="col">
-                        <ul className="pagination mb-4">
-                            <li className="page-item">
-                                <button className="page-link" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
-                                    Previous
-                                </button>
-                            </li>
-
-                            {Array.from(
-                                {
-                                    length: Math.ceil(classes.length / classesPerPage),
-                                },
-                                (_, i) => (
-                                    <li key={i} className={`page-item ${i + 1 === currentPage ? "active" : ""}`}>
-                                        <button className="page-link" onClick={() => paginate(i + 1)}>
-                                            {i + 1}
+                        <div className="row">
+                            <div className="col">
+                                <ul className="pagination mb-4">
+                                    <li className="page-item">
+                                        <button className="page-link" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
+                                            Previous
                                         </button>
                                     </li>
-                                )
-                            )}
-                            <li className="page-item">
-                                <button className="page-link" onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(classes.length / classesPerPage)}>
-                                    Next
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </Layout>
+
+                                    {Array.from(
+                                        {
+                                            length: Math.ceil(classes.length / classesPerPage),
+                                        },
+                                        (_, i) => (
+                                            <li key={i} className={`page-item ${i + 1 === currentPage ? "active" : ""}`}>
+                                                <button className="page-link" onClick={() => paginate(i + 1)}>
+                                                    {i + 1}
+                                                </button>
+                                            </li>
+                                        )
+                                    )}
+                                    <li className="page-item">
+                                        <button className="page-link" onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(classes.length / classesPerPage)}>
+                                            Next
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </Layout>
+                </>
+            )}
         </>
     );
 }

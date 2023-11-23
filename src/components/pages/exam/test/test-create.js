@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import Layout from "../../../layouts/layouts";
 import { Helmet } from "react-helmet";
+import NotFound from "../../../pages/other/not-found";
 function Test_Create() {
     const [userRole, setUserRole] = useState(null);
     const animatedComponents = makeAnimated();
@@ -29,6 +30,7 @@ function Test_Create() {
     const currentTime = "00:00";
     const todayDateTimeLocal = `${year}-${month}-${day}T${currentTime}`; //chỉ cho người dùng chọn từ ngay hôm nay trở đi
     const navigate = useNavigate();
+    const [error, setError] = useState(false);
     const [nameExistsError, setNameExistsError] = useState("");
     const selectAllOption = {
         value: "select_all",
@@ -280,7 +282,7 @@ function Test_Create() {
                 setUserRole(userRole);
 
                 if (userRole === "Teacher") {
-                    navigate("/404");
+                    setError(true);
                 }
             } catch (error) {
                 console.error("Error loading user role:", error);
@@ -297,133 +299,139 @@ function Test_Create() {
     };
     return (
         <>
-            <Helmet>
-                <title>Test | Examonimy</title>
-            </Helmet>
-            <Layout>
-                <div className="page-header">
-                    <div className="row">
-                        <div className="col">
-                            <h3 className="page-title">Create Test Multiple Choice</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div class="col-md-9">
-                        <ul class="list-links mb-4">
-                            <li class="active">
-                                <NavLink to="">Create your own questions</NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/test-excel">With excel files</NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/test-available">With questions available</NavLink>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <form onSubmit={handleSubmit}>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="card-title">Test Information</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div className="form-group">
-                                        <label>Name Test</label>
-                                        <input type="text" name="name" value={formTest.name} onChange={handleChange} class="form-control" placeholder="Enter Test Name" />
-                                        {errors.name && <div className="text-danger">{errors.name}</div>}
-                                        {nameExistsError && <div className="text-danger">{nameExistsError}</div>}
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Exam</label>
-                                        <Select
-                                            options={optionsExam}
-                                            isSearchable={isSearchable}
-                                            isClearable={isClearable}
-                                            value={optionsExam.find((option) => option.value === formTest.exam_id)}
-                                            onChange={handleChangeExam}
-                                            placeholder="Select Exam"
-                                        />
-                                        {errors.exam_id && <div className="text-danger">{errors.exam_id}</div>}
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Class</label>
-                                        <Select
-                                            isSearchable={isSearchable}
-                                            isClearable={isClearable}
-                                            options={OptionsClasses}
-                                            onChange={handleClassChange}
-                                            placeholder="Select class to select students"
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Student</label>
-                                        <Select
-                                            closeMenuOnSelect={false}
-                                            components={animatedComponents}
-                                            isMulti
-                                            options={allStudentsOptions}
-                                            onChange={handleStudentChange}
-                                            value={selectedStudents}
-                                            name="studentIds"
-                                            placeholder="Select Student..."
-                                        />
-                                        {errors.studentTds && <div className="text-danger">{errors.studentTds}</div>}
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Start Date Time</label>
-                                        <input className="form-control" type="datetime-local" name="startDate" value={formTest.startDate} onChange={handleChange} min={todayDateTimeLocal} />
-                                        {errors.startDate && <div className="text-danger">{errors.startDate}</div>}
-                                    </div>
-                                    <div class="form-group">
-                                        <label>End Date Time</label>
-                                        <input className="form-control" type="datetime-local" name="endDate" value={formTest.endDate} onChange={handleChange} min={formTest.startDate} />
-                                        {errors.endDate && <div className="text-danger">{errors.endDate}</div>}
-                                    </div>
-                                    <div className="form-group">
-                                        <label>
-                                            Pass Score{" "}
-                                            <span
-                                                style={{
-                                                    color: "#808080",
-                                                    fontSize: "13px",
-                                                }}
-                                            >
-                                                (Points to pass the test)
-                                            </span>
-                                        </label>
-                                        <select className="form-control" name="past_marks" value={formTest.past_marks} onChange={handleChange}>
-                                            <option value="">Select pass score...</option>
-                                            <option value="50">50</option>
-                                            <option value="40">40</option>
-                                            <option value="30">30</option>
-                                            <option value="20">20</option>
-                                        </select>
-                                        {errors.past_marks && <div className="text-danger">{errors.past_marks}</div>}
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Total Score</label>
-                                        <input type="text" class="form-control" value="100" name="total_marks" disabled />
-                                    </div>
-                                    <div className="text-end">
-                                        <button type="submit" className="btn btn-primary">
-                                            Create Test
-                                        </button>
-                                    </div>
+            {error ? (
+                <NotFound />
+            ) : (
+                <>
+                    <Helmet>
+                        <title>Test | Examonimy</title>
+                    </Helmet>
+                    <Layout>
+                        <div className="page-header">
+                            <div className="row">
+                                <div className="col">
+                                    <h3 className="page-title">Create Test Multiple Choice</h3>
                                 </div>
                             </div>
                         </div>
 
-                        <Question_Create onQuestionAdded={updateFormTestWithQuestions} />
-                        <ToastContainer />
-                    </div>
-                </form>
-            </Layout>
+                        <div className="row">
+                            <div class="col-md-9">
+                                <ul class="list-links mb-4">
+                                    <li class="active">
+                                        <NavLink to="">Create your own questions</NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink to="/test-excel">With excel files</NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink to="/test-available">With questions available</NavLink>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleSubmit}>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="card-title">Test Information</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div className="form-group">
+                                                <label>Name Test</label>
+                                                <input type="text" name="name" value={formTest.name} onChange={handleChange} class="form-control" placeholder="Enter Test Name" />
+                                                {errors.name && <div className="text-danger">{errors.name}</div>}
+                                                {nameExistsError && <div className="text-danger">{nameExistsError}</div>}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Exam</label>
+                                                <Select
+                                                    options={optionsExam}
+                                                    isSearchable={isSearchable}
+                                                    isClearable={isClearable}
+                                                    value={optionsExam.find((option) => option.value === formTest.exam_id)}
+                                                    onChange={handleChangeExam}
+                                                    placeholder="Select Exam"
+                                                />
+                                                {errors.exam_id && <div className="text-danger">{errors.exam_id}</div>}
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Class</label>
+                                                <Select
+                                                    isSearchable={isSearchable}
+                                                    isClearable={isClearable}
+                                                    options={OptionsClasses}
+                                                    onChange={handleClassChange}
+                                                    placeholder="Select class to select students"
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Student</label>
+                                                <Select
+                                                    closeMenuOnSelect={false}
+                                                    components={animatedComponents}
+                                                    isMulti
+                                                    options={allStudentsOptions}
+                                                    onChange={handleStudentChange}
+                                                    value={selectedStudents}
+                                                    name="studentIds"
+                                                    placeholder="Select Student..."
+                                                />
+                                                {errors.studentTds && <div className="text-danger">{errors.studentTds}</div>}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Start Date Time</label>
+                                                <input className="form-control" type="datetime-local" name="startDate" value={formTest.startDate} onChange={handleChange} min={todayDateTimeLocal} />
+                                                {errors.startDate && <div className="text-danger">{errors.startDate}</div>}
+                                            </div>
+                                            <div class="form-group">
+                                                <label>End Date Time</label>
+                                                <input className="form-control" type="datetime-local" name="endDate" value={formTest.endDate} onChange={handleChange} min={formTest.startDate} />
+                                                {errors.endDate && <div className="text-danger">{errors.endDate}</div>}
+                                            </div>
+                                            <div className="form-group">
+                                                <label>
+                                                    Pass Score{" "}
+                                                    <span
+                                                        style={{
+                                                            color: "#808080",
+                                                            fontSize: "13px",
+                                                        }}
+                                                    >
+                                                        (Points to pass the test)
+                                                    </span>
+                                                </label>
+                                                <select className="form-control" name="past_marks" value={formTest.past_marks} onChange={handleChange}>
+                                                    <option value="">Select pass score...</option>
+                                                    <option value="50">50</option>
+                                                    <option value="40">40</option>
+                                                    <option value="30">30</option>
+                                                    <option value="20">20</option>
+                                                </select>
+                                                {errors.past_marks && <div className="text-danger">{errors.past_marks}</div>}
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Total Score</label>
+                                                <input type="text" class="form-control" value="100" name="total_marks" disabled />
+                                            </div>
+                                            <div className="text-end">
+                                                <button type="submit" className="btn btn-primary">
+                                                    Create Test
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <Question_Create onQuestionAdded={updateFormTestWithQuestions} />
+                                <ToastContainer />
+                            </div>
+                        </form>
+                    </Layout>
+                </>
+            )}
         </>
     );
 }

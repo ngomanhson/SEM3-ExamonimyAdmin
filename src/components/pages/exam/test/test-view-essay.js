@@ -153,7 +153,7 @@ function Test_View_Essay() {
                     },
                 }
             );
-            toast.success("Cham diem thanh cong", {
+            toast.success("Score success", {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 3000,
             });
