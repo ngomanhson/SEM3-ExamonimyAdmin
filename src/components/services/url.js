@@ -82,5 +82,9 @@ const url = {
         LIST: "RegisterExam",
         CONFIRM: "RegisterExam/approve-register",
     },
+    LOCKTEST: {
+        LOCK: "/test/lock-test/{}",
+        UNLOCK: "test/unlock-test/{}",
+    },
 };
 export default url;

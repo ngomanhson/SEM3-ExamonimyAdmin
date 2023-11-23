@@ -227,6 +227,13 @@ function TestByHand_Create() {
                 });
             } else {
             }
+            if (error.response.status === 400 && error.response.data.message === "There is no official test yet") {
+                toast.error("Unable to create test, this exam does not have any main tests!", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
+            } else {
+            }
             toast.error("Unable to re-create test, please try again!", {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 3000,

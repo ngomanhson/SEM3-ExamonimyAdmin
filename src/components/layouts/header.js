@@ -4,6 +4,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 function Header() {
     const navigate = useNavigate();
     const [staffName, setStaffName] = useState("");
+    const [avatar, setAvatar] = useState("");
     const [roleStaff, setRoleStaff] = useState("");
     const [isFullscreen, setIsFullscreen] = useState(false);
     const { isExpired, isInvalid } = useJwt();
@@ -15,9 +16,10 @@ function Header() {
             const decodedToken = JSON.parse(atob(token.split(".")[1]));
             const staffName = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
             const roleStaff = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
-
+            const avatar = decodedToken["Thumbnail"];
             setStaffName(staffName);
-            setRoleStaff(roleStaff);
+            setStaffName(staffName);
+            setAvatar(avatar);
         } catch (error) {}
     }, [isExpired, isInvalid]);
 
@@ -191,7 +193,7 @@ function Header() {
                         <li className="nav-item dropdown has-arrow new-user-menus">
                             <a href="" className="dropdown-toggle nav-link" data-bs-toggle="dropdown">
                                 <span className="user-img">
-                                    <img className="rounded-circle" src="assets/img/profiles/avatar-01.jpg" width="31" alt="Ryan Taylor" />
+                                    <img className="rounded-circle" src={avatar} width="31" alt="Ryan Taylor" />
                                     <div className="user-text">
                                         <h6>{staffName}</h6>
                                         <p className="text-muted mb-0">{roleStaff}</p>
@@ -201,7 +203,7 @@ function Header() {
                             <div className="dropdown-menu">
                                 <div className="user-header">
                                     <div className="avatar avatar-sm">
-                                        <img src="assets/img/profiles/avatar-01.jpg" alt="User Image" className="avatar-img rounded-circle" />
+                                        <img src={avatar} alt="User Image" className="avatar-img rounded-circle" />
                                     </div>
                                     <div className="user-text">
                                         <h6> {staffName}</h6>
@@ -211,9 +213,6 @@ function Header() {
                                 <NavLink className="dropdown-item" to="/profile">
                                     My Profile
                                 </NavLink>
-                                <a className="dropdown-item" href="">
-                                    Inbox
-                                </a>
                                 <a className="dropdown-item" onClick={handleLogout}>
                                     Logout
                                 </a>

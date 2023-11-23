@@ -16,6 +16,7 @@ function Exam_Create() {
     const [courses, setCourses] = useState([]);
     const [loggedInUser, setLoggedInUser] = useState(null);
     const [nameExistsError, setNameExistsError] = useState("");
+    const [examExitstsError, setExamExistsError] = useState("");
     const today = new Date().toISOString().split("T")[0];
     const navigate = useNavigate();
     const [formExam, setFormExam] = useState({
@@ -82,11 +83,17 @@ function Exam_Create() {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 3000,
                 });
+                setTimeout(() => {
+                    navigate(`/exam-list`); //chuyển đến trang exam-list
+                }, 3000);
             } catch (error) {
-                if (error.response.status === 400 && error.response.data === "Exam name already exists") {
+                if (error.response.status === 400 && error.response.data.message === "Exam name already exists") {
                     setNameExistsError("This exam name already exists");
                 } else {
-                    // showNotification("danger", "Failed to create exam.");
+                }
+                if (error.response.status === 400 && error.response.data.message === "You have created too many exams") {
+                    setExamExistsError("This course has reached its exam limit, please choose another course!");
+                } else {
                 }
                 // console.error("Error creating test:", error);
                 // console.error("Response data:", error.response.data);
@@ -158,6 +165,7 @@ function Exam_Create() {
         const { name, value } = e.target;
         setFormExam({ ...formExam, [name]: value });
         setNameExistsError("");
+        setExamExistsError("");
     };
     return (
         <>
@@ -222,6 +230,7 @@ function Exam_Create() {
                                                     placeholder="Select Course"
                                                 />
                                                 {errors.courseClass_id && <div className="text-danger">{errors.courseClass_id}</div>}
+                                                {examExitstsError && <div className="text-danger">{examExitstsError}</div>}
                                             </div>
                                             <div class="form-group"></div>
                                             <div className="text-end">

@@ -7,6 +7,9 @@ import url from "../../../services/url";
 import Loading from "../../../layouts/loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+import { useJwt } from "react-jwt";
 function Test_View_Essay() {
     const { slug } = useParams();
     const [examName, setExamName] = useState([]);
@@ -17,6 +20,10 @@ function Test_View_Essay() {
     const [currentQuestionId, setCurrentQuestionId] = useState(null);
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [score, setScore] = useState(0);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
+    const [isTestLocked, setIsTestLocked] = useState(false);
+    const [userRole, setUserRole] = useState(null);
     const [initialScore, setInitialScore] = useState(0);
     const [testData, setTestData] = useState({
         id: "",
@@ -209,6 +216,64 @@ function Test_View_Essay() {
     const paginate = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
+
+    //xử lý khoá bài test
+    const handleLockTest = async () => {
+        try {
+            const userToken = localStorage.getItem("accessToken");
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userToken}`,
+                },
+            };
+            const isConfirmed = await Swal.fire({
+                title: testData.status === 1 ? "Unlock test?" : "Lock test?",
+                text: testData.status === 1 ? "Are you sure you want to unlock the test?" : "Are you sure you want to lock the test?",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Confirm",
+            });
+
+            if (isConfirmed.isConfirmed) {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
+                const updateResponse = await api.put(testData.status === 1 ? url.LOCKTEST.UNLOCK.replace("{}", slug) : url.LOCKTEST.LOCK.replace("{}", slug), config);
+                setIsTestLocked(!isTestLocked);
+                toast.success(testData.status === 1 ? "Unlock the test successfully." : "Lock the test successfully.", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
+                setTimeout(() => {
+                    navigate(`/test-list`); //chuyển đến trang test-list
+                }, 3000);
+            }
+        } catch (error) {
+            toast.error(testData.status === 1 ? "Unlock the test failed." : "Lock the test failed.", {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 3000,
+            });
+        }
+    };
+
+    const fetchUserRole = async () => {
+        const token = localStorage.getItem("accessToken");
+        try {
+            const decodedToken = JSON.parse(atob(token.split(".")[1]));
+            const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+            setUserRole(userRole);
+        } catch (error) {
+            console.error("Error loading user role:", error);
+        }
+    };
+
+    useEffect(() => {
+        setIsTestLocked(testData.locked);
+    }, [testData.locked]);
+
+    useEffect(() => {
+        fetchUserRole();
+    }, [navigate]);
     return (
         <>
             {loading ? <Loading /> : ""}
@@ -289,16 +354,6 @@ function Test_View_Essay() {
                                     <h5>{testData.past_marks}/100</h5>
                                 </div>
                             </div>
-                            <div class="personal-activity"></div>
-                            <div class="personal-activity mb-0">
-                                <div class="personal-icons">
-                                    <i class="fa fa-cloud"></i>
-                                </div>
-                                <div class="views-personal">
-                                    <h4>Status</h4>
-                                    <h5>It's not time to take the test yet</h5>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <div class="col-lg-8">
@@ -329,7 +384,16 @@ function Test_View_Essay() {
                     <div class="col-xl-12">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="card-title">Students</h5>
+                                <div className="row align-items-center">
+                                    <h5 className="card-title">
+                                        Students
+                                        {userRole === "Super Admin" ? (
+                                            <a className="btn btn-primary float-sm-end m-l-10" onClick={handleLockTest}>
+                                                {testData.status === 0 ? "Lock Test" : "Unlock Test"}
+                                            </a>
+                                        ) : null}
+                                    </h5>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
