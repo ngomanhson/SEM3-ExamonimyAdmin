@@ -24,7 +24,7 @@ function Course_Class_Create() {
     const currentTime = "00:00";
     const todayDateTimeLocal = `${year}-${month}-${day}T${currentTime}`; //chỉ cho người dùng chọn từ ngay hôm nay trở đi
     const navigate = useNavigate();
-
+    const [loggedInUser, setLoggedInUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -38,7 +38,7 @@ function Course_Class_Create() {
         class_id: "",
         start_date: "",
         end_date: "",
-        created_by: 1,
+        created_by: "",
     });
     const [errors, setErrors] = useState({});
     const validateForm = () => {
@@ -138,7 +138,11 @@ function Course_Class_Create() {
             const userToken = localStorage.getItem("accessToken");
             try {
                 api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-                const rs = await api.post(url.ClassCourse.CREATE, formCourseClass);
+                const updatedFormExam = {
+                    ...formCourseClass,
+                    created_by: loggedInUser || "",
+                };
+                const rs = await api.post(url.ClassCourse.CREATE, updatedFormExam);
                 toast.success("Add course with class successful.", {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 5000,
@@ -174,6 +178,29 @@ function Course_Class_Create() {
         const { name, value } = e.target;
         setFormCourseClass({ ...formCourseClass, [name]: value });
     };
+
+    //created_by
+    useEffect(() => {
+        const fetchLoggedInUser = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userId = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+                setLoggedInUser(userId);
+            } catch (error) {}
+        };
+
+        fetchLoggedInUser();
+    }, []);
+
+    useEffect(() => {
+        if (loggedInUser) {
+            setFormCourseClass((prevFormExam) => ({
+                ...prevFormExam,
+                created_by: loggedInUser,
+            }));
+        }
+    }, [loggedInUser]);
     return (
         <>
             {loading ? <Loading /> : ""}

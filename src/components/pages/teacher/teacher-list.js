@@ -136,9 +136,9 @@ function Teacher_List() {
                                                         <i className="fas fa-download"></i>
                                                         Download
                                                     </a>
-                                                    <a href="add-teacher.html" className="btn btn-primary">
+                                                    <NavLink to="/teacher-create" className="btn btn-primary">
                                                         <i className="fas fa-plus"></i>
-                                                    </a>
+                                                    </NavLink>
                                                 </div>
                                             </div>
                                         </div>

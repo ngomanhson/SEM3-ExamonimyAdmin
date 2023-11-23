@@ -6,11 +6,14 @@ import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
 import { useNavigate } from "react-router-dom";
 import NotFound from "../../pages/other/not-found";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function Teacher_Create() {
     const [userRole, setUserRole] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const [error, setError] = useState(false);
+    const [staffEmailExistsError, setStaffEmailExistsError] = useState("");
 
     useEffect(() => {
         setTimeout(() => {
@@ -19,7 +22,6 @@ function Teacher_Create() {
     });
 
     const [formTeacher, setFormTeacher] = useState({
-        staff_code: "",
         fullname: "",
         avatar: null,
         gender: "",
@@ -28,26 +30,13 @@ function Teacher_Create() {
         phone: "",
         address: "",
         password: "",
-        role: 1,
+        role: "",
     });
     const [errors, setErrors] = useState({});
-    const [teacherCodeExistsError, setTeacherCodeExistsError] = useState("");
     // tạo các validate cho các input
     const validateForm = () => {
         let valid = true;
         const newErrors = {};
-
-        if (formTeacher.staff_code.trim() === "") {
-            newErrors.staff_code = "Please enter Teacher code";
-            valid = false;
-        } else if (formTeacher.staff_code.length < 3) {
-            newErrors.staff_code = "The Teacher code must be at least 3 characters";
-            valid = false;
-        } else if (formTeacher.staff_code.length > 100) {
-            newErrors.staff_code = "Teacher code must be less than 100 characters";
-            valid = false;
-        }
-
         if (formTeacher.fullname.trim() === "") {
             newErrors.fullname = "Please enter full name";
             valid = false;
@@ -95,6 +84,11 @@ function Teacher_Create() {
             valid = false;
         }
 
+        if (formTeacher.role.trim() === "") {
+            newErrors.role = "Please choose role";
+            valid = false;
+        }
+
         if (formTeacher.password.trim() === "") {
             newErrors.password = "Please enter password";
             valid = false;
@@ -109,46 +103,8 @@ function Teacher_Create() {
         setErrors(newErrors);
         return valid;
     };
-    // hiển thị thông báo thêm sinh viên thành công
-    const showNotification = (type, message) => {
-        const notificationContainer = document.getElementById("notification-container");
-        const notification = document.createElement("div");
-        notification.className = `alert alert-${type}`;
-        notification.textContent = message;
-        notificationContainer.appendChild(notification);
 
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
-    };
-    //xử lý thêm
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
-    //     if (validateForm()) {
-    //         try {
-    //             const response = await api.post(
-    //                 url.STAFF.CREATE,
-    //                 formTeacher
-    //             );
-
-    //             if (response && response.data) {
-    //                 // Access the data property here
-    //                 console.log(response.data);
-    //                 showNotification("success", "Teacher created successfully!");
-    //             } else {
-    //                 // Handle the case where response or response.data is undefined
-    //                 console.error("Response or response.data is undefined.");
-    //             }
-    //         } catch (error) {
-    //             if (error.response && error.response.data === "Code student already exists") {
-    //                 setTeacherCodeExistsError("Student code already exists");
-    //             } else {
-    //                 // Handle other errors as needed
-    //                 console.error("An error occurred:", error);
-    //             }
-    //         }
-    //     }
-    // };
+    //xử lý thêm staff
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -160,29 +116,32 @@ function Teacher_Create() {
                 const response = await api.post(url.STAFF.CREATE, formTeacher, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
-
-                // Show a success notification
                 if (response && response.data) {
-                    // Access the data property here
-                    console.log(response.data);
-                    showNotification("success", "Teacher created successfully!");
+                    // console.log(response.data);
+                    toast.success("Create Staff Successfully", {
+                        position: toast.POSITION.TOP_RIGHT,
+                        autoClose: 3000,
+                    });
                 } else {
-                    // Handle the case where response or response.data is undefined
-                    console.error("Response or response.data is undefined.");
                 }
+                setTimeout(() => {
+                    navigate("/teacher-list");
+                }, 3000);
             } catch (error) {
-                if (error.response) {
-                    const { status, data } = error.response;
-                    if (status === 400) {
-                        if (data === "Student code already exists") {
-                            setTeacherCodeExistsError("Student code already exists");
-                        } else {
-                            setErrors(data); // Update errors state with validation errors
-                        }
-                    } else {
-                        console.error("Failed to create student:", error);
-                    }
+                if (error.response.status === 400 && error.response.data === "Staff code already exists") {
+                    setStaffEmailExistsError("Staff code already exists");
+                    toast.error("Staff code already exists", {
+                        position: toast.POSITION.TOP_RIGHT,
+                        autoClose: 3000,
+                    });
+                } else {
                 }
+                toast.error("Unable to create staff, please try again", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
+                console.error("Error creating test:", error);
+                console.error("Response data:", error.response.data);
             }
         }
     };
@@ -192,8 +151,9 @@ function Teacher_Create() {
             ...formTeacher,
             [name]: name === "avatar" ? files[0] : value,
         });
-        setTeacherCodeExistsError("");
+        setStaffEmailExistsError("");
     };
+
     //con mắt hiển thị password
     const [showPassword, setShowPassword] = useState(false);
     const togglePasswordVisibility = () => {
@@ -260,17 +220,6 @@ function Teacher_Create() {
                                                         </span>
                                                     </h5>
                                                 </div>
-                                                <div id="notification-container"></div>
-                                                <div className="col-12 col-sm-4">
-                                                    <div className="form-group local-forms">
-                                                        <label>
-                                                            Teacher ID <span className="login-danger">*</span>
-                                                        </label>
-                                                        <input type="text" className="form-control" name="staff_code" value={formTeacher.staff_code} onChange={handleChange} placeholder="Teacher ID" />
-                                                        {errors.staff_code && <div className="text-danger">{errors.staff_code}</div>}
-                                                        {teacherCodeExistsError && <div className="text-danger">{teacherCodeExistsError}</div>}
-                                                    </div>
-                                                </div>
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group local-forms">
                                                         <label>
@@ -310,6 +259,7 @@ function Teacher_Create() {
                                                         </label>
                                                         <input className="form-control" type="email" name="email" value={formTeacher.email} onChange={handleChange} placeholder="Enter Email Address" />
                                                         {errors.email && <div className="text-danger">{errors.email}</div>}
+                                                        {staffEmailExistsError && <div className="text-danger">{staffEmailExistsError}</div>}
                                                     </div>
                                                 </div>
                                                 <div className="col-12 col-sm-4">
@@ -328,6 +278,19 @@ function Teacher_Create() {
                                                         </label>
                                                         <input className="form-control" type="text" name="address" value={formTeacher.address} onChange={handleChange} placeholder="Enter Address" />
                                                         {errors.address && <div className="text-danger">{errors.address}</div>}
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-4">
+                                                    <div className="form-group local-forms">
+                                                        <label>
+                                                            Role <span className="login-danger">*</span>
+                                                        </label>
+                                                        <select className="form-control select" name="role" value={formTeacher.role} onChange={handleChange}>
+                                                            <option value="">Please select role</option>
+                                                            <option>Staff</option>
+                                                            <option>Teacher</option>
+                                                        </select>
+                                                        {errors.role && <div className="text-danger">{errors.role}</div>}
                                                     </div>
                                                 </div>
                                                 <div className="col-12 col-sm-4">
@@ -365,7 +328,6 @@ function Teacher_Create() {
                                                         {errors.password && <div className="text-danger">{errors.password}</div>}
                                                     </div>
                                                 </div>
-
                                                 <div className="col-12">
                                                     <div className="student-submit">
                                                         <button type="submit" className="btn btn-primary">
@@ -379,6 +341,7 @@ function Teacher_Create() {
                                 </div>
                             </div>
                         </div>
+                        <ToastContainer />
                     </Layout>
                 </>
             )}
