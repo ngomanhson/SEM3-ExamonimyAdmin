@@ -32,6 +32,7 @@ function Test_Create() {
     const navigate = useNavigate();
     const [error, setError] = useState(false);
     const [nameExistsError, setNameExistsError] = useState("");
+    const [examExistsError, setExamExistsError] = useState("");
     const [loggedInUser, setLoggedInUser] = useState(null);
     const selectAllOption = {
         value: "select_all",
@@ -272,6 +273,14 @@ function Test_Create() {
                 });
             } else {
             }
+            if (error.response.status === 400 && error.response.data.message === "Test already exists") {
+                setExamExistsError("This exam has enough tests, please choose another exam!");
+                toast.error("Choose the exam again!", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
+            } else {
+            }
             // console.error("Error creating test:", error);
             // console.error("Response data:", error.response.data);
         }
@@ -301,6 +310,7 @@ function Test_Create() {
         const { name, value } = e.target;
         setFormTest({ ...formTest, [name]: value });
         setNameExistsError("");
+        setExamExistsError("");
     };
 
     //created_by
@@ -384,6 +394,7 @@ function Test_Create() {
                                                     placeholder="Select Exam"
                                                 />
                                                 {errors.exam_id && <div className="text-danger">{errors.exam_id}</div>}
+                                                {examExistsError && <div className="text-danger">{examExistsError}</div>}
                                             </div>
                                             <div className="form-group">
                                                 <label>Class</label>

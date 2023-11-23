@@ -29,7 +29,6 @@ function Teacher_Create() {
         email: "",
         phone: "",
         address: "",
-        password: "",
         role: "",
     });
     const [errors, setErrors] = useState({});
@@ -89,17 +88,6 @@ function Teacher_Create() {
             valid = false;
         }
 
-        if (formTeacher.password.trim() === "") {
-            newErrors.password = "Please enter password";
-            valid = false;
-        } else if (formTeacher.password.length < 6) {
-            newErrors.password = "Enter at least 6 characters";
-            valid = false;
-        } else if (formTeacher.password.length > 255) {
-            newErrors.password = "Enter up to 255 characters";
-            valid = false;
-        }
-
         setErrors(newErrors);
         return valid;
     };
@@ -153,13 +141,6 @@ function Teacher_Create() {
         });
         setStaffEmailExistsError("");
     };
-
-    //con mắt hiển thị password
-    const [showPassword, setShowPassword] = useState(false);
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-    };
-    const passwordInputType = showPassword ? "text" : "password";
 
     //kiểm tra role
     useEffect(() => {
@@ -300,32 +281,6 @@ function Teacher_Create() {
                                                         </label>{" "}
                                                         <input type="file" className="form-control" name="avatar" accept="image/*" onChange={handleChange} />{" "}
                                                         {errors.avatar && <div className="text-danger">{errors.avatar}</div>}
-                                                    </div>
-                                                </div>
-                                                <div className="col-12">
-                                                    <h5 className="form-title">
-                                                        <span>Create login accounts for teacher</span>
-                                                    </h5>
-                                                </div>
-                                                <div className="col-12 col-sm-4">
-                                                    <div className="form-group local-forms password-input-container">
-                                                        <label>
-                                                            Password <span className="login-danger">*</span>
-                                                        </label>
-                                                        <div className="password-input">
-                                                            <input
-                                                                type={passwordInputType}
-                                                                className="form-control"
-                                                                name="password"
-                                                                value={formTeacher.password}
-                                                                onChange={handleChange}
-                                                                placeholder="Enter Password"
-                                                            />
-                                                            <span className={`password-toggle-icon ${showPassword ? "show" : "hide"}`} onClick={togglePasswordVisibility}>
-                                                                {showPassword ? <i className="fa fa-eye-slash"></i> : <i className="fa fa-eye"></i>}
-                                                            </span>
-                                                        </div>
-                                                        {errors.password && <div className="text-danger">{errors.password}</div>}
                                                     </div>
                                                 </div>
                                                 <div className="col-12">

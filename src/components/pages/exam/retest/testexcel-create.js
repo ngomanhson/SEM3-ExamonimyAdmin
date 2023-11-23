@@ -27,6 +27,7 @@ function TestExcel_Create() {
     const [error, setError] = useState(false);
     const [nameExistsError, setNameExistsError] = useState("");
     const [studentExistsError, setStudentExistsError] = useState("");
+    const [fileExcelError, setFileExcelError] = useState("");
     const [loggedInUser, setLoggedInUser] = useState(null);
     const [formTest, setFormTest] = useState({
         name: "",
@@ -190,10 +191,27 @@ function TestExcel_Create() {
                 });
             } else {
             }
+            if (error.response.status === 400 && error.response.data.message === "Object reference not set to an instance of an object.") {
+                setFileExcelError("The format in this excel file is incorrect, please choose another file!");
+                toast.error("Select another excel file again!", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
+            } else {
+            }
+            if (error.response.status === 400 && error.response.data.message === "There is no official test yet") {
+                toast.error("Unable to create test, this exam does not have any main tests!", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
+            } else {
+            }
             toast.error("Unable to re-create test, please try again!", {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 3000,
             });
+            console.error("Error creating test:", error);
+            console.error("Response data:", error.response.data);
         }
     };
     const handleFileUpload = (e) => {
@@ -229,6 +247,7 @@ function TestExcel_Create() {
         setFormTest({ ...formTest, [name]: value });
         setNameExistsError("");
         setStudentExistsError("");
+        setFileExcelError("");
     };
 
     //created_by
@@ -305,6 +324,7 @@ function TestExcel_Create() {
                                                 <label>Upload Excel File</label>
                                                 <input type="file" name="excelFile" accept=".xlsx" onChange={handleFileUpload} className="form-control" />
                                                 {errors.excelFile && <div className="text-danger">{errors.excelFile}</div>}
+                                                {fileExcelError && <div className="text-danger">{fileExcelError}</div>}
                                             </div>
                                             <div class="form-group">
                                                 <label>Exam</label>

@@ -73,13 +73,13 @@ function Teacher_List() {
             ) : (
                 <>
                     <Helmet>
-                        <title>Teacher | Examonimy</title>
+                        <title>Staff | Examonimy</title>
                     </Helmet>
                     <Layout>
                         <div className="page-header">
                             <div className="row align-items-center">
                                 <div className="col">
-                                    <h3 className="page-title">Teachers</h3>
+                                    <h3 className="page-title">Staffs</h3>
                                     <ul className="breadcrumb">
                                         <li className="breadcrumb-item">
                                             <a href="index.html">Dashboard</a>
@@ -123,7 +123,7 @@ function Teacher_List() {
                                         <div className="page-header">
                                             <div className="row align-items-center">
                                                 <div className="col">
-                                                    <h3 className="page-title">Teachers</h3>
+                                                    <h3 className="page-title">Staffs</h3>
                                                 </div>
                                                 <div className="col-auto text-end float-end ms-auto download-grp">
                                                     <a href="teachers.html" className="btn btn-outline-gray me-2 active">
@@ -152,7 +152,7 @@ function Teacher_List() {
                                                                 <input className="form-check-input" type="checkbox" value="something" />
                                                             </div>
                                                         </th>
-                                                        <th>Teacher Code</th>
+                                                        <th>Staff Code</th>
                                                         <th>Full Name</th>
                                                         <th>Birth Day</th>
                                                         <th>Email</th>

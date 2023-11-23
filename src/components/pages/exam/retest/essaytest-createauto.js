@@ -175,14 +175,29 @@ function EssayTest_CreateAuto() {
             } else {
             }
             if (error.response.status === 400 && error.response.data.message === "The number of hard questions is not enough, the exam cannot be created") {
-                toast.error("The number of hard questions is not enough, the exam cannot be createds", {
+                toast.error("Cannot create test because there are no questions available!", {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 3000,
                 });
             } else {
             }
-            // console.error("Error creating test:", error);
-            // console.error("Response data:", error.response.data);
+            if (error.response.status === 400 && error.response.data.message === "No students registered to retake the exam") {
+                setStudentExistsError("There are currently no students registered to retake this exam, please choose another exam!");
+                toast.error("There are currently no students registered to retake this exam, please choose another exam!", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
+            } else {
+            }
+            if (error.response.status === 400 && error.response.data.message === "There is no official test yet") {
+                toast.error("Unable to create test, this exam does not have any main tests!", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
+            } else {
+            }
+            console.error("Error creating test:", error);
+            console.error("Response data:", error.response.data);
         }
     };
 
