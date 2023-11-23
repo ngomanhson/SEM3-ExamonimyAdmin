@@ -27,6 +27,7 @@ function TestExcel_Create() {
     const [error, setError] = useState(false);
     const [nameExistsError, setNameExistsError] = useState("");
     const [studentExistsError, setStudentExistsError] = useState("");
+    const [loggedInUser, setLoggedInUser] = useState(null);
     const [formTest, setFormTest] = useState({
         name: "",
         exam_id: "",
@@ -34,7 +35,7 @@ function TestExcel_Create() {
         endDate: "",
         past_marks: "",
         total_marks: 100,
-        created_by: 1,
+        created_by: "",
         excelFile: null,
     });
     const clearForm = () => {
@@ -45,7 +46,7 @@ function TestExcel_Create() {
             endDate: "",
             past_marks: "",
             total_marks: 100,
-            created_by: 1,
+            created_by: "",
         });
     };
     const [errors, setErrors] = useState({});
@@ -153,7 +154,11 @@ function TestExcel_Create() {
                 excelFile: formTest.excelFile,
             };
             api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-            const rs = await api.post(url.TEST.CREATE_MULTIPLE_EXCEL_RETAKE, data, {
+            const updatedFormExam = {
+                ...data,
+                created_by: loggedInUser || "",
+            };
+            const rs = await api.post(url.TEST.CREATE_MULTIPLE_EXCEL_RETAKE, updatedFormExam, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -225,6 +230,29 @@ function TestExcel_Create() {
         setNameExistsError("");
         setStudentExistsError("");
     };
+
+    //created_by
+    useEffect(() => {
+        const fetchLoggedInUser = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userId = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+                setLoggedInUser(userId);
+            } catch (error) {}
+        };
+
+        fetchLoggedInUser();
+    }, []);
+
+    useEffect(() => {
+        if (loggedInUser) {
+            setFormTest((prevFormExam) => ({
+                ...prevFormExam,
+                created_by: loggedInUser,
+            }));
+        }
+    }, [loggedInUser]);
     return (
         <>
             {error ? (

@@ -11,7 +11,7 @@ import Loading from "../../layouts/loading";
 function Course_Create() {
     const navigate = useNavigate();
     const [userRole, setUserRole] = useState(null);
-
+    const [loggedInUser, setLoggedInUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -23,13 +23,13 @@ function Course_Create() {
     const [formCourse, setFormCourse] = useState({
         name: "",
         course_code: "",
-        created_by: 1,
+        created_by: "",
     });
 
     const [errors, setErrors] = useState({
         name: "",
         course_code: "",
-        created_by: 1,
+        created_by: "",
     });
 
     const [courseCodeExistsError, setCourseCodeExistsError] = useState("");
@@ -70,7 +70,11 @@ function Course_Create() {
             const userToken = localStorage.getItem("accessToken");
             try {
                 api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-                const rs = await api.post(url.COURSE.CREATE, formCourse);
+                const updatedFormExam = {
+                    ...formCourse,
+                    created_by: loggedInUser || "",
+                };
+                const rs = await api.post(url.COURSE.CREATE, updatedFormExam);
                 toast.success("To successfully create a course, continue to choose the class for the course.", {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 5000,
@@ -112,6 +116,29 @@ function Course_Create() {
         setFormCourse({ ...formCourse, [name]: value });
         setCourseCodeExistsError("");
     };
+
+    //created_by
+    useEffect(() => {
+        const fetchLoggedInUser = async () => {
+            const token = localStorage.getItem("accessToken");
+            try {
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userId = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+                setLoggedInUser(userId);
+            } catch (error) {}
+        };
+
+        fetchLoggedInUser();
+    }, []);
+
+    useEffect(() => {
+        if (loggedInUser) {
+            setFormCourse((prevFormExam) => ({
+                ...prevFormExam,
+                created_by: loggedInUser,
+            }));
+        }
+    }, [loggedInUser]);
 
     return (
         <>
