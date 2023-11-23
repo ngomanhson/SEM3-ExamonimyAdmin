@@ -12,10 +12,7 @@ import { Helmet } from "react-helmet";
 function Test_Of_Exam_List() {
     const { id } = useParams();
     const [tests, setTests] = useState([]);
-    const [examNames, setExamNames] = useState({});
-    const [studentAvatars, setStudentAvatars] = useState({});
     const maxInitialStudents = 2;
-    const [examName, setExamName] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [testsPerPage] = useState(10);
     const [userRole, setUserRole] = useState(null);
@@ -30,32 +27,7 @@ function Test_Of_Exam_List() {
     const loadTestForExam = async (examId) => {
         try {
             const response = await api.get(`${url.TEST.EXAM_ID}?examId=${examId}`);
-            //lấy ảnh của sinh viên qua slug của bài test
-            const studentAvatarData = {};
-            for (const test of response.data) {
-                const slug = test.slug; // Lấy slug của bài test từ dữ liệu
-                const studentListResponse = await api.get(url.STUDENT.TEST_SLUG.replace("{}", slug));
-                studentAvatarData[slug] = studentListResponse.data;
-            }
-            setStudentAvatars(studentAvatarData);
             setTests(response.data);
-        } catch (error) {}
-    };
-
-    // hiển thị tên kì thi
-    const fetchExamNames = async () => {
-        const userToken = localStorage.getItem("accessToken");
-        try {
-            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-            const response = await api.get(url.EXAM.LIST);
-            const examData = response.data.reduce((acc, curr) => {
-                acc[curr.id] = curr.name;
-                return acc;
-            }, {});
-            setExamNames(examData);
-            if (examData[id]) {
-                setExamName(examData[id]);
-            }
         } catch (error) {}
     };
 
@@ -83,14 +55,13 @@ function Test_Of_Exam_List() {
 
     useEffect(() => {
         loadTestForExam(id);
-        fetchExamNames();
         fetchUserRole();
     }, [id]);
     return (
         <>
             {loading ? <Loading /> : ""}
             <Helmet>
-                <title>Blog | Examonimy</title>
+                <title>Test | Examonimy</title>
             </Helmet>
             <Layout>
                 <div className="page-header">
@@ -126,8 +97,6 @@ function Test_Of_Exam_List() {
                                                 <th>Ordinal</th>
                                                 <th>Name Test</th>
                                                 <th>Type Test</th>
-                                                <th>Exam</th>
-                                                <th>Student List</th>
                                                 <th>Start Date Time</th>
                                                 <th>End Date Time</th>
                                                 <th>Past Marks</th>
@@ -143,24 +112,6 @@ function Test_Of_Exam_List() {
                                                         <td>{index + 1}</td>
                                                         <td>{item.name}</td>
                                                         <td>{item.type_test === 0 ? "Multiple Choice" : "Essay Test"}</td>
-                                                        <td>{examNames[item.exam_id]}</td>
-                                                        <td>
-                                                            <div className="avatar-group">
-                                                                {studentAvatars[item.slug] &&
-                                                                    studentAvatars[item.slug].slice(0, maxInitialStudents).map((student) => (
-                                                                        <div className="avatar" key={student.id}>
-                                                                            <img className="avatar-img rounded-circle border border-white" src={student.avatar} />
-                                                                        </div>
-                                                                    ))}
-                                                                {studentAvatars[item.slug] && studentAvatars[item.slug].length > maxInitialStudents && (
-                                                                    <div className="avatar">
-                                                                        <span className="avatar-title rounded-circle border border-white">
-                                                                            +{studentAvatars[item.slug].length - maxInitialStudents}
-                                                                        </span>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </td>
                                                         <td>{format(new Date(item.startDate), "yyyy-MM-dd HH:mm")}</td>
                                                         <td>{format(new Date(item.endDate), "yyyy-MM-dd HH:mm")}</td>
 

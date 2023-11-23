@@ -5,10 +5,12 @@ import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
 import { useNavigate } from "react-router-dom";
+import NotFound from "../../pages/other/not-found";
 function Teacher_Create() {
     const [userRole, setUserRole] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const [error, setError] = useState(false);
 
     useEffect(() => {
         setTimeout(() => {
@@ -209,7 +211,7 @@ function Teacher_Create() {
                 setUserRole(userRole);
 
                 if (userRole === "Teacher" || userRole === "Staff") {
-                    navigate("/404");
+                    setError(true);
                 }
             } catch (error) {
                 console.error("Error loading user role:", error);
@@ -220,161 +222,166 @@ function Teacher_Create() {
     }, [navigate]);
     return (
         <>
-            {loading ? <Loading /> : ""}
-            <Helmet>
-                <title>Teacher | Examonimy</title>
-            </Helmet>
-            <Layout>
-                <div className="page-header">
-                    <div className="row align-items-center">
-                        <div className="col">
-                            <h3 className="page-title">Add Teachers</h3>
-                            <ul className="breadcrumb">
-                                <li className="breadcrumb-item">
-                                    <a href="teachers.html">Teachers</a>
-                                </li>
-                                <li className="breadcrumb-item active">Add Teachers</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div className="col-sm-12">
-                        <div className="card">
-                            <div className="card-body">
-                                <form onSubmit={handleSubmit}>
-                                    <div className="row">
-                                        <div className="col-12">
-                                            <h5 className="form-title ">
-                                                Teacher Information
-                                                <span>
-                                                    <a href="javascript:;">
-                                                        <i className="feather-more-vertical"></i>
-                                                    </a>
-                                                </span>
-                                            </h5>
-                                        </div>
-                                        <div id="notification-container"></div>
-                                        <div className="col-12 col-sm-4">
-                                            <div className="form-group local-forms">
-                                                <label>
-                                                    Teacher ID <span className="login-danger">*</span>
-                                                </label>
-                                                <input type="text" className="form-control" name="staff_code" value={formTeacher.staff_code} onChange={handleChange} placeholder="Teacher ID" />
-                                                {errors.staff_code && <div className="text-danger">{errors.staff_code}</div>}
-                                                {teacherCodeExistsError && <div className="text-danger">{teacherCodeExistsError}</div>}
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-sm-4">
-                                            <div className="form-group local-forms">
-                                                <label>
-                                                    Full Name <span className="login-danger">*</span>
-                                                </label>
-                                                <input type="text" className="form-control" name="fullname" value={formTeacher.fullName} onChange={handleChange} placeholder="Enter Name" />
-                                                {errors.fullname && <div className="text-danger">{errors.fullname}</div>}
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-sm-4">
-                                            <div className="form-group local-forms">
-                                                <label>
-                                                    Gender <span className="login-danger">*</span>
-                                                </label>
-                                                <select className="form-control select" name="gender" value={formTeacher.gender} onChange={handleChange}>
-                                                    <option value="">Please select gender</option>
-                                                    <option>Male</option>
-                                                    <option>Female</option>
-                                                    <option>Others</option>
-                                                </select>
-                                                {errors.gender && <div className="text-danger">{errors.gender}</div>}
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-sm-4">
-                                            <div className="form-group local-forms ">
-                                                <label>
-                                                    Date Of Birth <span className="login-danger">*</span>
-                                                </label>
-                                                <input className="form-control " type="date" name="birthday" value={formTeacher.birthday} onChange={handleChange} placeholder="YYY-MM-DD" />
-                                                {errors.birthday && <div className="text-danger">{errors.birthday}</div>}
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-sm-4">
-                                            <div className="form-group local-forms">
-                                                <label>
-                                                    Email <span className="login-danger">*</span>
-                                                </label>
-                                                <input className="form-control" type="email" name="email" value={formTeacher.email} onChange={handleChange} placeholder="Enter Email Address" />
-                                                {errors.email && <div className="text-danger">{errors.email}</div>}
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-sm-4">
-                                            <div className="form-group local-forms">
-                                                <label>
-                                                    Phone Number <span className="login-danger">*</span>
-                                                </label>
-                                                <input type="text" className="form-control" name="phone" value={formTeacher.phone} onChange={handleChange} placeholder="Enter Phone" />
-                                                {errors.phone && <div className="text-danger">{errors.phone}</div>}
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-sm-4">
-                                            <div className="form-group local-forms">
-                                                <label>
-                                                    Address <span className="login-danger">*</span>
-                                                </label>
-                                                <input className="form-control" type="text" name="address" value={formTeacher.address} onChange={handleChange} placeholder="Enter Address" />
-                                                {errors.address && <div className="text-danger">{errors.address}</div>}
-                                            </div>
-                                        </div>
-                                        <div className="col-12 col-sm-4">
-                                            <div className="form-group students-up-files">
-                                                <label>
-                                                    Upload Student Photo (150px X 150px) <span className="login-danger">*</span>
-                                                </label>{" "}
-                                                <input type="file" className="form-control" name="avatar" accept="image/*" onChange={handleChange} />{" "}
-                                                {errors.avatar && <div className="text-danger">{errors.avatar}</div>}
-                                            </div>
-                                        </div>
-                                        <div className="col-12">
-                                            <h5 className="form-title">
-                                                <span>Create login accounts for teacher</span>
-                                            </h5>
-                                        </div>
-                                        <div className="col-12 col-sm-4">
-                                            <div className="form-group local-forms password-input-container">
-                                                <label>
-                                                    Password <span className="login-danger">*</span>
-                                                </label>
-                                                <div className="password-input">
-                                                    <input
-                                                        type={passwordInputType}
-                                                        className="form-control"
-                                                        name="password"
-                                                        value={formTeacher.password}
-                                                        onChange={handleChange}
-                                                        placeholder="Enter Password"
-                                                    />
-                                                    <span className={`password-toggle-icon ${showPassword ? "show" : "hide"}`} onClick={togglePasswordVisibility}>
-                                                        {showPassword ? <i className="fa fa-eye-slash"></i> : <i className="fa fa-eye"></i>}
-                                                    </span>
-                                                </div>
-                                                {errors.password && <div className="text-danger">{errors.password}</div>}
-                                            </div>
-                                        </div>
-
-                                        <div className="col-12">
-                                            <div className="student-submit">
-                                                <button type="submit" className="btn btn-primary">
-                                                    Submit
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
+            {error ? (
+                <NotFound />
+            ) : (
+                <>
+                    <Helmet>
+                        <title>Teacher | Examonimy</title>
+                    </Helmet>
+                    <Layout>
+                        <div className="page-header">
+                            <div className="row align-items-center">
+                                <div className="col">
+                                    <h3 className="page-title">Add Teachers</h3>
+                                    <ul className="breadcrumb">
+                                        <li className="breadcrumb-item">
+                                            <a href="teachers.html">Teachers</a>
+                                        </li>
+                                        <li className="breadcrumb-item active">Add Teachers</li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </Layout>
+
+                        <div className="row">
+                            <div className="col-sm-12">
+                                <div className="card">
+                                    <div className="card-body">
+                                        <form onSubmit={handleSubmit}>
+                                            <div className="row">
+                                                <div className="col-12">
+                                                    <h5 className="form-title ">
+                                                        Teacher Information
+                                                        <span>
+                                                            <a href="javascript:;">
+                                                                <i className="feather-more-vertical"></i>
+                                                            </a>
+                                                        </span>
+                                                    </h5>
+                                                </div>
+                                                <div id="notification-container"></div>
+                                                <div className="col-12 col-sm-4">
+                                                    <div className="form-group local-forms">
+                                                        <label>
+                                                            Teacher ID <span className="login-danger">*</span>
+                                                        </label>
+                                                        <input type="text" className="form-control" name="staff_code" value={formTeacher.staff_code} onChange={handleChange} placeholder="Teacher ID" />
+                                                        {errors.staff_code && <div className="text-danger">{errors.staff_code}</div>}
+                                                        {teacherCodeExistsError && <div className="text-danger">{teacherCodeExistsError}</div>}
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-4">
+                                                    <div className="form-group local-forms">
+                                                        <label>
+                                                            Full Name <span className="login-danger">*</span>
+                                                        </label>
+                                                        <input type="text" className="form-control" name="fullname" value={formTeacher.fullName} onChange={handleChange} placeholder="Enter Name" />
+                                                        {errors.fullname && <div className="text-danger">{errors.fullname}</div>}
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-4">
+                                                    <div className="form-group local-forms">
+                                                        <label>
+                                                            Gender <span className="login-danger">*</span>
+                                                        </label>
+                                                        <select className="form-control select" name="gender" value={formTeacher.gender} onChange={handleChange}>
+                                                            <option value="">Please select gender</option>
+                                                            <option>Male</option>
+                                                            <option>Female</option>
+                                                            <option>Others</option>
+                                                        </select>
+                                                        {errors.gender && <div className="text-danger">{errors.gender}</div>}
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-4">
+                                                    <div className="form-group local-forms ">
+                                                        <label>
+                                                            Date Of Birth <span className="login-danger">*</span>
+                                                        </label>
+                                                        <input className="form-control " type="date" name="birthday" value={formTeacher.birthday} onChange={handleChange} placeholder="YYY-MM-DD" />
+                                                        {errors.birthday && <div className="text-danger">{errors.birthday}</div>}
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-4">
+                                                    <div className="form-group local-forms">
+                                                        <label>
+                                                            Email <span className="login-danger">*</span>
+                                                        </label>
+                                                        <input className="form-control" type="email" name="email" value={formTeacher.email} onChange={handleChange} placeholder="Enter Email Address" />
+                                                        {errors.email && <div className="text-danger">{errors.email}</div>}
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-4">
+                                                    <div className="form-group local-forms">
+                                                        <label>
+                                                            Phone Number <span className="login-danger">*</span>
+                                                        </label>
+                                                        <input type="text" className="form-control" name="phone" value={formTeacher.phone} onChange={handleChange} placeholder="Enter Phone" />
+                                                        {errors.phone && <div className="text-danger">{errors.phone}</div>}
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-4">
+                                                    <div className="form-group local-forms">
+                                                        <label>
+                                                            Address <span className="login-danger">*</span>
+                                                        </label>
+                                                        <input className="form-control" type="text" name="address" value={formTeacher.address} onChange={handleChange} placeholder="Enter Address" />
+                                                        {errors.address && <div className="text-danger">{errors.address}</div>}
+                                                    </div>
+                                                </div>
+                                                <div className="col-12 col-sm-4">
+                                                    <div className="form-group students-up-files">
+                                                        <label>
+                                                            Upload Student Photo (150px X 150px) <span className="login-danger">*</span>
+                                                        </label>{" "}
+                                                        <input type="file" className="form-control" name="avatar" accept="image/*" onChange={handleChange} />{" "}
+                                                        {errors.avatar && <div className="text-danger">{errors.avatar}</div>}
+                                                    </div>
+                                                </div>
+                                                <div className="col-12">
+                                                    <h5 className="form-title">
+                                                        <span>Create login accounts for teacher</span>
+                                                    </h5>
+                                                </div>
+                                                <div className="col-12 col-sm-4">
+                                                    <div className="form-group local-forms password-input-container">
+                                                        <label>
+                                                            Password <span className="login-danger">*</span>
+                                                        </label>
+                                                        <div className="password-input">
+                                                            <input
+                                                                type={passwordInputType}
+                                                                className="form-control"
+                                                                name="password"
+                                                                value={formTeacher.password}
+                                                                onChange={handleChange}
+                                                                placeholder="Enter Password"
+                                                            />
+                                                            <span className={`password-toggle-icon ${showPassword ? "show" : "hide"}`} onClick={togglePasswordVisibility}>
+                                                                {showPassword ? <i className="fa fa-eye-slash"></i> : <i className="fa fa-eye"></i>}
+                                                            </span>
+                                                        </div>
+                                                        {errors.password && <div className="text-danger">{errors.password}</div>}
+                                                    </div>
+                                                </div>
+
+                                                <div className="col-12">
+                                                    <div className="student-submit">
+                                                        <button type="submit" className="btn btn-primary">
+                                                            Submit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Layout>
+                </>
+            )}
         </>
     );
 }

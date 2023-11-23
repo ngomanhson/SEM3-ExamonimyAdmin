@@ -7,6 +7,7 @@ import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
 import { useNavigate } from "react-router-dom";
+import NotFound from "../../pages/other/not-found";
 function Exam_List() {
     const [userRole, setUserRole] = useState(null);
     const [exams, setExams] = useState([]);
@@ -89,7 +90,7 @@ function Exam_List() {
                 setUserRole(userRole);
 
                 if (userRole === "Teacher") {
-                    navigate("/404");
+                    setError(true);
                 }
             } catch (error) {
                 console.error("Error loading user role:", error);
@@ -106,83 +107,89 @@ function Exam_List() {
     return (
         <>
             {loading ? <Loading /> : ""}
-            <Helmet>
-                <title>Exam | Examonimy</title>
-            </Helmet>
-            <Layout>
-                <div className="page-header">
-                    <div className="row align-items-center">
-                        <div className="col">
-                            <h3 className="page-title">Exam List</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div className="col-sm-12">
-                        <div className="card card-table">
-                            <div className="card-body">
-                                <div id="notification-container"></div>
-
-                                <div className="page-header">
-                                    <div className="row align-items-center">
-                                        <div className="col">
-                                            <h3 className="page-title">Exam</h3>
-                                        </div>
-                                        <div className="col-auto text-end float-end ms-auto download-grp">
-                                            <NavLink to="/retest-list" className="btn btn-outline-primary me-2">
-                                                Retest List
-                                            </NavLink>
-                                            <NavLink to="/exam-create" className="btn btn-primary">
-                                                <i className="fas fa-plus"></i>
-                                            </NavLink>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="table-responsive">
-                                    <table className="table border-0 star-student table-hover table-center mb-0 datatable table-striped">
-                                        <thead className="student-thread">
-                                            <tr>
-                                                <th>Ordinal</th>
-                                                <th>Name Exam</th>
-                                                <th>Course</th>
-                                                <th>Date</th>
-                                                <th className="text-end">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {exams.map((item, index) => {
-                                                return (
-                                                    <tr>
-                                                        <td>{index + 1}</td>
-                                                        <td>{item.name}</td>
-                                                        <td>{courseNames[item.courseClass_id]}</td>
-                                                        <td>{format(new Date(item.start_date), "yyyy-MM-dd")}</td>
-                                                        <td className="text-end">
-                                                            <div className="actions">
-                                                                <NavLink to={`/test-of-exam-list/${item.id}`} className="btn btn-sm bg-success-light me-2">
-                                                                    <i className="feather-eye"></i>
-                                                                </NavLink>
-                                                                <NavLink to={`/exam-edit/${item.slug}`} className="btn btn-sm bg-danger-light">
-                                                                    <i className="feather-edit"></i>
-                                                                </NavLink>
-                                                                <NavLink onClick={() => handleDeleteExam(item.id)} className="btn btn-sm bg-danger-light">
-                                                                    <i className="feather-trash"></i>
-                                                                </NavLink>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
+            {error ? (
+                <NotFound />
+            ) : (
+                <>
+                    <Helmet>
+                        <title>Exam | Examonimy</title>
+                    </Helmet>
+                    <Layout>
+                        <div className="page-header">
+                            <div className="row align-items-center">
+                                <div className="col">
+                                    <h3 className="page-title">Exam List</h3>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </Layout>
+
+                        <div className="row">
+                            <div className="col-sm-12">
+                                <div className="card card-table">
+                                    <div className="card-body">
+                                        <div id="notification-container"></div>
+
+                                        <div className="page-header">
+                                            <div className="row align-items-center">
+                                                <div className="col">
+                                                    <h3 className="page-title">Exam</h3>
+                                                </div>
+                                                <div className="col-auto text-end float-end ms-auto download-grp">
+                                                    <NavLink to="/retest-list" className="btn btn-outline-primary me-2">
+                                                        Retest List
+                                                    </NavLink>
+                                                    <NavLink to="/exam-create" className="btn btn-primary">
+                                                        <i className="fas fa-plus"></i>
+                                                    </NavLink>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="table-responsive">
+                                            <table className="table border-0 star-student table-hover table-center mb-0 datatable table-striped">
+                                                <thead className="student-thread">
+                                                    <tr>
+                                                        <th>Ordinal</th>
+                                                        <th>Name Exam</th>
+                                                        <th>Course</th>
+                                                        <th>Date</th>
+                                                        <th className="text-end">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {exams.map((item, index) => {
+                                                        return (
+                                                            <tr>
+                                                                <td>{index + 1}</td>
+                                                                <td>{item.name}</td>
+                                                                <td>{courseNames[item.courseClass_id]}</td>
+                                                                <td>{format(new Date(item.start_date), "yyyy-MM-dd")}</td>
+                                                                <td className="text-end">
+                                                                    <div className="actions">
+                                                                        <NavLink to={`/test-of-exam-list/${item.id}`} className="btn btn-sm bg-success-light me-2">
+                                                                            <i className="feather-eye"></i>
+                                                                        </NavLink>
+                                                                        <NavLink to={`/exam-edit/${item.slug}`} className="btn btn-sm bg-danger-light">
+                                                                            <i className="feather-edit"></i>
+                                                                        </NavLink>
+                                                                        <NavLink onClick={() => handleDeleteExam(item.id)} className="btn btn-sm bg-danger-light">
+                                                                            <i className="feather-trash"></i>
+                                                                        </NavLink>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Layout>
+                </>
+            )}
         </>
     );
 }

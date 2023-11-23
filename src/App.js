@@ -11,8 +11,6 @@ import Course_List from "./components/pages/course/course-list";
 import Course_Create from "./components/pages/course/course-create";
 import Classes_List from "./components/pages/classes/classes-list";
 import Classes_Create from "./components/pages/classes/classes-create";
-import Blog_List from "./components/pages/blog/blog-list";
-import Blog_Create from "./components/pages/blog/blog-create";
 import Classes_Edit from "./components/pages/classes/classes-edit";
 import Student_Edit from "./components/pages/student/student-edit";
 import Student_DeleteAt from "./components/pages/student/student-deleteAt";
@@ -38,6 +36,9 @@ import Retest_List from "./components/pages/exam/retest-list";
 import TestExcel_Create from "./components/pages/exam/retest/testexcel-create";
 import TestAvaliable_Create from "./components/pages/exam/retest/testavaliable-create";
 import TestByHand_Create from "./components/pages/exam/retest/testbyhand-create";
+import EssayTest_Create from "./components/pages/exam/retest/essaytest-create";
+import TestEssay_CreateAuto from "./components/pages/exam/test/test-essay-create-auto";
+import EssayTest_CreateAuto from "./components/pages/exam/retest/essaytest-createauto";
 function App() {
     const ProtectedRoute = ({ element }) => {
         const token = localStorage.getItem("accessToken");
@@ -82,6 +83,7 @@ function App() {
                 <Route path="/test-excel" element={<ProtectedRoute element={<Test_Excel_Create />} />}></Route>
                 <Route path="/test-available" element={<ProtectedRoute element={<Test_Avaliable />} />}></Route>
                 <Route path="/test-essay-create" element={<ProtectedRoute element={<Test_Essay_Create />} />}></Route>
+                <Route path="/test-essay-create-auto" element={<ProtectedRoute element={<TestEssay_CreateAuto />} />}></Route>
                 {/* end route exam */}
 
                 {/* start retest route */}
@@ -89,6 +91,8 @@ function App() {
                 <Route path="/retest-byhand-create" element={<ProtectedRoute element={<TestByHand_Create />} />}></Route>
                 <Route path="/retest-excel-create" element={<ProtectedRoute element={<TestExcel_Create />} />}></Route>
                 <Route path="/retest-avaliable-create" element={<ProtectedRoute element={<TestAvaliable_Create />} />}></Route>
+                <Route path="/retest-essay-byhand-create" element={<ProtectedRoute element={<EssayTest_Create />} />}></Route>
+                <Route path="/retest-essay-auto-create" element={<ProtectedRoute element={<EssayTest_CreateAuto />} />}></Route>
                 {/* end retest route */}
 
                 {/* start route classes */}
@@ -116,10 +120,6 @@ function App() {
                 <Route path="/student-deleteat" element={<ProtectedRoute element={<Student_DeleteAt />} />}></Route>
                 {/* end route student */}
 
-                {/* start route blog */}
-                <Route path="/blog-list" element={<ProtectedRoute element={<Blog_List />} />}></Route>
-                <Route path="/blog-create" element={<ProtectedRoute element={<Blog_Create />} />}></Route>
-                {/* end route blog */}
                 <Route path="/profile" element={<ProtectedRoute element={<Profile />} />}></Route>
                 <Route path="/login" element={<ProtectedLoginRoute element={<Login />} />} />
 

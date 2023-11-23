@@ -8,13 +8,22 @@ import "react-toastify/dist/ReactToastify.css";
 import { useEffect, useState } from "react";
 import { NavLink, Navigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../layouts/loading";
+import NotFound from "../../pages/other/not-found";
 function Retest_List() {
+    const [loading, setLoading] = useState(true);
     const [userRole, setUserRole] = useState(null);
     const [retestExam, setRetestExam] = useState([]);
     const [examName, setExamName] = useState({});
     const [studentName, setStudentName] = useState({});
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    });
 
     //hiển thị danh sách các kỳ thi
     const loadRetestExams = async () => {
@@ -109,7 +118,7 @@ function Retest_List() {
                 setUserRole(userRole);
 
                 if (userRole === "Teacher") {
-                    navigate("/404");
+                    setError(true);
                 }
             } catch (error) {
                 console.error("Error loading user role:", error);
@@ -126,72 +135,131 @@ function Retest_List() {
     }, []);
     return (
         <>
-            <Helmet>
-                <title>Retest | Examonimy</title>
-            </Helmet>
-            <Layout>
-                <div className="page-header">
-                    <div className="row align-items-center">
-                        <div className="col">
-                            <h3 className="page-title">List of re-exam registrations</h3>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div className="col-sm-12">
-                        <div className="card card-table">
-                            <div className="card-body">
-                                <div className="page-header">
-                                    <div className="row align-items-center">
-                                        <div className="col">
-                                            <h3 className="page-title">Exam</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="table-responsive">
-                                    <table className="table border-0 star-student table-hover table-center mb-0 datatable table-striped">
-                                        <thead className="student-thread">
-                                            <tr>
-                                                <th>Ordinal</th>
-                                                <th>Exam</th>
-                                                <th>Student</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {retestExam.map((item, index) => {
-                                                return (
-                                                    <tr key={index}>
-                                                        <td>{index + 1}</td>
-                                                        <td>{examName[item.exam_id]}</td>
-                                                        <td>{studentName[item.student_id]}</td>
-                                                        <td>{item.status === 0 ? "Retest has not been confirmed" : "Retest has been confirmed"}</td>
-                                                        <td>
-                                                            {item.status === 0 ? (
-                                                                <span className="badge badge-soft-info" style={{ cursor: "pointer" }} onClick={() => handleConfirmClick(item)}>
-                                                                    Confirm
-                                                                </span>
-                                                            ) : item.status === 1 ? (
-                                                                <NavLink to="/retest-byhand-create">
-                                                                    <span className="badge badge-gradient-danger">Create Test</span>
-                                                                </NavLink>
-                                                            ) : (
-                                                                <span className="badge badge-soft-success">Test created</span>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
+            {loading ? <Loading /> : ""}
+            {error ? (
+                <NotFound />
+            ) : (
+                <>
+                    <Helmet>
+                        <title>Retest | Examonimy</title>
+                    </Helmet>
+                    <Layout>
+                        <div className="page-header">
+                            <div className="row align-items-center">
+                                <div className="col">
+                                    <h3 className="page-title">List of re-exam registrations</h3>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </Layout>
+
+                        <div className="row">
+                            <div className="col-sm-12">
+                                <div className="card card-table">
+                                    <div className="card-body">
+                                        <div className="page-header">
+                                            <div className="row align-items-center">
+                                                <h5 className="card-title">
+                                                    Exam
+                                                    <NavLink to={`/test-create`} data-bs-toggle="modal" data-bs-target="#signup-modal" className="btn btn-primary float-sm-end m-l-10">
+                                                        Add New Test
+                                                    </NavLink>
+                                                </h5>
+                                            </div>
+                                        </div>
+                                        <div className="table-responsive">
+                                            <table className="table border-0 star-student table-hover table-center mb-0 datatable table-striped">
+                                                <thead className="student-thread">
+                                                    <tr>
+                                                        <th>Ordinal</th>
+                                                        <th>Exam</th>
+                                                        <th>Student</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {retestExam.map((item, index) => {
+                                                        return (
+                                                            <tr key={index}>
+                                                                <td>{index + 1}</td>
+                                                                <td>{examName[item.exam_id]}</td>
+                                                                <td>{studentName[item.student_id]}</td>
+                                                                <td>{item.status === 0 ? "Retest has not been confirmed" : "Retest has been confirmed"}</td>
+                                                                <td>
+                                                                    {item.status === 0 ? (
+                                                                        <span className="badge badge-soft-warning" style={{ cursor: "pointer" }} onClick={() => handleConfirmClick(item)}>
+                                                                            Unconfimred
+                                                                        </span>
+                                                                    ) : item.status === 1 ? (
+                                                                        <span className="badge badge-soft-info">Confirmed</span>
+                                                                    ) : (
+                                                                        <span className="badge badge-soft-success">Exam taken</span>
+                                                                    )}
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="signup-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-body">
+                                        <div class="text-center mt-2 mb-4">
+                                            <div class="auth-logo">
+                                                <a href="index.html" class="logo logo-dark">
+                                                    <span class="logo-lg">
+                                                        <img src="assets/img/logo.png" alt height="42" />
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="text-center mt-2 mb-4">
+                                            <h6>Do you want to create a multiple choice or essay test?</h6>
+                                        </div>
+                                        <div class="text-center mt-2 mb-4">
+                                            <NavLink
+                                                to="/retest-byhand-create"
+                                                style={{
+                                                    color: "white",
+                                                }}
+                                            >
+                                                <button class="btn btn-primary" data-bs-dismiss="modal">
+                                                    Multiple choice
+                                                </button>
+                                            </NavLink>
+                                            <NavLink
+                                                to="/retest-essay-byhand-create"
+                                                style={{
+                                                    color: "white",
+                                                }}
+                                            >
+                                                {" "}
+                                                <button
+                                                    class="btn btn-primary"
+                                                    data-bs-dismiss="modal"
+                                                    style={{
+                                                        color: "white",
+                                                        marginLeft: "10px",
+                                                    }}
+                                                >
+                                                    Essay test
+                                                </button>
+                                            </NavLink>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Layout>
+                </>
+            )}
         </>
     );
 }

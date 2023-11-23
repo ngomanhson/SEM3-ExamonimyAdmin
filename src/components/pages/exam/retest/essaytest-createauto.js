@@ -1,16 +1,18 @@
-import Select from "react-select";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import Select from "react-select";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import api from "../../../services/api";
+import url from "../../../services/url";
+import makeAnimated from "react-select/animated";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import makeAnimated from "react-select/animated";
-import { useEffect, useState } from "react";
-import api from "../../../services/api";
-import url from "../../../services/url";
 import Layout from "../../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import NotFound from "../../../pages/other/not-found";
-function TestAvaliable_Create() {
+function EssayTest_CreateAuto() {
     const [userRole, setUserRole] = useState(null);
     const animatedComponents = makeAnimated();
     const [isClearable, setIsClearable] = useState(true);
@@ -24,6 +26,7 @@ function TestAvaliable_Create() {
     const currentTime = "00:00";
     const todayDateTimeLocal = `${year}-${month}-${day}T${currentTime}`; //chỉ cho người dùng chọn từ ngay hôm nay trở đi
     const navigate = useNavigate();
+    const [errors, setErrors] = useState({});
     const [error, setError] = useState(false);
     const [nameExistsError, setNameExistsError] = useState("");
     const [studentExistsError, setStudentExistsError] = useState("");
@@ -47,7 +50,6 @@ function TestAvaliable_Create() {
             created_by: 1,
         });
     };
-    const [errors, setErrors] = useState({});
     const validateForm = () => {
         //validate cho thông tin bài test
         let valid = true;
@@ -81,11 +83,11 @@ function TestAvaliable_Create() {
             newErrors.startDate = "Start Date must be before End Date";
             valid = false;
         }
-
         if (formTest.past_marks === "") {
             newErrors.past_marks = "Please choose past marks";
             valid = false;
         }
+
         setErrors(newErrors);
         return valid;
     };
@@ -126,7 +128,6 @@ function TestAvaliable_Create() {
         setFormTest({ ...formTest, exam_id: selectedOption.value });
     };
 
-    //xử lý tạo bài thi lại
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formValidationResult = validateForm();
@@ -149,7 +150,7 @@ function TestAvaliable_Create() {
                 created_by: formTest.created_by,
             };
             api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-            const rs = await api.post(url.TEST.CREATE_MULTIPLE_AUTO_RETAKE, data);
+            const rs = await api.post(url.TEST.CREATE_ESSAY_AUTO_RETAKE, data);
             const createdExamId = rs.data.exam_id;
             clearForm();
             toast.success("Create Test Successfully", {
@@ -160,7 +161,7 @@ function TestAvaliable_Create() {
                 navigate(`/test-of-exam-list/${createdExamId}`); //chuyển đến trang test-list
             }, 3000);
         } catch (error) {
-            if (error.response.status === 400 && error.response.data.message === "Test name already exists") {
+            if (error.response.status === 400 && error.response.data.message === "Class name already exists") {
                 setNameExistsError("This test name already exists");
                 toast.error("This test name already exists", {
                     position: toast.POSITION.TOP_RIGHT,
@@ -168,18 +169,15 @@ function TestAvaliable_Create() {
                 });
             } else {
             }
-            if (error.response.status === 400 && error.response.data.message === "No students registered to retake the exam") {
-                setStudentExistsError("There are currently no students registered to retake this exam, please choose another exam!");
-                toast.error("There are currently no students registered to retake this exam, please choose another exam!", {
+            if (error.response.status === 400 && error.response.data.message === "The number of hard questions is not enough, the exam cannot be created") {
+                toast.error("The number of hard questions is not enough, the exam cannot be createds", {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 3000,
                 });
             } else {
             }
-            toast.error("Unable to re-create test, please try again!", {
-                position: toast.POSITION.TOP_RIGHT,
-                autoClose: 3000,
-            });
+            // console.error("Error creating test:", error);
+            // console.error("Response data:", error.response.data);
         }
     };
 
@@ -220,9 +218,9 @@ function TestAvaliable_Create() {
                     </Helmet>
                     <Layout>
                         <div className="page-header">
-                            <div className="row align-items-center">
+                            <div className="row">
                                 <div className="col">
-                                    <h3 className="page-title">Create a retest multiple choice</h3>
+                                    <h3 className="page-title">Create An Essay Test</h3>
                                 </div>
                             </div>
                         </div>
@@ -231,10 +229,7 @@ function TestAvaliable_Create() {
                             <div class="col-md-9">
                                 <ul class="list-links mb-4">
                                     <li>
-                                        <NavLink to="/retest-byhand-create">Create your own questions</NavLink>
-                                    </li>
-                                    <li>
-                                        <NavLink to="/retest-excel-create">With excel files</NavLink>
+                                        <NavLink to="/retest-essay-byhand-create">Create your own questions</NavLink>
                                     </li>
                                     <li class="active">
                                         <NavLink to="">With questions available</NavLink>
@@ -243,9 +238,10 @@ function TestAvaliable_Create() {
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <form onSubmit={handleSubmit}>
+                        <form onSubmit={handleSubmit}>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {" "}
                                     <div class="card">
                                         <div class="card-header">
                                             <h5 class="card-title">Test Information</h5>
@@ -313,84 +309,14 @@ function TestAvaliable_Create() {
                                             </div>
                                         </div>
                                     </div>
-                                </form>
-                            </div>
-                            <div className="col-xl-6">
-                                <div className="card bg-white">
-                                    <div class="card-header">
-                                        <h5 class="card-title">Test Question</h5>
-                                    </div>
-                                    <div className="card-body">
-                                        <div class="row">
-                                            <div class="col-md-10">
-                                                <h5>Question</h5>
-                                            </div>
-                                            <div class="col-md-2"></div>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <div class="vertical-scroll scroll-demo">
-                                                <div
-                                                    style={{
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        justifyContent: "center",
-                                                        height: "100%",
-                                                    }}
-                                                >
-                                                    <p
-                                                        style={{
-                                                            fontSize: "20px",
-                                                            color: "#8F9BBA",
-                                                        }}
-                                                    >
-                                                        Questions will be added randomly from the system !!!
-                                                    </p>
-                                                </div>
-                                                {/* <div className="row">
-                                        <div className="col-md-10">
-                                            <div className="invoice-terms">
-                                                <h6>
-                                                    1.
-                                                    <span>
-                                                        Ten cua cau hoi
-                                                    </span>{" "}
-                                                    <span
-                                                        style={{
-                                                            fontSize: "15px",
-                                                            color: "#8F9BBA",
-                                                        }}
-                                                    >
-                                                        (Easy, 4.5 score)
-                                                    </span>
-                                                </h6>
-                                                <p className="mb-1">
-                                                    A - <span>dap an a</span>
-                                                </p>
-                                                <p className="mb-1 text-primary">
-                                                    B - <span>dap an b</span>
-                                                    <i className="fa fa-check"></i>
-                                                </p>
-                                                <p className="mb-1">
-                                                    C - <span>dap an c</span>
-                                                </p>
-                                                <p className="mb-1">
-                                                    D - <span>dap an d</span>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-2"></div>
-                                    </div> */}
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
+                                <ToastContainer />
                             </div>
-                            <ToastContainer />
-                        </div>
+                        </form>
                     </Layout>
                 </>
             )}
         </>
     );
 }
-export default TestAvaliable_Create;
+export default EssayTest_CreateAuto;

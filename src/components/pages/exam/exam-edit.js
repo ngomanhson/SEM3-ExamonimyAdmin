@@ -13,7 +13,7 @@ function Exam_Edit() {
     const [examData, setExamData] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [courses, setCourses] = useState([]);
-    const [creator, setCreator] = useState([]);
+    const [loggedInUser, setLoggedInUser] = useState(null);
     const [nameExistsError, setNameExistsError] = useState("");
     const today = new Date().toISOString().split("T")[0];
 
@@ -21,7 +21,7 @@ function Exam_Edit() {
         name: "",
         start_date: "",
         courseClass_id: "",
-        teacher_id: "",
+        created_by: "",
     });
 
     const validateForm = async () => {
@@ -92,7 +92,11 @@ function Exam_Edit() {
             const userToken = localStorage.getItem("accessToken");
             try {
                 api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-                const rs = await api.put(`${url.EXAM.EDIT}?id=${examData.id}`, examData);
+                const updatedFormExam = {
+                    ...examData,
+                    created_by: loggedInUser || "",
+                };
+                const rs = await api.put(`${url.EXAM.EDIT}?id=${examData.id}`, updatedFormExam);
                 showNotification("success", "Exam updated successfully!");
             } catch (error) {
                 if (error.response.status === 400 && error.response.data === "Exam name already exists") {
@@ -124,24 +128,28 @@ function Exam_Edit() {
         setExamData({ ...examData, courseClass_id: selectedOption.value });
     };
 
-    //hiển thị select creator
+    //created_by
     useEffect(() => {
-        const fetchCreators = async () => {
+        const fetchLoggedInUser = async () => {
+            const token = localStorage.getItem("accessToken");
             try {
-                const response = await api.get(url.STAFF.LIST);
-                const creatorData = response.data.map((creator) => ({
-                    value: creator.id,
-                    label: creator.fullname,
-                }));
-                setCreator(creatorData);
+                const decodedToken = JSON.parse(atob(token.split(".")[1]));
+                const userId = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+                setLoggedInUser(userId);
             } catch (error) {}
         };
-        fetchCreators();
+
+        fetchLoggedInUser();
     }, []);
-    const optionsCreator = creator;
-    const handleChangeCreator = (selectedOption) => {
-        setExamData({ ...examData, created_by: selectedOption.value });
-    };
+
+    useEffect(() => {
+        if (loggedInUser) {
+            setExamData((prevFormExam) => ({
+                ...prevFormExam,
+                created_by: loggedInUser,
+            }));
+        }
+    }, [loggedInUser]);
     return (
         <>
             <Helmet>
@@ -217,21 +225,6 @@ function Exam_Edit() {
                                             onChange={handleChangeCourse}
                                         />
                                         {errors.courseClass_id && <div className="text-danger">{errors.courseClass_id}</div>}
-                                    </div>
-                                    <div className="form-group">
-                                        <label>
-                                            Creator
-                                            <span className="login-danger">*</span>
-                                        </label>
-                                        <Select
-                                            options={optionsCreator}
-                                            isSearchable={isSearchable}
-                                            isClearable={isClearable}
-                                            value={optionsCreator.find((option) => option.value === examData.created_by)}
-                                            onChange={handleChangeCreator}
-                                            placeholder="Select Creator"
-                                        />
-                                        {errors.created_by && <div className="text-danger">{errors.created_by}</div>}
                                     </div>
                                     <div class="form-group"></div>
                                     <div className="text-end">
