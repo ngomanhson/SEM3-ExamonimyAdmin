@@ -71,7 +71,7 @@ function Login() {
                     // Determine the redirect URL based on the user's role
                     let redirectUrl = "/";
                     if (userRole === "Staff") {
-                        redirectUrl = "/exam-list";
+                        redirectUrl = "/staff-dashboard";
                     } else if (userRole === "Teacher") {
                         redirectUrl = "/teacher-dashboard";
                     }

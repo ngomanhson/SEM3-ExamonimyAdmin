@@ -7,8 +7,9 @@ import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-function Course_List() {
+function ClassCourse_List() {
     const [courses, setCourses] = useState([]);
+    const [courseCodes, setCourseCodes] = useState([]);
     const [userRole, setUserRole] = useState(null);
     const navigate = useNavigate();
 
@@ -19,14 +20,29 @@ function Course_List() {
             setLoading(false);
         }, 2000);
     });
-    //hiển thị danh sách lớp
+
     const loadCourses = async () => {
         const userToken = localStorage.getItem("accessToken");
         try {
             api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-            const response = await api.get(url.COURSE.LIST);
-            setCourses(response.data.data);
+            const classCourseResponse = await api.get(url.ClassCourse.LIST);
+            const classIds = classCourseResponse.data.data.map((item) => item.class_id);
+            const courseResponse = await api.get(url.COURSE.LIST, {
+                params: {
+                    classIds: classIds.join(","),
+                },
+            });
+            const fetchedCourseCodes = courseResponse.data.data.reduce((acc, item) => {
+                acc[item.id] = item.course_code;
+                return acc;
+            }, {});
+            setCourses(classCourseResponse.data.data);
+            setCourseCodes(fetchedCourseCodes);
         } catch (error) {}
+    };
+
+    const getCourseCode = (courseId) => {
+        return courseCodes[courseId] || "";
     };
 
     //kiểm tra role
@@ -56,7 +72,7 @@ function Course_List() {
         <>
             {loading ? <Loading /> : ""}
             <Helmet>
-                <title>Course | Examonimy</title>
+                <title>Class Course | Examonimy</title>
             </Helmet>
             <Layout>
                 <div className="page-header">
@@ -106,7 +122,7 @@ function Course_List() {
                                             <a href="#" className="btn btn-outline-primary me-2">
                                                 <i className="fas fa-download"></i> Download
                                             </a>
-                                            <NavLink to="/course-create" className="btn btn-primary">
+                                            <NavLink to="/course-class-create" className="btn btn-primary">
                                                 <i className="fas fa-plus"></i>
                                             </NavLink>
                                         </div>
@@ -124,7 +140,10 @@ function Course_List() {
                                                 </th>
                                                 <th>Ordinal</th>
                                                 <th>Name Course</th>
-                                                <th>Code Course</th>
+                                                <th>Name Class</th>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Created By</th>
                                                 <th className="text-end">Action</th>
                                             </tr>
                                         </thead>
@@ -138,8 +157,11 @@ function Course_List() {
                                                             </div>
                                                         </td>
                                                         <td>{index + 1}</td>
-                                                        <td>{item.name}</td>
-                                                        <td>{item.course_code}</td>
+                                                        <td>{item.courseName}</td>
+                                                        <td>{item.className}</td>
+                                                        <td>{format(new Date(item.startDate), "yyyy-MM-dd")}</td>
+                                                        <td>{format(new Date(item.endDate), "yyyy-MM-dd")}</td>
+                                                        <td>{item.createByName}</td>
                                                         <td className="text-end">
                                                             <div className="actions">
                                                                 <a href="javascript:;" className="btn btn-sm bg-success-light me-2">
@@ -164,4 +186,4 @@ function Course_List() {
         </>
     );
 }
-export default Course_List;
+export default ClassCourse_List;

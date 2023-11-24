@@ -22,7 +22,7 @@ function NotFound() {
             setUserRole(userRole);
 
             if (userRole === "Staff") {
-                setHomePath("/exam-list");
+                setHomePath("/staff-dashboard");
             } else if (userRole === "Teacher") {
                 setHomePath("/teacher-dashboard");
             } else {

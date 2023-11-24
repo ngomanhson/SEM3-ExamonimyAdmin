@@ -7,7 +7,7 @@ import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../layouts/loading";
 import NotFound from "../../pages/other/not-found";
-function Classes_List() {
+function ClassByTeacher_List() {
     const [classes, setClasses] = useState([]);
     const [teacherNames, setTeacherNames] = useState({});
     const [error, setError] = useState(null);
@@ -27,42 +27,10 @@ function Classes_List() {
         const userToken = localStorage.getItem("accessToken");
         try {
             api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-            const response = await api.get(url.CLASS.LIST);
+            const response = await api.get(url.CLASS.CLASSOFTEACHER);
             setClasses(response.data);
         } catch (error) {
             setError("Failed to load classes.");
-        }
-    };
-
-    //thông báo
-    const showNotification = (type, message) => {
-        const notificationContainer = document.getElementById("notification-container");
-        const notification = document.createElement("div");
-        notification.className = `alert alert-${type}`;
-        notification.textContent = message;
-        notificationContainer.appendChild(notification);
-
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
-    };
-
-    //xử lý xoá lớp học
-    const handleDeleteClass = (id) => {
-        const confirmed = window.confirm("Are you sure you want to delete this class?");
-        if (confirmed) {
-            deleteClass(id);
-        }
-    };
-
-    const deleteClass = async (id) => {
-        const userToken = localStorage.getItem("accessToken");
-        try {
-            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-            await api.delete(`${url.CLASS.DELETE}?id=${id}`);
-            setClasses(classes.filter((c) => c.id !== id));
-        } catch (error) {
-            showNotification("danger", "The class cannot be deleted because this class currently has students.");
         }
     };
 
@@ -90,7 +58,7 @@ function Classes_List() {
                 const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
                 setUserRole(userRole);
 
-                if (userRole === "Teacher") {
+                if (userRole === "Staff" || userRole === "Super Admin") {
                     setError(true);
                 }
             } catch (error) {
@@ -166,11 +134,6 @@ function Classes_List() {
                                                 <div className="col">
                                                     <h3 className="page-title">Class</h3>
                                                 </div>
-                                                <div className="col-auto text-end float-end ms-auto download-grp">
-                                                    <NavLink to="/class-create" className="btn btn-primary">
-                                                        <i className="fas fa-plus"></i>
-                                                    </NavLink>
-                                                </div>
                                             </div>
                                         </div>
 
@@ -208,12 +171,6 @@ function Classes_List() {
                                                                 <div className="actions">
                                                                     <NavLink to={`/student-of-class-list/${item.id}`} className="btn btn-sm bg-success-light me-2">
                                                                         <i className="feather-eye"></i>
-                                                                    </NavLink>
-                                                                    <NavLink to={`/classes-edit/${item.slug}`} className="btn btn-sm bg-danger-light">
-                                                                        <i className="feather-edit"></i>
-                                                                    </NavLink>
-                                                                    <NavLink onClick={() => handleDeleteClass(item.id)} className="btn btn-sm bg-danger-light">
-                                                                        <i className="feather-trash"></i>
                                                                     </NavLink>
                                                                 </div>
                                                             </td>
@@ -262,4 +219,4 @@ function Classes_List() {
         </>
     );
 }
-export default Classes_List;
+export default ClassByTeacher_List;

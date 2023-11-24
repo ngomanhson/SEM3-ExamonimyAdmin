@@ -39,6 +39,11 @@ import TestByHand_Create from "./components/pages/exam/retest/testbyhand-create"
 import EssayTest_Create from "./components/pages/exam/retest/essaytest-create";
 import TestEssay_CreateAuto from "./components/pages/exam/test/test-essay-create-auto";
 import EssayTest_CreateAuto from "./components/pages/exam/retest/essaytest-createauto";
+import ClassCourse_List from "./components/pages/classescourse/classescourse";
+import Staff_Dashboard from "./components/pages/dashboard/staff-dashboard";
+import TestByTeacher_List from "./components/pages/teacher/testbyteacher-list";
+import ClassByTeacher_List from "./components/pages/teacher/classbyteacher-list";
+import Add_ClassCourse from "./components/pages/classescourse/add-classcourse";
 function App() {
     const ProtectedRoute = ({ element }) => {
         const token = localStorage.getItem("accessToken");
@@ -67,6 +72,7 @@ function App() {
             <Routes>
                 {/* start route dashboard */}
                 <Route path="/" element={<ProtectedRoute element={<Admin_Dashboard />} />}></Route>
+                <Route path="/staff-dashboard" element={<ProtectedRoute element={<Staff_Dashboard />} />}></Route>
                 <Route path="/teacher-dashboard" element={<ProtectedRoute element={<Teacher_Dashboard />} />}></Route>
                 {/* end route dashboard */}
 
@@ -105,12 +111,18 @@ function App() {
                 {/* start route course */}
                 <Route path="/course-list" element={<ProtectedRoute element={<Course_List />} />}></Route>
                 <Route path="/course-create" element={<ProtectedRoute element={<Course_Create />} />}></Route>
-                <Route path="/course-class-create" element={<ProtectedRoute element={<Course_Class_Create />} />}></Route>
                 {/* end route course */}
+
+                {/* start route classcourse */}
+                <Route path="/courseclass-list" element={<ProtectedRoute element={<ClassCourse_List />} />}></Route>
+                <Route path="/course-class-create" element={<ProtectedRoute element={<Add_ClassCourse />} />}></Route>
+                {/* end route classcourse */}
 
                 {/* start route teacher */}
                 <Route path="/teacher-list" element={<ProtectedRoute element={<Teacher_List />} />}></Route>
                 <Route path="/teacher-create" element={<ProtectedRoute element={<Teacher_Create />} />}></Route>
+                <Route path="/testbyteacher-list" element={<ProtectedRoute element={<TestByTeacher_List />} />}></Route>
+                <Route path="/classesbyteacher-list" element={<ProtectedRoute element={<ClassByTeacher_List />} />}></Route>
                 {/* end route teacher */}
 
                 {/* start route student */}
