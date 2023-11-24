@@ -7,6 +7,8 @@ import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../layouts/loading";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function Student_Edit() {
     const { student_code } = useParams();
     const [studentData, setStudentData] = useState({});
@@ -137,7 +139,10 @@ function Student_Edit() {
                 const response = await api.put(url.STUDENT.EDIT, formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
-
+                toast.success("Update Student Successfuly", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 5000,
+                });
                 showNotification("success", "Successfully edited student information!");
                 // Sử dụng navigate để chuyển hướng đến "/student-list"
                 navigate("/student-list");

@@ -3,7 +3,7 @@ import api from "../../services/api";
 import url from "../../services/url";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Loading from "../../layouts/loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -209,6 +209,19 @@ function Student_Create() {
                                         <h3 className="page-title">Add Student</h3>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div className="row">
+                            <div class="col-md-9">
+                                <ul class="list-links mb-4">
+                                    <li class="active">
+                                        <NavLink to="">Add Student</NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink to="/student-excel-create">With excel files</NavLink>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
 

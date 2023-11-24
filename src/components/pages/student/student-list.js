@@ -15,6 +15,9 @@ function Student_List() {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [studentsPerPage] = useState(20);
+    const [searchByStudentCode, setSearchByStudentCode] = useState("");
+    const [searchByName, setSearchByName] = useState("");
+    const [searchByPhone, setSearchByPhone] = useState("");
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
@@ -101,6 +104,24 @@ function Student_List() {
         loadStudents();
         fetchClassNames();
     }, []);
+
+    const handleSearch = () => {
+        // Tạo RegExp cho mã sinh viên, tên sinh viên, và số điện thoại
+        const codeRegex = new RegExp(searchByStudentCode, "i"); // 'i' là không phân biệt chữ hoa chữ thường
+        const nameRegex = new RegExp(searchByName, "i");
+        const phoneRegex = new RegExp(searchByPhone, "i");
+
+        // Lọc danh sách sinh viên dựa trên thông tin tìm kiếm
+        const filteredStudents = students.filter((student) => {
+            const codeMatch = codeRegex.test(student.student_code);
+            const nameMatch = nameRegex.test(student.fullname);
+            const phoneMatch = phoneRegex.test(student.phone);
+            return codeMatch && nameMatch && phoneMatch;
+        });
+
+        setStudents(filteredStudents);
+    };
+
     return (
         <>
             {loading ? <Loading /> : ""}
@@ -126,22 +147,28 @@ function Student_List() {
                             <div className="row">
                                 <div className="col-lg-3 col-md-6">
                                     <div className="form-group">
-                                        <input type="text" className="form-control" placeholder="Search by ID ..." />
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            placeholder="Search by Student Code ..."
+                                            value={searchByStudentCode}
+                                            onChange={(e) => setSearchByStudentCode(e.target.value)}
+                                        />
                                     </div>
                                 </div>
                                 <div className="col-lg-3 col-md-6">
                                     <div className="form-group">
-                                        <input type="text" className="form-control" placeholder="Search by Name ..." />
+                                        <input type="text" className="form-control" placeholder="Search by Name ..." value={searchByName} onChange={(e) => setSearchByName(e.target.value)} />
                                     </div>
                                 </div>
                                 <div className="col-lg-4 col-md-6">
                                     <div className="form-group">
-                                        <input type="text" className="form-control" placeholder="Search by Phone ..." />
+                                        <input type="text" className="form-control" placeholder="Search by Phone ..." value={searchByPhone} onChange={(e) => setSearchByPhone(e.target.value)} />
                                     </div>
                                 </div>
                                 <div className="col-lg-2">
                                     <div className="search-student-btn">
-                                        <button type="btn" className="btn btn-primary">
+                                        <button type="btn" className="btn btn-primary" onClick={handleSearch}>
                                             Search
                                         </button>
                                     </div>

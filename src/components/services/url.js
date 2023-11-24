@@ -22,6 +22,7 @@ const url = {
     STUDENT: {
         LIST: "/student",
         CREATE: "/student",
+        CREATE_EXCEL: "/student/by-excel",
         EDIT: "/student",
         DELETE: "/student",
         DELETE_FOREVER: "/student/permanently-delete",
@@ -42,6 +43,7 @@ const url = {
         LIST: "/staff",
         CREATE: "/staff",
         DELETE: "/staff",
+        LISTROLE: "/staff/get-by-role?role=Teacher",
     },
     EXAM: {
         LIST: "/exam",
