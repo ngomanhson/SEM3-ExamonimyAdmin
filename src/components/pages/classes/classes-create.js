@@ -6,6 +6,8 @@ import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
 import NotFound from "../../pages/other/not-found";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function Classes_Create() {
     const [loading, setLoading] = useState(true);
     const [userRole, setUserRole] = useState(null);
@@ -68,18 +70,6 @@ function Classes_Create() {
         return valid;
     };
 
-    const showNotification = (type, message) => {
-        const notificationContainer = document.getElementById("notification-container");
-        const notification = document.createElement("div");
-        notification.className = `alert alert-${type}`;
-        notification.textContent = message;
-        notificationContainer.appendChild(notification);
-
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
@@ -87,13 +77,20 @@ function Classes_Create() {
             try {
                 api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const rs = await api.post(url.CLASS.CREATE, formClass);
-                showNotification("success", "Class created successfully!");
+                toast.success("Create Class Successfuly", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 5000,
+                });
             } catch (error) {
                 if (error.response.status === 400 && error.response.data === "Class name already exists") {
                     setNameExistsError("The class name already exists");
                 } else {
                     // showNotification("danger", "Failed to create class.");
                 }
+                toast.error("Create Class Fail, Please try again", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 5000,
+                });
             }
         }
     };
@@ -107,10 +104,15 @@ function Classes_Create() {
     //hiển thị select teacher
     useEffect(() => {
         const fetchTeachers = async () => {
+            const userToken = localStorage.getItem("accessToken");
             try {
-                const response = await api.get(url.STAFF.LIST);
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
+                const response = await api.get(url.STAFF.LISTROLE);
                 setTeachers(response.data);
-            } catch (error) {}
+            } catch (error) {
+                // console.error("Error creating test:", error);
+                // console.error("Response data:", error.response.data);
+            }
         };
         fetchTeachers();
     }, []);
@@ -164,8 +166,6 @@ function Classes_Create() {
                                                         <span>Class Information</span>
                                                     </h5>
                                                 </div>
-                                                <div id="notification-container"></div>
-
                                                 <div className="col-12 col-sm-4">
                                                     <div className="form-group local-forms">
                                                         <label>

@@ -5,6 +5,8 @@ import url from "../../services/url";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function Classes_Edit() {
     const { slug } = useParams();
     const [classData, setClassData] = useState({});
@@ -70,18 +72,6 @@ function Classes_Edit() {
         return valid;
     };
 
-    const showNotification = (type, message) => {
-        const notificationContainer = document.getElementById("notification-container");
-        const notification = document.createElement("div");
-        notification.className = `alert alert-${type}`;
-        notification.textContent = message;
-        notificationContainer.appendChild(notification);
-
-        setTimeout(() => {
-            notification.remove();
-        }, 5000);
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validateForm()) {
@@ -89,12 +79,19 @@ function Classes_Edit() {
             try {
                 api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const rs = await api.put(`${url.CLASS.EDIT}?id=${classData.id}`, classData);
-                showNotification("success", "Class updated successfully!");
+                toast.success("Update Class Successfuly", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 5000,
+                });
             } catch (error) {
                 if (error.response.status === 400 && error.response.data === "Class name already exists") {
                     setNameExistsError("The class name already exists");
                 } else {
                 }
+                toast.success("Update Class Fail, Please try again", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 5000,
+                });
             }
         }
     };
@@ -136,8 +133,6 @@ function Classes_Edit() {
                                                 <span>Class Information</span>
                                             </h5>
                                         </div>
-                                        <div id="notification-container"></div>
-
                                         <div className="col-12 col-sm-4">
                                             <div className="form-group local-forms">
                                                 <label>

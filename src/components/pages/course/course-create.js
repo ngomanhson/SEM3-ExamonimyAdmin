@@ -79,9 +79,9 @@ function Course_Create() {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 5000,
                 });
-                setTimeout(() => {
-                    navigate(`/course-list`); //chuyển đến trang course-class
-                }, 5000);
+                // setTimeout(() => {
+                //     navigate(`/course-list`); //chuyển đến trang course-class
+                // }, 5000);
             } catch (error) {
                 if (error.response.status === 400 && error.response.data === "Course code already exists") {
                     setCourseCodeExistsError("The course code already exists");

@@ -110,7 +110,7 @@ function Exam_Create() {
                 const response = await api.get(url.ClassCourse.LIST);
                 const courseData = response.data.data.map((course) => ({
                     value: course.id,
-                    label: course.courseName,
+                    label: course.courseName + " " + "(" + course.className + ")",
                 }));
                 setCourses(courseData);
             } catch (error) {}

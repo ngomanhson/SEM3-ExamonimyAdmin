@@ -23,7 +23,6 @@ import Test_List from "./components/pages/exam/test/test-list";
 import Test_Essay_Create from "./components/pages/exam/test/test-essay-create";
 import Test_Excel_Create from "./components/pages/exam/test/test-excel-create";
 import Test_Edit from "./components/pages/exam/test/test-edit";
-import Course_Class_Create from "./components/pages/course/course-class-create";
 import Login from "./components/pages/auth/login";
 import { useJwt } from "react-jwt";
 import Profile from "./components/pages/auth/profile";
@@ -44,6 +43,7 @@ import Staff_Dashboard from "./components/pages/dashboard/staff-dashboard";
 import TestByTeacher_List from "./components/pages/teacher/testbyteacher-list";
 import ClassByTeacher_List from "./components/pages/teacher/classbyteacher-list";
 import Add_ClassCourse from "./components/pages/classescourse/add-classcourse";
+import StudentExcel_Create from "./components/pages/student/studentexcel-create";
 function App() {
     const ProtectedRoute = ({ element }) => {
         const token = localStorage.getItem("accessToken");
@@ -128,6 +128,7 @@ function App() {
                 {/* start route student */}
                 <Route path="/student-list" element={<Student_List />}></Route>
                 <Route path="/student-create" element={<ProtectedRoute element={<Student_Create />} />}></Route>
+                <Route path="/student-excel-create" element={<ProtectedRoute element={<StudentExcel_Create />} />}></Route>
                 <Route path="/student-edit/:student_code" element={<ProtectedRoute element={<Student_Edit />} />}></Route>
                 <Route path="/student-deleteat" element={<ProtectedRoute element={<Student_DeleteAt />} />}></Route>
                 {/* end route student */}
