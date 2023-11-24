@@ -147,9 +147,9 @@ function Add_ClassCourse() {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 5000,
                 });
-                setTimeout(() => {
-                    navigate(`/courseclass-list`);
-                }, 5000);
+                // setTimeout(() => {
+                //     navigate(`/courseclass-list`);
+                // }, 5000);
             } catch (error) {
                 // console.error("Error creating test:", error);
                 // console.error("Response data:", error.response.data);

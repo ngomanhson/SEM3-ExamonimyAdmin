@@ -30,6 +30,7 @@ function TestByTeacher_List() {
             api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.get(url.TEST.TESTOFTEACHER);
             setTests(response.data);
+            console.log(response.data);
         } catch (error) {
             if (error.response.status === 403) {
                 setError(true);
@@ -98,6 +99,7 @@ function TestByTeacher_List() {
                                                 </thead>
                                                 <tbody>
                                                     {tests.map((item, index) => {
+                                                        const testViewLink = item.typeTest === 0 ? `/test-view/${item.testSlug}` : `/test-view-essay/${item.testSlug}`;
                                                         return (
                                                             <tr>
                                                                 <td>{index + 1}</td>
@@ -106,7 +108,9 @@ function TestByTeacher_List() {
                                                                 <td>{format(new Date(item.startDate), "yyyy-MM-dd HH:mm")}</td>
                                                                 <td>{format(new Date(item.endDate), "yyyy-MM-dd HH:mm")}</td>
                                                                 <td>
-                                                                    <span className="badge badge-soft-info">View</span>
+                                                                    <NavLink to={testViewLink}>
+                                                                        <span className="badge badge-soft-info">View</span>
+                                                                    </NavLink>
                                                                 </td>
                                                             </tr>
                                                         );
