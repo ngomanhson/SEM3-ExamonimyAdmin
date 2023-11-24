@@ -13,6 +13,7 @@ const url = {
     },
     CLASS: {
         LIST: "/classes",
+        CLASSOFTEACHER: "/classes/get-by-teacher",
         CREATE: "/classes",
         EDIT: "/classes",
         DELETE: "/classes",
@@ -51,6 +52,7 @@ const url = {
     },
     TEST: {
         LIST: "/test",
+        TESTOFTEACHER: "/test/get-by-teacher",
         CREATE_MULTIPLE: "/test/multiple-choice-by-hand",
         CREATE_MULTIPLE_RETAKE: "/test/multiple-choice-by-hand/retake",
         CREATE_MULTIPLE_EXCEL: "/test/multiple-choice-by-excel-file",

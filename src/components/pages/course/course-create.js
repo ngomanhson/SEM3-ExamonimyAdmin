@@ -80,7 +80,7 @@ function Course_Create() {
                     autoClose: 5000,
                 });
                 setTimeout(() => {
-                    navigate(`/course-class-create`); //chuyển đến trang course-class
+                    navigate(`/course-list`); //chuyển đến trang course-class
                 }, 5000);
             } catch (error) {
                 if (error.response.status === 400 && error.response.data === "Course code already exists") {
@@ -152,19 +152,6 @@ function Course_Create() {
                         <div className="col">
                             <h3 className="page-title">Add Course</h3>
                         </div>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div class="col-md-9">
-                        <ul class="list-links mb-4">
-                            <li className="active">
-                                <NavLink to="">Create Course</NavLink>
-                            </li>
-                            <li>
-                                <NavLink to="/course-class-create">Create Course with Class</NavLink>
-                            </li>
-                        </ul>
                     </div>
                 </div>
 

@@ -124,7 +124,7 @@ function Classes_Create() {
                 const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
                 setUserRole(userRole);
 
-                if (userRole === "Teacher" || userRole === "Staff") {
+                if (userRole === "Teacher") {
                     setError(true);
                 }
             } catch (error) {
