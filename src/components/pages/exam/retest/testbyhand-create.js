@@ -184,6 +184,19 @@ function TestByHand_Create() {
         }
         const userToken = localStorage.getItem("accessToken");
         try {
+            //kiểm tra nếu bài test chính là tự luận thì không được taoj
+            const examTestsResponse = await api.get(url.TEST.LIST, {
+                params: { exam_id: formTest.exam_id },
+            });
+            const examTests = examTestsResponse.data;
+            const mainTest = examTests.find((test) => test.retakeTestId === null);
+            if (mainTest && mainTest.type_test === 1) {
+                toast.error("Cannot create a test because the main test is an essay test!", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
+                return;
+            }
             const data = {
                 name: formTest.name,
                 exam_id: formTest.exam_id,
