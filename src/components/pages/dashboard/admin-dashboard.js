@@ -3,17 +3,20 @@ import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
 import NotFound from "../../pages/other/not-found";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import Chart from "react-apexcharts";
 import api from "../../services/api";
 import url from "../../services/url";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
+import { useJwt } from "react-jwt";
 function Admin_Dashboard() {
     const [userRole, setUserRole] = useState(null);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [staffName, setStaffName] = useState("");
+    const { isExpired, isInvalid } = useJwt();
     const [userStats, setUserStats] = useState({
         totalUsers: "",
         enrolledStudents: "",
@@ -277,6 +280,19 @@ function Admin_Dashboard() {
         loadTests();
         loadHighTests();
     }, []);
+
+    // Get staff name from token
+    useEffect(() => {
+        const staffToken = localStorage.getItem("accessToken");
+
+        try {
+            const decodedToken = JSON.parse(atob(staffToken.split(".")[1]));
+
+            const staffName = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+
+            setStaffName(staffName);
+        } catch (error) {}
+    }, [isExpired, isInvalid]);
     return (
         <>
             {loading ? <Loading /> : ""}
@@ -292,7 +308,7 @@ function Admin_Dashboard() {
                             <div className="row">
                                 <div className="col-sm-12">
                                     <div className="page-sub-header">
-                                        <h3 className="page-title">Welcome Admin!</h3>
+                                        <h3 className="page-title">Welcome {staffName}!</h3>
                                         <ul className="breadcrumb">
                                             <li className="breadcrumb-item">
                                                 <a href="index.html">Home</a>
@@ -475,17 +491,19 @@ function Admin_Dashboard() {
                         <div className="row">
                             <div className="col-xl-3 col-sm-6 col-12 d-flex">
                                 <div className="card bg-comman w-100">
-                                    <div className="card-body">
-                                        <div className="db-widgets d-flex justify-content-between align-items-center">
-                                            <div className="db-info">
-                                                <h6>Total Registrations Retake</h6>
-                                                <h3>{registerExamStats.totalRegistrations}</h3>
-                                            </div>
-                                            <div className="db-icon">
-                                                <img src="assets/img/icons/retest.svg" alt="Dashboard Icon" />
+                                    <Link to="/retest-list">
+                                        <div className="card-body">
+                                            <div className="db-widgets d-flex justify-content-between align-items-center">
+                                                <div className="db-info">
+                                                    <h6>Total Registrations Retake</h6>
+                                                    <h3>{registerExamStats.totalRegistrations}</h3>
+                                                </div>
+                                                <div className="db-icon">
+                                                    <img src="assets/img/icons/retest.svg" alt="Dashboard Icon" />
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 </div>
                             </div>
                             <div className="col-xl-3 col-sm-6 col-12 d-flex">
