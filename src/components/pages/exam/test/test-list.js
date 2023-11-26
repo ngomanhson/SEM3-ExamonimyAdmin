@@ -11,49 +11,63 @@ import Loading from "../../../layouts/loading";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import NotFound from "../../../pages/other/not-found";
+import { formatISO } from "date-fns";
 function Test_List() {
     const { id } = useParams();
     const [tests, setTests] = useState([]);
-    const maxInitialStudents = 2;
-    const [currentPage, setCurrentPage] = useState(1);
-    const [testsPerPage] = useState(10);
     const [userRole, setUserRole] = useState(null);
-    const { isExpired, isInvalid } = useJwt();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [search, setSearch] = useState("");
+    const [from, setFromDate] = useState(null);
+    const [toDate, setToDate] = useState(null);
+    const [sortBy, setSortBy] = useState("");
+    const [page, setPage] = useState(1);
     const navigate = useNavigate();
-    useEffect(() => {
-        setTimeout(() => {
-            setLoading(false);
-        }, 2000);
-    }, []);
-    //in ra danh sách bài test
+    const handleSearchChange = (e) => setSearch(e.target.value);
+    const handleFromDateChange = (date) => {
+        const isoFormattedDate = formatISO(new Date(date), { representation: "complete" });
+        const formattedDate = isoFormattedDate.slice(0, 16);
+        setFromDate(formattedDate);
+    };
+    const handleToDateChange = (date) => setToDate(date);
+    const handleSortByChange = (e) => setSortBy(e.target.value);
+    //reset lọc
+    const handleResetFilters = () => {
+        setSearch("");
+        setFromDate("");
+        setToDate("");
+        setSortBy("");
+        setPage(1);
+    };
+
+    //hiển thị test list
     const loadTestList = async () => {
         const userToken = localStorage.getItem("accessToken");
         try {
             api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-            const response = await api.get(url.TEST.LIST);
-            setTests(response.data);
+            const response = await api.get(url.TEST.LIST, {
+                params: {
+                    search,
+                    from,
+                    toDate,
+                    sortBy,
+                    page,
+                },
+            });
+            setTests(response.data.data);
         } catch (error) {
-            if (error.response.status === 403) {
-                setError(true);
-                return;
-            }
+            console.error("Error loading test list:", error);
         }
     };
 
+    //kiểm tra edit bài test
     const canEditTest = (startDate) => {
-        // So sánh startDate với thời gian hiện tại
         const currentDate = Date.now();
         return startDate > currentDate;
     };
 
-    //pa gi nết
-    const indexOfLastTest = currentPage * testsPerPage;
-    const indexOfFirstTest = indexOfLastTest - testsPerPage;
-    const currentTests = tests.slice(indexOfFirstTest, indexOfLastTest);
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
+    //kiểm tra role
     const fetchUserRole = async () => {
         const token = localStorage.getItem("accessToken");
         try {
@@ -65,10 +79,21 @@ function Test_List() {
         }
     };
 
+    //paginate
+    const handleNextPage = () => {
+        setPage((prevPage) => prevPage + 1);
+    };
+    const handlePrevPage = () => {
+        setPage((prevPage) => Math.max(prevPage - 1, 1));
+    };
+
     useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
         loadTestList();
         fetchUserRole();
-    }, [navigate]);
+    }, [navigate, search, from, toDate, sortBy, page]);
     return (
         <>
             {loading ? <Loading /> : ""}
@@ -103,6 +128,41 @@ function Test_List() {
                                                     </NavLink>
                                                 ) : null}
                                             </h5>
+
+                                            <div className="col-md-3">
+                                                <div className="form-group">
+                                                    <label>Search:</label>
+                                                    <input type="text" className="form-control" placeholder="Search" value={search} onChange={handleSearchChange} />
+                                                </div>
+                                            </div>
+
+                                            <div className="col-md-3">
+                                                <div className="form-group">
+                                                    <label>From Date:</label>
+                                                    <input type="datetime-local" className="form-control" value={from} onChange={(e) => handleFromDateChange(e.target.value)} />
+                                                </div>
+                                                {/* <div className="form-group">
+                                                    <label>To Date:</label>
+                                                    <input type="date" className="form-control" onChange={(e) => handleToDateChange(e.target.value)} />
+                                                </div> */}
+                                            </div>
+
+                                            <div className="col-md-3">
+                                                <div className="form-group">
+                                                    <label>Sort By:</label>
+                                                    <select className="form-control" value={sortBy} onChange={handleSortByChange}>
+                                                        <option value="">Default</option>
+                                                        <option value="name_desc">Name (Desc)</option>
+                                                        <option value="createAt_asc">Start Date At (Asc)</option>
+                                                        <option value="createAt_desc">Start Date At (Desc)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="col-md-3 text-end">
+                                                <button className="btn btn-secondary" onClick={handleResetFilters}>
+                                                    Reset Filters
+                                                </button>
+                                            </div>
                                         </div>
 
                                         <div className="table-responsive">
@@ -119,7 +179,7 @@ function Test_List() {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {currentTests.map((item, index) => {
+                                                    {tests.map((item, index) => {
                                                         const isEditable = canEditTest(new Date(item.startDate));
                                                         const testViewLink = item.type_test === 0 ? `/test-view/${item.slug}` : `/test-view-essay/${item.slug}`;
                                                         return (
@@ -167,37 +227,15 @@ function Test_List() {
                                 </div>
                             </div>
                         </div>
-
-                        <div className="row">
-                            <div className="col">
-                                <ul className="pagination mb-4">
-                                    <li className="page-item">
-                                        <button className="page-link" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>
-                                            Previous
-                                        </button>
-                                    </li>
-
-                                    {Array.from(
-                                        {
-                                            length: Math.ceil(tests.length / testsPerPage),
-                                        },
-                                        (_, i) => (
-                                            <li key={i} className={`page-item ${i + 1 === currentPage ? "active" : ""}`}>
-                                                <button className="page-link" onClick={() => paginate(i + 1)}>
-                                                    {i + 1}
-                                                </button>
-                                            </li>
-                                        )
-                                    )}
-                                    <li className="page-item">
-                                        <button className="page-link" onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(tests.length / testsPerPage)}>
-                                            Next
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
+                        <div className="text-center">
+                            <button className="btn btn-secondary me-2" onClick={handlePrevPage} disabled={page === 1}>
+                                Previous Page
+                            </button>
+                            <span>Page {page}</span>
+                            <button className="btn btn-secondary ms-2" onClick={handleNextPage} disabled={tests.length === 0}>
+                                Next Page
+                            </button>
                         </div>
-
                         <div id="signup-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">

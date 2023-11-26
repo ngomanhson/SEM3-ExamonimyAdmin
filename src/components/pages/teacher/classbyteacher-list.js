@@ -169,7 +169,7 @@ function ClassByTeacher_List() {
                                                             <td>{teacherNames[item.teacher_id]}</td>
                                                             <td className="text-end">
                                                                 <div className="actions">
-                                                                    <NavLink to={`/student-of-class-list/${item.id}`} className="btn btn-sm bg-success-light me-2">
+                                                                    <NavLink to={`/classes-detail-teacher/${item.id}`} className="btn btn-sm bg-success-light me-2">
                                                                         <i className="feather-eye"></i>
                                                                     </NavLink>
                                                                 </div>

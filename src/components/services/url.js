@@ -28,6 +28,7 @@ const url = {
         DELETE_FOREVER: "/student/permanently-delete",
         DETAIL: "/student/get-by-codeStudent",
         CLASS_ID: "/student/get-by-classId",
+        CLASS_ID_TEACHER: "/student/get-by-classId-teacher",
         TEST_SLUG: "/student/student-test/{}",
     },
     COURSE: {
@@ -55,6 +56,7 @@ const url = {
     TEST: {
         LIST: "/test",
         TESTOFTEACHER: "/test/get-by-teacher",
+        DETAIL_TEST_OF_SLUG_TEACHER: "/test/get-by-slug-teacher",
         CREATE_MULTIPLE: "/test/multiple-choice-by-hand",
         CREATE_MULTIPLE_RETAKE: "/test/multiple-choice-by-hand/retake",
         CREATE_MULTIPLE_EXCEL: "/test/multiple-choice-by-excel-file",
@@ -89,6 +91,18 @@ const url = {
     LOCKTEST: {
         LOCK: "/test/lock-test/{}",
         UNLOCK: "test/unlock-test/{}",
+    },
+    DASHBOARD: {
+        ADMIN: {
+            USER_STATS: "/Dashboard/user-stats",
+            TEST_STATS: "Dashboard/test-stats",
+            REGISTER_EXAM_STATS: "/Dashboard/registerExam-stats",
+            AVERAGE: "/Dashboard/average-scores/{}",
+            TEST_COURSE: "/Dashboard/test-exam-stats",
+            GENDER: "/Dashboard/gender-distribution",
+            RECENT_TEST: "/Dashboard/top-10-recent-tests",
+            HIGH_AVERAGE: "/Dashboard/top-10-high-average",
+        },
     },
 };
 export default url;
