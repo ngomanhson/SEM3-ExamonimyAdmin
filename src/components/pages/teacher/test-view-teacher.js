@@ -39,7 +39,12 @@ function Test_View_Teacher() {
                 setTestData(response.data);
                 fetchStudentGrades(response.data.id);
             })
-            .catch((error) => {});
+            .catch((error) => {
+                if (error.response && error.response.status === 404) {
+                    setError(true);
+                } else {
+                }
+            });
     }, [slug]);
     //format ngay gio thi
     const formatDateTime = (dateTimeString) => {
