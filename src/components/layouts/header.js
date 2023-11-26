@@ -18,7 +18,7 @@ function Header() {
             const roleStaff = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
             const avatar = decodedToken["Thumbnail"];
             setStaffName(staffName);
-            setStaffName(staffName);
+            setRoleStaff(roleStaff);
             setAvatar(avatar);
         } catch (error) {}
     }, [isExpired, isInvalid]);

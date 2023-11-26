@@ -103,6 +103,14 @@ const url = {
             RECENT_TEST: "/Dashboard/top-10-recent-tests",
             HIGH_AVERAGE: "/Dashboard/top-10-high-average",
         },
+        TEACHER: {
+            LATEST_CLASSES: "/Dashboard/latest-classes",
+            RECENT_TESTS: "/Dashboard/recent-tests-for-teacher",
+            NO_SCORE: "/Dashboard/test-type-essay-noscore",
+            TOTAL_CLASS: "/Dashboard/total-class",
+            STATS_GRADE: "/Dashboard/test-grade-stats",
+            TOTAL_TESTS: "/Dashboard/test-stats",
+        },
     },
 };
 export default url;

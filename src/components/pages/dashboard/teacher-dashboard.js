@@ -1,27 +1,80 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
+import { useJwt } from "react-jwt";
+import api from "../../services/api";
+import url from "../../services/url";
+import { format } from "date-fns";
+import { Link } from "react-router-dom";
 function Teacher_Dashboard() {
     const [loading, setLoading] = useState(true);
+    const [staffId, setStaffId] = useState("");
+    const [staffName, setStaffName] = useState("");
+    const [latestClass, setLatestClass] = useState([]);
+    const [recentTest, setRecentTest] = useState([]);
+    const [noScore, setNoScore] = useState([]);
+    const [totalClass, setTotalClass] = useState([]);
+    const [statsGrade, setStatsGrade] = useState([]);
+    const [totalTest, setTotalTest] = useState([]);
 
     useEffect(() => {
         setTimeout(() => {
             setLoading(false);
         }, 2000);
     });
+
+    const { isExpired, isInvalid } = useJwt();
+
+    useEffect(() => {
+        const staffToken = localStorage.getItem("accessToken");
+
+        try {
+            const decodedToken = JSON.parse(atob(staffToken.split(".")[1]));
+
+            const staffId = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+            const staffName = decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+
+            setStaffName(staffName);
+            setStaffId(staffId);
+        } catch (error) {}
+    }, [isExpired, isInvalid]);
+
+    const loadData = useCallback(async () => {
+        try {
+            const latestTestResponse = await api.get(url.DASHBOARD.TEACHER.LATEST_CLASSES + `/${staffId}`);
+            const recentTestResponse = await api.get(url.DASHBOARD.TEACHER.RECENT_TESTS + `/${staffId}`);
+            const noScoreResponse = await api.get(url.DASHBOARD.TEACHER.NO_SCORE + `/${staffId}`);
+            const totalClassesResponse = await api.get(url.DASHBOARD.TEACHER.TOTAL_CLASS + `/${staffId}`);
+            const statsGradeResponse = await api.get(url.DASHBOARD.TEACHER.STATS_GRADE + `/${staffId}`);
+            const totalTestResponse = await api.get(url.DASHBOARD.TEACHER.TOTAL_TESTS + `/${staffId}`);
+
+            setLatestClass(latestTestResponse.data);
+            setRecentTest(recentTestResponse.data);
+            setNoScore(noScoreResponse.data);
+            setTotalClass(totalClassesResponse.data);
+            setStatsGrade(statsGradeResponse.data);
+            setTotalTest(totalTestResponse.data);
+        } catch (error) {}
+    }, [staffId]);
+
+    useEffect(() => {
+        loadData();
+    }, [staffId, loadData]);
+
     return (
         <>
             {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Dashboard | Examonimy</title>
             </Helmet>
+
             <Layout>
                 <div className="page-header">
                     <div className="row">
                         <div className="col-sm-12">
                             <div className="page-sub-header">
-                                <h3 className="page-title">Welcome Jonathan!</h3>
+                                <h3 className="page-title">Welcome {staffName}!</h3>
                                 <ul className="breadcrumb">
                                     <li className="breadcrumb-item">
                                         <a href="index.html">Home</a>
@@ -34,28 +87,13 @@ function Teacher_Dashboard() {
                 </div>
 
                 <div className="row">
-                    <div className="col-xl-3 col-sm-6 col-12 d-flex">
+                    <div className="col-xl-4 col-sm-6 col-12 d-flex">
                         <div className="card bg-comman w-100">
                             <div className="card-body">
                                 <div className="db-widgets d-flex justify-content-between align-items-center">
                                     <div className="db-info">
-                                        <h6>Total classNamees</h6>
-                                        <h3>04/06</h3>
-                                    </div>
-                                    <div className="db-icon">
-                                        <img src="assets/img/icons/teacher-icon-01.svg" alt="Dashboard Icon" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-xl-3 col-sm-6 col-12 d-flex">
-                        <div className="card bg-comman w-100">
-                            <div className="card-body">
-                                <div className="db-widgets d-flex justify-content-between align-items-center">
-                                    <div className="db-info">
-                                        <h6>Total Students</h6>
-                                        <h3>40/60</h3>
+                                        <h6>Total Classes</h6>
+                                        <h3>{totalClass.totalClass}</h3>
                                     </div>
                                     <div className="db-icon">
                                         <img src="assets/img/icons/dash-icon-01.svg" alt="Dashboard Icon" />
@@ -64,13 +102,16 @@ function Teacher_Dashboard() {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xl-3 col-sm-6 col-12 d-flex">
+
+                    <div className="col-xl-4 col-sm-6 col-12 d-flex">
                         <div className="card bg-comman w-100">
                             <div className="card-body">
                                 <div className="db-widgets d-flex justify-content-between align-items-center">
                                     <div className="db-info">
-                                        <h6>Total Lessons</h6>
-                                        <h3>30/50</h3>
+                                        <h6>Tests In Progress</h6>
+                                        <h3>
+                                            {totalTest.examsInProgress}/{totalTest.totalTests}
+                                        </h3>
                                     </div>
                                     <div className="db-icon">
                                         <img src="assets/img/icons/teacher-icon-02.svg" alt="Dashboard Icon" />
@@ -79,13 +120,16 @@ function Teacher_Dashboard() {
                             </div>
                         </div>
                     </div>
-                    <div className="col-xl-3 col-sm-6 col-12 d-flex">
+
+                    <div className="col-xl-4 col-sm-6 col-12 d-flex">
                         <div className="card bg-comman w-100">
                             <div className="card-body">
                                 <div className="db-widgets d-flex justify-content-between align-items-center">
                                     <div className="db-info">
-                                        <h6>Total Hours</h6>
-                                        <h3>15/20</h3>
+                                        <h6>Practical Not Yet Score</h6>
+                                        <h3>
+                                            {noScore.essayNoScoreTest}/{noScore.totalEssayTest}
+                                        </h3>
                                     </div>
                                     <div className="db-icon">
                                         <img src="assets/img/icons/teacher-icon-03.svg" alt="Dashboard Icon" />
@@ -97,342 +141,238 @@ function Teacher_Dashboard() {
                 </div>
 
                 <div className="row">
-                    <div className="col-12 col-lg-12 col-xl-8">
-                        <div className="row">
-                            <div className="col-12 col-lg-8 col-xl-8 d-flex">
-                                <div className="card flex-fill comman-shadow">
-                                    <div className="card-header">
-                                        <div className="row align-items-center">
-                                            <div className="col-6">
-                                                <h5 className="card-title">Upcoming Lesson</h5>
-                                            </div>
-                                            <div className="col-6">
-                                                <span className="float-end view-link">
-                                                    <a href="#">View All Courses</a>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="pt-3 pb-3">
-                                        <div className="table-responsive lesson">
-                                            <table className="table table-center">
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <div className="date">
-                                                                <b>Lessons 30</b>
-                                                                <p>3.1 Ipsuum dolor</p>
-                                                                <ul className="teacher-date-list">
-                                                                    <li>
-                                                                        <i className="fas fa-calendar-alt me-2"></i>
-                                                                        Sep 5, 2022
-                                                                    </li>
-                                                                    <li>|</li>
-                                                                    <li>
-                                                                        <i className="fas fa-clock me-2"></i>
-                                                                        09:00 - 10:00 am
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div className="lesson-confirm">
-                                                                <a href="#">Confirmed</a>
-                                                            </div>
-                                                            <button type="submit" className="btn btn-info">
-                                                                Reschedule
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <div className="date">
-                                                                <b>Lessons 30</b>
-                                                                <p>3.1 Ipsuum dolor</p>
-                                                                <ul className="teacher-date-list">
-                                                                    <li>
-                                                                        <i className="fas fa-calendar-alt me-2"></i>
-                                                                        Sep 5, 2022
-                                                                    </li>
-                                                                    <li>|</li>
-                                                                    <li>
-                                                                        <i className="fas fa-clock me-2"></i>
-                                                                        09:00 - 10:00 am
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div className="lesson-confirm">
-                                                                <a href="#">Confirmed</a>
-                                                            </div>
-                                                            <button type="submit" className="btn btn-info">
-                                                                Reschedule
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div className="col-xl-6 d-flex">
+                        <div className="card flex-fill student-space comman-shadow">
+                            <div className="card-header d-flex align-items-center">
+                                <h5 className="card-title">Latest Classes</h5>
+                                <ul className="chart-list-out student-ellips">
+                                    <li className="star-menus">
+                                        <a href="javascript:;">
+                                            <i className="fas fa-ellipsis-v"></i>
+                                        </a>
+                                    </li>
+                                </ul>
                             </div>
-                            <div className="col-12 col-lg-4 col-xl-4 d-flex">
-                                <div className="card flex-fill comman-shadow">
-                                    <div className="card-header">
-                                        <div className="row align-items-center">
-                                            <div className="col-12">
-                                                <h5 className="card-title">Semester Progress</h5>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="dash-widget">
-                                        <div className="circle-bar circle-bar1">
-                                            <div className="circle-graph1" data-percent="50">
-                                                <div className="progress-less">
-                                                    <b>55/60</b>
-                                                    <p>Lesson Progressed</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-12 col-lg-12 col-xl-12 d-flex">
-                                <div className="card flex-fill comman-shadow">
-                                    <div className="card-header">
-                                        <div className="row align-items-center">
-                                            <div className="col-6">
-                                                <h5 className="card-title">Teaching Activity</h5>
-                                            </div>
-                                            <div className="col-6">
-                                                <ul className="chart-list-out">
-                                                    <li>
-                                                        <span className="circle-blue"></span>
-                                                        Teacher
-                                                    </li>
-                                                    <li>
-                                                        <span className="circle-green"></span>
-                                                        Students
-                                                    </li>
-                                                    <li className="star-menus">
-                                                        <a href="javascript:;">
-                                                            <i className="fas fa-ellipsis-v"></i>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="card-body">
-                                        <div id="school-area"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="col-12 col-lg-12 col-xl-12 d-flex">
-                                <div className="card flex-fill comman-shadow">
-                                    <div className="card-header d-flex align-items-center">
-                                        <h5 className="card-title">Teaching History</h5>
-                                        <ul className="chart-list-out student-ellips">
-                                            <li className="star-menus">
-                                                <a href="javascript:;">
-                                                    <i className="fas fa-ellipsis-v"></i>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div className="card-body">
-                                        <div className="teaching-card">
-                                            <ul className="steps-history">
-                                                <li>Sep22</li>
-                                                <li>Sep23</li>
-                                                <li>Sep24</li>
-                                            </ul>
-                                            <ul className="activity-feed">
-                                                <li className="feed-item d-flex align-items-center">
-                                                    <div className="dolor-activity">
-                                                        <span className="feed-text1">
-                                                            <a>Mathematics</a>
-                                                        </span>
-                                                        <ul className="teacher-date-list">
-                                                            <li>
-                                                                <i className="fas fa-calendar-alt me-2"></i>
-                                                                September 5, 2022
-                                                            </li>
-                                                            <li>|</li>
-                                                            <li>
-                                                                <i className="fas fa-clock me-2"></i>
-                                                                09:00 am - 10:00 am (60 Minutes)
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div className="activity-btns ms-auto">
-                                                        <button type="submit" className="btn btn-info">
-                                                            In Progress
-                                                        </button>
-                                                    </div>
-                                                </li>
-                                                <li className="feed-item d-flex align-items-center">
-                                                    <div className="dolor-activity">
-                                                        <span className="feed-text1">
-                                                            <a>Geography </a>
-                                                        </span>
-                                                        <ul className="teacher-date-list">
-                                                            <li>
-                                                                <i className="fas fa-calendar-alt me-2"></i>
-                                                                September 5, 2022
-                                                            </li>
-                                                            <li>|</li>
-                                                            <li>
-                                                                <i className="fas fa-clock me-2"></i>
-                                                                09:00 am - 10:00 am (60 Minutes)
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div className="activity-btns ms-auto">
-                                                        <button type="submit" className="btn btn-info">
-                                                            Completed
-                                                        </button>
-                                                    </div>
-                                                </li>
-                                                <li className="feed-item d-flex align-items-center">
-                                                    <div className="dolor-activity">
-                                                        <span className="feed-text1">
-                                                            <a>Botony</a>
-                                                        </span>
-                                                        <ul className="teacher-date-list">
-                                                            <li>
-                                                                <i className="fas fa-calendar-alt me-2"></i>
-                                                                September 5, 2022
-                                                            </li>
-                                                            <li>|</li>
-                                                            <li>
-                                                                <i className="fas fa-clock me-2"></i>
-                                                                09:00 am - 10:00 am (60 Minutes)
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div className="activity-btns ms-auto">
-                                                        <button type="submit" className="btn btn-info">
-                                                            In Progress
-                                                        </button>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                            <div className="card-body">
+                                <div className="table-responsive">
+                                    <table className="table star-student table-hover table-center table-borderless table-striped">
+                                        <thead className="thead-light">
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Class Name</th>
+                                                <th>Room</th>
+                                                <th>Start date</th>
+                                                <th className="text-end">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {latestClass.length > 0 ? (
+                                                latestClass.map((item, index) => {
+                                                    const orderNumber = index + 1;
+                                                    return (
+                                                        <tr key={index}>
+                                                            <td className="text-nowrap">
+                                                                <div>{orderNumber}</div>
+                                                            </td>
+                                                            <td className="text-nowrap">
+                                                                <div>{item.name}</div>
+                                                            </td>
+                                                            <td className="text-nowrap">{item.room}</td>
+                                                            <td className="text-nowrap">
+                                                                <div>{format(new Date(item.createdAt), "dd/MM/yyyy")}</div>
+                                                            </td>
+                                                            <td className="text-end">
+                                                                <Link to={`/student-of-class-list/${item.id}`} className="btn btn-sm bg-success-light me-2">
+                                                                    <i className="feather-eye"></i>
+                                                                </Link>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })
+                                            ) : (
+                                                <tr>
+                                                    <td>No data available for latest classes.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div className="col-12 col-lg-12 col-xl-4 d-flex">
-                        <div className="card flex-fill comman-shadow">
+                    <div className="col-xl-6 d-flex">
+                        <div className="card flex-fill student-space comman-shadow">
+                            <div className="card-header d-flex align-items-center">
+                                <h5 className="card-title">Recent Tests</h5>
+                                <ul className="chart-list-out student-ellips">
+                                    <li className="star-menus">
+                                        <a href="javascript:;">
+                                            <i className="fas fa-ellipsis-v"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                             <div className="card-body">
-                                <div id="calendar-doctor" className="calendar-container"></div>
-                                <div className="calendar-info calendar-info1">
-                                    <div className="up-come-header">
-                                        <h2>Upcoming Events</h2>
-                                        <span>
-                                            <a href="javascript:;">
-                                                <i className="feather-plus"></i>
-                                            </a>
-                                        </span>
-                                    </div>
-                                    <div className="upcome-event-date">
-                                        <h3>10 Jan</h3>
-                                        <span>
-                                            <i className="fas fa-ellipsis-h"></i>
-                                        </span>
-                                    </div>
-                                    <div className="calendar-details">
-                                        <p>08:00 am</p>
-                                        <div className="calendar-box normal-bg">
-                                            <div className="calandar-event-name">
-                                                <h4>Botony</h4>
-                                                <h5>Lorem ipsum sit amet</h5>
-                                            </div>
-                                            <span>08:00 - 09:00 am</span>
-                                        </div>
-                                    </div>
-                                    <div className="calendar-details">
-                                        <p>09:00 am</p>
-                                        <div className="calendar-box normal-bg">
-                                            <div className="calandar-event-name">
-                                                <h4>Botony</h4>
-                                                <h5>Lorem ipsum sit amet</h5>
-                                            </div>
-                                            <span>09:00 - 10:00 am</span>
-                                        </div>
-                                    </div>
-                                    <div className="calendar-details">
-                                        <p>10:00 am</p>
-                                        <div className="calendar-box normal-bg">
-                                            <div className="calandar-event-name">
-                                                <h4>Botony</h4>
-                                                <h5>Lorem ipsum sit amet</h5>
-                                            </div>
-                                            <span>10:00 - 11:00 am</span>
-                                        </div>
-                                    </div>
-                                    <div className="upcome-event-date">
-                                        <h3>10 Jan</h3>
-                                        <span>
-                                            <i className="fas fa-ellipsis-h"></i>
-                                        </span>
-                                    </div>
-                                    <div className="calendar-details">
-                                        <p>08:00 am</p>
-                                        <div className="calendar-box normal-bg">
-                                            <div className="calandar-event-name">
-                                                <h4>English</h4>
-                                                <h5>Lorem ipsum sit amet</h5>
-                                            </div>
-                                            <span>08:00 - 09:00 am</span>
-                                        </div>
-                                    </div>
-                                    <div className="calendar-details">
-                                        <p>09:00 am</p>
-                                        <div className="calendar-box normal-bg">
-                                            <div className="calandar-event-name">
-                                                <h4>Mathematics</h4>
-                                                <h5>Lorem ipsum sit amet</h5>
-                                            </div>
-                                            <span>09:00 - 10:00 am</span>
-                                        </div>
-                                    </div>
-                                    <div className="calendar-details">
-                                        <p>10:00 am</p>
-                                        <div className="calendar-box normal-bg">
-                                            <div className="calandar-event-name">
-                                                <h4>History</h4>
-                                                <h5>Lorem ipsum sit amet</h5>
-                                            </div>
-                                            <span>10:00 - 11:00 am</span>
-                                        </div>
-                                    </div>
-                                    <div className="calendar-details">
-                                        <p>11:00 am</p>
-                                        <div className="calendar-box break-bg">
-                                            <div className="calandar-event-name">
-                                                <h4>Break</h4>
-                                                <h5>Lorem ipsum sit amet</h5>
-                                            </div>
-                                            <span>11:00 - 12:00 am</span>
-                                        </div>
-                                    </div>
-                                    <div className="calendar-details">
-                                        <p>11:30 am</p>
-                                        <div className="calendar-box normal-bg">
-                                            <div className="calandar-event-name">
-                                                <h4>History</h4>
-                                                <h5>Lorem ipsum sit amet</h5>
-                                            </div>
-                                            <span>11:30 - 12:00 am</span>
-                                        </div>
-                                    </div>
+                                <div className="table-responsive">
+                                    <table className="table star-student table-hover table-center table-borderless table-striped">
+                                        <thead className="thead-light">
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Test Name</th>
+                                                <th>Class Name</th>
+                                                <th>Start date</th>
+                                                <th className="text-end">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {recentTest.length > 0 ? (
+                                                recentTest.map((item, index) => {
+                                                    const orderNumber = index + 1;
+                                                    return (
+                                                        <tr key={index}>
+                                                            <td className="text-nowrap">
+                                                                <div>{orderNumber}</div>
+                                                            </td>
+                                                            <td className="text-nowrap">
+                                                                <div>{item.testName}</div>
+                                                            </td>
+                                                            <td className="text-nowrap">{item.className}</td>
+                                                            <td className="text-nowrap">
+                                                                <div>{format(new Date(item.createdAt), "dd/MM/yyyy")}</div>
+                                                            </td>
+                                                            <td className="text-end">
+                                                                <Link to={`/test-view-essay/${item.testSlug}`} className="btn btn-sm bg-success-light me-2">
+                                                                    <i className="feather-eye"></i>
+                                                                </Link>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })
+                                            ) : (
+                                                <tr>
+                                                    <td>No data available for recent tests.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="row">
+                    <div className="col-xl-12 d-flex">
+                        <div className="card flex-fill student-space comman-shadow">
+                            <div className="card-header d-flex align-items-center">
+                                <h5 className="card-title">Test Grade Stats</h5>
+                                <ul className="chart-list-out student-ellips">
+                                    <li className="star-menus">
+                                        <a href="javascript:;">
+                                            <i className="fas fa-ellipsis-v"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div className="card-body">
+                                <div className="table-responsive">
+                                    <table className="table star-student table-hover table-center table-borderless table-striped">
+                                        <thead className="thead-light">
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>Class Name</th>
+                                                <th>Test Name</th>
+                                                <th>Average Score</th>
+                                                <th>Start date</th>
+                                                <th>End date</th>
+                                                <th className="text-end">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {statsGrade.length > 0 ? (
+                                                statsGrade.map((item, index) => {
+                                                    const orderNumber = index + 1;
+                                                    return (
+                                                        <tr key={index}>
+                                                            <td className="text-nowrap">
+                                                                <div>{orderNumber}</div>
+                                                            </td>
+                                                            <td>{item.className}</td>
+                                                            <td className="text-nowrap">
+                                                                <div>
+                                                                    {item.testName} ({item.retake_test_id === null ? "Main test" : "Retake test"})
+                                                                </div>
+                                                            </td>
+                                                            <td className="text-nowrap">{item.averageScore}</td>
+                                                            <td className="text-nowrap">
+                                                                <div>{format(new Date(item.startDate), "dd/MM/yyyy")}</div>
+                                                            </td>
+                                                            <td className="text-nowrap">
+                                                                <div>{format(new Date(item.endDate), "dd/MM/yyyy")}</div>
+                                                            </td>
+                                                            <td className="text-end">
+                                                                <Link to={`/test-view-essay/${item.testSlug}`} className="btn btn-sm bg-success-light me-2">
+                                                                    <i className="feather-eye"></i>
+                                                                </Link>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })
+                                            ) : (
+                                                <tr>
+                                                    <td>No data available for test grade stats.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="row">
+                    <div className="col-xl-3 col-sm-6 col-12">
+                        <div className="card flex-fill fb sm-box">
+                            <div className="social-likes">
+                                <p>Like us on facebook</p>
+                                <h6>50,095</h6>
+                            </div>
+                            <div className="social-boxs">
+                                <img src="assets/img/icons/social-icon-01.svg" alt="Social Icon" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-xl-3 col-sm-6 col-12">
+                        <div className="card flex-fill twitter sm-box">
+                            <div className="social-likes">
+                                <p>Follow us on twitter</p>
+                                <h6>48,596</h6>
+                            </div>
+                            <div className="social-boxs">
+                                <img src="assets/img/icons/social-icon-02.svg" alt="Social Icon" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-xl-3 col-sm-6 col-12">
+                        <div className="card flex-fill insta sm-box">
+                            <div className="social-likes">
+                                <p>Follow us on instagram</p>
+                                <h6>52,085</h6>
+                            </div>
+                            <div className="social-boxs">
+                                <img src="assets/img/icons/social-icon-03.svg" alt="Social Icon" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-xl-3 col-sm-6 col-12">
+                        <div className="card flex-fill linkedin sm-box">
+                            <div className="social-likes">
+                                <p>Follow us on linkedin</p>
+                                <h6>69,050</h6>
+                            </div>
+                            <div className="social-boxs">
+                                <img src="assets/img/icons/social-icon-04.svg" alt="Social Icon" />
                             </div>
                         </div>
                     </div>
