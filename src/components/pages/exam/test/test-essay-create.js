@@ -265,8 +265,8 @@ function Test_Essay_Create() {
         if (content.length < 3) {
             setEditorError("Content must be at least 3 characters.");
             return false;
-        } else if (content.length > 255) {
-            setEditorError("Content must be at most 255 characters.");
+        } else if (content.length > 1000) {
+            setEditorError("Content must be at most 1000 characters.");
             return false;
         } else {
             setEditorError("");
