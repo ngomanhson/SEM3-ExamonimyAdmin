@@ -44,6 +44,9 @@ import TestByTeacher_List from "./components/pages/teacher/testbyteacher-list";
 import ClassByTeacher_List from "./components/pages/teacher/classbyteacher-list";
 import Add_ClassCourse from "./components/pages/classescourse/add-classcourse";
 import StudentExcel_Create from "./components/pages/student/studentexcel-create";
+import Test_View_Teacher from "./components/pages/teacher/test-view-teacher";
+import Test_View_Essay_Teacher from "./components/pages/teacher/test-view-essay-teacher";
+import Class_Detail_Teacher from "./components/pages/teacher/class-view-teacher";
 function App() {
     const ProtectedRoute = ({ element }) => {
         const token = localStorage.getItem("accessToken");
@@ -122,7 +125,10 @@ function App() {
                 <Route path="/teacher-list" element={<ProtectedRoute element={<Teacher_List />} />}></Route>
                 <Route path="/teacher-create" element={<ProtectedRoute element={<Teacher_Create />} />}></Route>
                 <Route path="/testbyteacher-list" element={<ProtectedRoute element={<TestByTeacher_List />} />}></Route>
+                <Route path="/test-view-teacher/:slug" element={<ProtectedRoute element={<Test_View_Teacher />} />}></Route>
+                <Route path="/test-view-essay-teacher/:slug" element={<ProtectedRoute element={<Test_View_Essay_Teacher />} />}></Route>
                 <Route path="/classesbyteacher-list" element={<ProtectedRoute element={<ClassByTeacher_List />} />}></Route>
+                <Route path="/classes-detail-teacher/:id" element={<ProtectedRoute element={<Class_Detail_Teacher />} />}></Route>
                 {/* end route teacher */}
 
                 {/* start route student */}

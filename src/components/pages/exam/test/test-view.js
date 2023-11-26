@@ -1,15 +1,24 @@
 import { useParams } from "react-router-dom";
 import Layout from "../../../layouts/layouts";
 import { Helmet } from "react-helmet";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import api from "../../../services/api";
 import url from "../../../services/url";
+import Loading from "../../../layouts/loading";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+import { useJwt } from "react-jwt";
 function Test_View() {
     const { slug } = useParams();
     const [examName, setExamName] = useState([]);
     const [studentList, setStudentList] = useState([]);
     const [questionList, setQuestionList] = useState([]);
     const [studentGrades, setStudentGrades] = useState([]);
+    const [isTestLocked, setIsTestLocked] = useState(false);
+    const [userRole, setUserRole] = useState(null);
+    const navigate = useNavigate();
     const [testData, setTestData] = useState({
         id: "",
         name: "",
@@ -100,8 +109,76 @@ function Test_View() {
     const paginate = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
+
+    //xử lý khoá bài test
+    const handleLockTest = async () => {
+        try {
+            const userToken = localStorage.getItem("accessToken");
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${userToken}`,
+                },
+            };
+            const isConfirmed = await Swal.fire({
+                title: testData.status === 1 ? "Unlock test?" : "Lock test?",
+                text: testData.status === 1 ? "Are you sure you want to unlock the test?" : "Are you sure you want to lock the test?",
+                icon: "info",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Confirm",
+            });
+
+            if (isConfirmed.isConfirmed) {
+                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
+                const updateResponse = await api.put(testData.status === 1 ? url.LOCKTEST.UNLOCK.replace("{}", slug) : url.LOCKTEST.LOCK.replace("{}", slug), config);
+                setIsTestLocked(!isTestLocked);
+                toast.success(testData.status === 1 ? "Unlock the test successfully." : "Lock the test successfully.", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                });
+                setTimeout(() => {
+                    navigate(`/test-list`); //chuyển đến trang test-list
+                }, 3000);
+            }
+        } catch (error) {
+            toast.error(testData.status === 1 ? "Unlock the test failed." : "Lock the test failed.", {
+                position: toast.POSITION.TOP_RIGHT,
+                autoClose: 3000,
+            });
+            // console.log(error);
+            // console.error("Response data:", error.response.data);
+        }
+    };
+
+    const fetchUserRole = async () => {
+        const token = localStorage.getItem("accessToken");
+        try {
+            const decodedToken = JSON.parse(atob(token.split(".")[1]));
+            const userRole = decodedToken["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+            setUserRole(userRole);
+        } catch (error) {
+            console.error("Error loading user role:", error);
+        }
+    };
+
+    useEffect(() => {
+        setIsTestLocked(testData.locked);
+    }, [testData.locked]);
+
+    useEffect(() => {
+        fetchUserRole();
+    }, [navigate]);
+
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+    }, []);
     return (
         <>
+            {loading ? <Loading /> : ""}
             <Helmet>
                 <title>Test Detail | Examonimy</title>
             </Helmet>
@@ -197,11 +274,13 @@ function Test_View() {
                             <div className="card-header d-flex align-items-center">
                                 <h5 className="card-title">List Students</h5>
                                 <ul className="chart-list-out student-ellips">
-                                    <li className="star-menus">
-                                        <a href="javascript:;">
-                                            <i className="fas fa-ellipsis-v"></i>
+                                    {/* <li className="star-menus"> */}
+                                    {userRole === "Super Admin" ? (
+                                        <a className="btn btn-primary float-sm-end m-l-10" onClick={handleLockTest}>
+                                            {testData.status === 0 ? "Lock Test" : "Unlock Test"}
                                         </a>
-                                    </li>
+                                    ) : null}
+                                    {/* </li> */}
                                 </ul>
                             </div>
                             <div className="card-body">

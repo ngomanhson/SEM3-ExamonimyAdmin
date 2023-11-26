@@ -5,7 +5,7 @@ import url from "../../services/url";
 import { format } from "date-fns";
 import Layout from "../../layouts/layouts";
 import { Helmet } from "react-helmet";
-function Student_Of_Class_List() {
+function Class_Detail_Teacher() {
     const { id } = useParams();
     const [students, setStudents] = useState([]);
     const [classNames, setClassNames] = useState({});
@@ -14,8 +14,10 @@ function Student_Of_Class_List() {
 
     //in ra danh sách sinh viên theo lớp
     const loadStudentsForClass = async (classId) => {
+        const userToken = localStorage.getItem("accessToken");
         try {
-            const response = await api.get(`${url.STUDENT.CLASS_ID}?classId=${classId}`);
+            api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
+            const response = await api.get(`${url.STUDENT.CLASS_ID_TEACHER}?classId=${classId}`);
             setStudents(response.data);
         } catch (error) {
             setError("Failed to load students for this class.");
@@ -27,7 +29,7 @@ function Student_Of_Class_List() {
         const userToken = localStorage.getItem("accessToken");
         try {
             api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-            const response = await api.get(url.CLASS.LIST);
+            const response = await api.get(url.CLASS.CLASSOFTEACHER);
             const classData = response.data.reduce((acc, curr) => {
                 acc[curr.id] = curr.name;
                 return acc;
@@ -38,21 +40,6 @@ function Student_Of_Class_List() {
             }
         } catch (error) {
             setError("Failed to load class names.");
-        }
-    };
-
-    // xử lý xoá sinh viên
-    const handleDeleteStudent = async (id) => {
-        const confirmed = window.confirm("Are you sure you want to delete this student?");
-        if (confirmed) {
-            const userToken = localStorage.getItem("accessToken");
-            try {
-                api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-                await api.delete(`${url.STUDENT.DELETE}?id=${id}`);
-                setStudents((prevStudents) => prevStudents.filter((student) => student.id !== id));
-            } catch (error) {
-                console.error("Failed to delete student:", error);
-            }
         }
     };
 
@@ -193,4 +180,4 @@ function Student_Of_Class_List() {
         </>
     );
 }
-export default Student_Of_Class_List;
+export default Class_Detail_Teacher;
