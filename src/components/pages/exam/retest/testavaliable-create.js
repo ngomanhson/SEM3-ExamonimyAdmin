@@ -141,7 +141,7 @@ function TestAvaliable_Create() {
         const userToken = localStorage.getItem("accessToken");
         try {
             //kiểm tra nếu bài test chính là tự luận thì không được taoj
-            const examTestsResponse = await api.get(url.TEST.LIST, {
+            const examTestsResponse = await api.get(url.TEST.ALL, {
                 params: { exam_id: formTest.exam_id },
             });
             const examTests = examTestsResponse.data;
@@ -317,7 +317,6 @@ function TestAvaliable_Create() {
                                                 <Select
                                                     options={optionsExam}
                                                     isSearchable={isSearchable}
-                                                    isClearable={isClearable}
                                                     value={optionsExam.find((option) => option.value === formTest.exam_id)}
                                                     onChange={handleChangeExam}
                                                     placeholder="Select Exam"

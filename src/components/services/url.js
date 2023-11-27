@@ -36,6 +36,10 @@ const url = {
         CREATE: "/course",
         DETAIL: "/product/get-by-codeCourse",
     },
+    QUESTION: {
+        LIST: "/question",
+        CREATE_MULTIPLE_QUESTION: "/question/multiple-choice",
+    },
     ClassCourse: {
         LIST: "/ClassCourse",
         CREATE: "/ClassCourse",
@@ -55,6 +59,7 @@ const url = {
     },
     TEST: {
         LIST: "/test",
+        ALL: "/test/test-list",
         TESTOFTEACHER: "/test/get-by-teacher",
         DETAIL_TEST_OF_SLUG_TEACHER: "/test/get-by-slug-teacher",
         CREATE_MULTIPLE: "/test/multiple-choice-by-hand",
