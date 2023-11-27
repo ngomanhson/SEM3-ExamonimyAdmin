@@ -9,17 +9,11 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import NotFound from "../../pages/other/not-found";
 function StudentExcel_Create() {
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [userRole, setUserRole] = useState(null);
     const [error, setError] = useState(false);
     const [fileTypeError, setFileTypeError] = useState("");
     const [excelFileExistsError, setExcelFileExistsError] = useState("");
-
-    useEffect(() => {
-        setTimeout(() => {
-            setLoading(false);
-        }, 2000);
-    });
 
     const [formStudent, setFormStudent] = useState({
         excelFile: null,
@@ -59,17 +53,18 @@ function StudentExcel_Create() {
         if (isFormValid) {
             const userToken = localStorage.getItem("accessToken");
             try {
+                setLoading(true);
                 api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
                 const response = await api.post(url.STUDENT.CREATE_EXCEL, formStudent, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
 
-                if (response && response.data) {
-                    console.log(response.data);
+                if (response.status === 200) {
                     toast.success("Create Student With Excel File Successfully", {
                         position: toast.POSITION.TOP_RIGHT,
                         autoClose: 3000,
                     });
+                    setLoading(false);
                 } else {
                 }
                 setTimeout(() => {

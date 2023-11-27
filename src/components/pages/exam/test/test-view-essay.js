@@ -420,7 +420,7 @@ function Test_View_Essay() {
                                                             <div>{student.student_code}</div>
                                                         </td>
                                                         <td className="text-nowrap">
-                                                            <img className="rounded-circle" src={student.avatar} width="25" alt={student.fullname} />
+                                                            <img className="rounded-circle" src={student.avatar} width="40" height="40" alt={student.fullname} />
                                                             {student.fullname}
                                                         </td>
                                                         <td className="text-nowrap">{grade ? (grade.finishedAt ? formatDateTime(grade.finishedAt) : "This student haven't taken the test!") : "-"}</td>

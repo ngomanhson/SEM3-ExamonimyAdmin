@@ -7,6 +7,7 @@ import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../layouts/loading";
 import NotFound from "../../pages/other/not-found";
+import Swal from "sweetalert2";
 function Classes_List() {
     const [classes, setClasses] = useState([]);
     const [teacherNames, setTeacherNames] = useState({});
@@ -48,9 +49,18 @@ function Classes_List() {
     };
 
     //xử lý xoá lớp học
-    const handleDeleteClass = (id) => {
-        const confirmed = window.confirm("Are you sure you want to delete this class?");
-        if (confirmed) {
+    const handleDeleteClass = async (id) => {
+        const isConfirmed = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to delete class?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "I'm sure",
+        });
+
+        if (isConfirmed.isConfirmed) {
             deleteClass(id);
         }
     };

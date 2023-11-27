@@ -8,6 +8,7 @@ import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
 import { useNavigate } from "react-router-dom";
 import NotFound from "../../pages/other/not-found";
+import Swal from "sweetalert2";
 function Student_DeleteAt() {
     const [userRole, setUserRole] = useState(null);
     const [students, setStudents] = useState([]);
@@ -57,8 +58,16 @@ function Student_DeleteAt() {
 
     //xử lý xoá sinh viên
     const handleDeleteStudent = async (id) => {
-        const confirmed = window.confirm("Are you sure you want to permanently delete this student?");
-        if (confirmed) {
+        const isConfirmed = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to delete class?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "I'm sure",
+        });
+        if (isConfirmed.isConfirmed) {
             try {
                 await api.delete(`${url.STUDENT.DELETE_FOREVER}/${id}`);
                 setStudents((prevStudents) => prevStudents.filter((student) => student.id !== id));

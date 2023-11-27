@@ -8,6 +8,7 @@ import { Helmet } from "react-helmet";
 import Loading from "../../layouts/loading";
 import { useNavigate } from "react-router-dom";
 import NotFound from "../../pages/other/not-found";
+import Swal from "sweetalert2";
 function Student_List() {
     const [userRole, setUserRole] = useState(null);
     const [students, setStudents] = useState([]);
@@ -60,8 +61,16 @@ function Student_List() {
 
     //xử lý xoá sinh viên
     const handleDeleteStudent = async (id) => {
-        const confirmed = window.confirm("Are you sure you want to delete this student?");
-        if (confirmed) {
+        const isConfirmed = await Swal.fire({
+            title: "Are you sure?",
+            text: "You want to delete class?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "I'm sure",
+        });
+        if (isConfirmed.isConfirmed) {
             const userToken = localStorage.getItem("accessToken");
             try {
                 api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
@@ -185,12 +194,10 @@ function Student_List() {
                                                     <h3 className="page-title">Students</h3>
                                                 </div>
                                                 <div className="col-auto text-end float-end ms-auto download-grp">
-                                                    <a href="" className="btn btn-outline-gray me-2">
+                                                    <NavLink to="/student-deleteat" className="btn btn-outline-gray me-2">
                                                         <i class="fa fa-trash" aria-hidden="true"></i>
-                                                    </a>
-                                                    <a href="" className="btn btn-outline-primary me-2">
-                                                        <i className="fas fa-download"></i> Download
-                                                    </a>
+                                                    </NavLink>
+
                                                     <NavLink to="/student-create" className="btn btn-primary">
                                                         <i className="fas fa-plus"></i>
                                                     </NavLink>
