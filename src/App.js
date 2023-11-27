@@ -49,6 +49,8 @@ import Test_View_Essay_Teacher from "./components/pages/teacher/test-view-essay-
 import Class_Detail_Teacher from "./components/pages/teacher/class-view-teacher";
 import Question_List from "./components/pages/question/question-list";
 import Question_Create_Multiple from "./components/pages/question/question-create";
+import Question_List_Essay from "./components/pages/question/question-list-essay";
+import Question_Create_Essay from "./components/pages/question/question-create-essay";
 function App() {
     const ProtectedRoute = ({ element }) => {
         const token = localStorage.getItem("accessToken");
@@ -143,7 +145,9 @@ function App() {
 
                 {/* start route question */}
                 <Route path="/question-list" element={<ProtectedRoute element={<Question_List />} />}></Route>
-                <Route path="/question-create" element={<ProtectedRoute element={<Question_Create_Multiple />} />}></Route>
+                <Route path="/question-list-essay" element={<ProtectedRoute element={<Question_List_Essay />} />}></Route>
+                <Route path="/question-create-multiple" element={<ProtectedRoute element={<Question_Create_Multiple />} />}></Route>
+                <Route path="/question-create-essay" element={<ProtectedRoute element={<Question_Create_Essay />} />}></Route>
                 {/* end route question */}
 
                 <Route path="/profile" element={<ProtectedRoute element={<Profile />} />}></Route>
