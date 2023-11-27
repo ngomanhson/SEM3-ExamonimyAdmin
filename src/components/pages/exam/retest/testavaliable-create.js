@@ -131,6 +131,7 @@ function TestAvaliable_Create() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formValidationResult = validateForm();
+
         if (!formValidationResult) {
             toast.error("You have not completely filled in the Test information", {
                 position: toast.POSITION.TOP_RIGHT,

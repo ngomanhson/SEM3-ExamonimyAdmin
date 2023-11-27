@@ -182,7 +182,7 @@ function Teacher_Dashboard() {
                                                                 <div>{format(new Date(item.createdAt), "dd/MM/yyyy")}</div>
                                                             </td>
                                                             <td className="text-end">
-                                                                <Link to={`/student-of-class-list/${item.id}`} className="btn btn-sm bg-success-light me-2">
+                                                                <Link to={`/classes-detail-teacher/${item.id}`} className="btn btn-sm bg-success-light me-2">
                                                                     <i className="feather-eye"></i>
                                                                 </Link>
                                                             </td>
@@ -241,7 +241,7 @@ function Teacher_Dashboard() {
                                                                 <div>{format(new Date(item.createdAt), "dd/MM/yyyy")}</div>
                                                             </td>
                                                             <td className="text-end">
-                                                                <Link to={`/test-view-essay/${item.testSlug}`} className="btn btn-sm bg-success-light me-2">
+                                                                <Link to={`/test-view-essay-teacher/${item.testSlug}`} className="btn btn-sm bg-success-light me-2">
                                                                     <i className="feather-eye"></i>
                                                                 </Link>
                                                             </td>

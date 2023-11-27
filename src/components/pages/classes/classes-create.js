@@ -81,6 +81,11 @@ function Classes_Create() {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 5000,
                 });
+                setFormClass({
+                    name: "",
+                    room: "",
+                    teacher_id: "",
+                });
             } catch (error) {
                 if (error.response.status === 400 && error.response.data === "Class name already exists") {
                     setNameExistsError("The class name already exists");
