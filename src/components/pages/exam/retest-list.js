@@ -95,6 +95,9 @@ function Retest_List() {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 3000,
                 });
+                setTimeout(() => {
+                    navigate(`/retest-list`);
+                }, 3000);
             }
         } catch (error) {
             if (error.response && error.response.status === 403) {

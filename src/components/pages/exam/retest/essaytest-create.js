@@ -155,7 +155,7 @@ function EssayTest_Create() {
             const userToken = localStorage.getItem("accessToken");
             try {
                 //kiểm tra nếu bài test chính là trắc nghiệm thì không được taoj
-                const examTestsResponse = await api.get(url.TEST.LIST, {
+                const examTestsResponse = await api.get(url.TEST.ALL, {
                     params: { exam_id: formTest.exam_id },
                 });
                 const examTests = examTestsResponse.data;
@@ -349,7 +349,6 @@ function EssayTest_Create() {
                                                 <Select
                                                     options={optionsExam}
                                                     isSearchable={isSearchable}
-                                                    isClearable={isClearable}
                                                     value={optionsExam.find((option) => option.value === formTest.exam_id)}
                                                     onChange={handleChangeExam}
                                                     placeholder="Select Exam"

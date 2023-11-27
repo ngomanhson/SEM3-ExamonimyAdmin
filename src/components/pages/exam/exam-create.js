@@ -12,7 +12,6 @@ import NotFound from "../../pages/other/not-found";
 function Exam_Create() {
     const [userRole, setUserRole] = useState(null);
     const [isSearchable, setIsSearchable] = useState(true);
-    const [isClearable, setIsClearable] = useState(true);
     const [courses, setCourses] = useState([]);
     const [loggedInUser, setLoggedInUser] = useState(null);
     const [nameExistsError, setNameExistsError] = useState("");
@@ -218,7 +217,6 @@ function Exam_Create() {
                                                 <Select
                                                     options={courses}
                                                     isSearchable={isSearchable}
-                                                    isClearable={isClearable}
                                                     name="courseClass_id"
                                                     value={courses.find((option) => option.value === formExam.courseClass_id)}
                                                     onChange={(selectedOption) => {

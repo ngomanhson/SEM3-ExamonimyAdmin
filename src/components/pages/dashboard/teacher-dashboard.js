@@ -292,6 +292,7 @@ function Teacher_Dashboard() {
                                             {statsGrade.length > 0 ? (
                                                 statsGrade.map((item, index) => {
                                                     const orderNumber = index + 1;
+                                                    const testViewLink = item.typeTest === 0 ? `/test-view-teacher/${item.testSlug}` : `/test-view-essay-teacher/${item.testSlug}`;
                                                     return (
                                                         <tr key={index}>
                                                             <td className="text-nowrap">
@@ -311,7 +312,7 @@ function Teacher_Dashboard() {
                                                                 <div>{format(new Date(item.endDate), "dd/MM/yyyy")}</div>
                                                             </td>
                                                             <td className="text-end">
-                                                                <Link to={`/test-view-essay/${item.testSlug}`} className="btn btn-sm bg-success-light me-2">
+                                                                <Link to={testViewLink} className="btn btn-sm bg-success-light me-2">
                                                                     <i className="feather-eye"></i>
                                                                 </Link>
                                                             </td>

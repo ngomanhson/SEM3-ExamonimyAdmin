@@ -347,7 +347,6 @@ function Test_Avaliable() {
                                                 <Select
                                                     options={optionsExam}
                                                     isSearchable={isSearchable}
-                                                    isClearable={isClearable}
                                                     value={optionsExam.find((option) => option.value === formTest.exam_id)}
                                                     onChange={handleChangeExam}
                                                     placeholder="Select Exam"
