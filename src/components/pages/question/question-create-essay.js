@@ -8,23 +8,18 @@ import Loading from "../../layouts/loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import NotFound from "../../pages/other/not-found";
-function Question_Create_Multiple() {
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+function Question_Create_Essay() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const [error, setError] = useState(false);
-    const [selectedLevel, setSelectedLevel] = useState("");
     const [course, setCourse] = useState([]);
     const [questionErrors, setQuestionErrors] = useState({});
+    const [editorError, setEditorError] = useState("");
     const [questionData, setQuestionData] = useState({
         title: "",
-        level: "",
         course_id: "",
-        answers: [
-            { content: "", status: 0 },
-            { content: "", status: 0 },
-            { content: "", status: 0 },
-            { content: "", status: 0 },
-        ],
     });
 
     const validateQuestion = () => {
@@ -32,38 +27,17 @@ function Question_Create_Multiple() {
         let valid = true;
         const newQuestionErrors = {};
 
-        if (!questionData.title) {
-            newQuestionErrors.title = "Please enter question title";
-            valid = false;
-        } else if (questionData.title.length < 3) {
-            newQuestionErrors.title = "Enter at least 3 characters";
-            valid = false;
-        } else if (questionData.title.length > 255) {
-            newQuestionErrors.title = "Enter up to 255 characters";
-            valid = false;
-        }
-
-        questionData.answers.forEach((answer, index) => {
-            if (!answer.content) {
-                newQuestionErrors[`answer${String.fromCharCode(65 + index)}`] = `Please enter choice ${String.fromCharCode(65 + index)}`;
-                valid = false;
-            }
-        });
-
-        const hasCorrectAnswer = questionData.answers.some((answer) => answer.status === 1);
-        if (!hasCorrectAnswer) {
-            newQuestionErrors.correctAnswer = "Please select correct answer";
-            valid = false;
-        }
-
-        if (!questionData.level) {
-            newQuestionErrors.level = "Please select level of question";
-            valid = false;
-        }
-
         if (!questionData.course_id) {
             newQuestionErrors.course_id = "Please select course";
             valid = false;
+        }
+
+        const editorContent = questionData.title.trim();
+        if (editorContent.length < 3 || editorContent.length > 1000) {
+            setEditorError("Question must be between 3 and 1000 characters");
+            valid = false;
+        } else {
+            setEditorError("");
         }
 
         setQuestionErrors(newQuestionErrors);
@@ -86,23 +60,20 @@ function Question_Create_Multiple() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const isFormValid = validateQuestion();
-
-        const hasCorrectAnswer = questionData.answers.some((answer) => answer.status === 1);
         const userToken = localStorage.getItem("accessToken");
-
-        if (isFormValid && hasCorrectAnswer) {
+        if (isFormValid) {
             try {
                 api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
-                const response = await api.post(url.QUESTION.CREATE_MULTIPLE_QUESTION, questionData);
+                const response = await api.post(url.QUESTION.CREATE_ESSAY_QUESTION, questionData);
                 toast.success("Create Question Successfully", {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 3000,
                 });
                 setTimeout(() => {
-                    navigate(`/question-list`);
+                    navigate(`/question-list-essay`);
                 }, 3000);
             } catch (error) {
-                toast.error("Create Question Failed", {
+                toast.error("Create Question Failed!", {
                     position: toast.POSITION.TOP_RIGHT,
                     autoClose: 3000,
                 });
@@ -110,7 +81,7 @@ function Question_Create_Multiple() {
                 console.error("Response data:", error.response.data);
             }
         } else {
-            toast.error("Haven't chosen the correct answer!", {
+            toast.error("Please complete all information!", {
                 position: toast.POSITION.TOP_RIGHT,
                 autoClose: 3000,
             });
@@ -124,20 +95,10 @@ function Question_Create_Multiple() {
         }));
     };
 
-    const handleAnswerChange = (index, content) => {
+    const handleChangeEditor = (content, delta, source, editor) => {
         setQuestionData((prevData) => ({
             ...prevData,
-            answers: prevData.answers.map((answer, i) => (i === index ? { ...answer, content } : answer)),
-        }));
-    };
-
-    const handleCorrectAnswerChange = (index) => {
-        setQuestionData((prevData) => ({
-            ...prevData,
-            answers: prevData.answers.map((answer, i) => ({
-                ...answer,
-                status: i === index ? 1 : 0,
-            })),
+            title: content,
         }));
     };
 
@@ -170,11 +131,11 @@ function Question_Create_Multiple() {
                         <div className="row">
                             <div class="col-md-9">
                                 <ul class="list-links mb-4">
-                                    <li class="active">
-                                        <NavLink to="">Add Question Multiple</NavLink>
-                                    </li>
                                     <li>
-                                        <NavLink to="/question-create-essay">Add Queston Essay</NavLink>
+                                        <NavLink to="/question-create-multiple">Add Question Multiple</NavLink>
+                                    </li>
+                                    <li class="active">
+                                        <NavLink to="">Add Queston Essay</NavLink>
                                     </li>
                                 </ul>
                             </div>
@@ -198,46 +159,57 @@ function Question_Create_Multiple() {
                                                 </div>
                                                 <div className="form-group">
                                                     <label>Question Name</label>
-                                                    <input type="text" value={questionData.title} onChange={(e) => handleInputChange("title", e.target.value)} className="form-control" />
-                                                    {questionErrors.title && <div className="text-danger">{questionErrors.title}</div>}
-                                                </div>
-
-                                                {questionData.answers.map((answer, index) => (
-                                                    <div key={index} className="form-group">
-                                                        <label>{`Choice ${String.fromCharCode(65 + index)}`}</label>
-                                                        <input type="text" value={answer.content} onChange={(e) => handleAnswerChange(index, e.target.value)} className="form-control" />
-                                                        {questionErrors[`answer${String.fromCharCode(65 + index)}`] && (
-                                                            <div className="text-danger">{questionErrors[`answer${String.fromCharCode(65 + index)}`]}</div>
-                                                        )}
-                                                        <div className="form-check">
-                                                            <input className="form-check-input" type="radio" checked={answer.status === 1} onChange={() => handleCorrectAnswerChange(index)} />
-                                                            <label className="form-check-label">Correct Answer</label>
-                                                        </div>
-                                                    </div>
-                                                ))}
-
-                                                <div className="form-group">
-                                                    <label>Level of difficulty</label>
-                                                    <select
-                                                        className="form-control"
-                                                        value={selectedLevel}
-                                                        onChange={(e) => {
-                                                            setSelectedLevel(e.target.value);
-                                                            handleInputChange("level", e.target.value);
+                                                    {editorError && <div className="text-danger">{editorError}</div>}
+                                                    <ReactQuill
+                                                        value={questionData.title}
+                                                        onChange={handleChangeEditor}
+                                                        modules={{
+                                                            toolbar: [
+                                                                [
+                                                                    {
+                                                                        header: "1",
+                                                                    },
+                                                                    {
+                                                                        header: "2",
+                                                                    },
+                                                                    {
+                                                                        font: [],
+                                                                    },
+                                                                ],
+                                                                ["bold", "italic", "underline", "strike", "blockquote"],
+                                                                [
+                                                                    "link",
+                                                                    // "image",
+                                                                    "video",
+                                                                ],
+                                                                [
+                                                                    {
+                                                                        list: "ordered",
+                                                                    },
+                                                                    {
+                                                                        list: "bullet",
+                                                                    },
+                                                                    {
+                                                                        indent: "-1",
+                                                                    },
+                                                                    {
+                                                                        indent: "+1",
+                                                                    },
+                                                                ],
+                                                            ],
                                                         }}
-                                                    >
-                                                        <option value="">Select level question...</option>
-                                                        <option value="1">Easy</option>
-                                                        <option value="2">Medium</option>
-                                                        <option value="3">Difficult</option>
-                                                    </select>
-                                                    {questionErrors.level && <div className="text-danger">{questionErrors.level}</div>}
-                                                </div>
-
-                                                <div className="form-group local-forms">
-                                                    <label>
-                                                        Course Name <span className="login-danger">*</span>
-                                                    </label>
+                                                        style={{
+                                                            height: "300px",
+                                                        }}
+                                                    />
+                                                </div>{" "}
+                                                <div
+                                                    className="form-group"
+                                                    style={{
+                                                        marginTop: "40px",
+                                                    }}
+                                                >
+                                                    <label>Course Name</label>
                                                     <select
                                                         className="form-control select"
                                                         name="course_id"
@@ -253,7 +225,6 @@ function Question_Create_Multiple() {
                                                     </select>
                                                     {questionErrors.course_id && <div className="text-danger">{questionErrors.course_id}</div>}
                                                 </div>
-
                                                 <div className="col-12">
                                                     <div className="student-submit">
                                                         <button type="submit" className="btn btn-primary">
@@ -274,4 +245,4 @@ function Question_Create_Multiple() {
         </>
     );
 }
-export default Question_Create_Multiple;
+export default Question_Create_Essay;

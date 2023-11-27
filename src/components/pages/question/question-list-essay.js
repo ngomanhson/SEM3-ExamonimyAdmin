@@ -10,13 +10,13 @@ import NotFound from "../../pages/other/not-found";
 import Swal from "sweetalert2";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-function Question_List() {
+function Question_List_Essay() {
     const [questions, setQuestions] = useState([]);
     const [userRole, setUserRole] = useState(null);
     const navigate = useNavigate();
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [questionsPerPage] = useState(20);
+    const [questionsPerPage] = useState(10);
     const [loading, setLoading] = useState(true);
     const [searchByName, setSearchByName] = useState("");
 
@@ -42,7 +42,7 @@ function Question_List() {
         try {
             api.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
             const response = await api.get(url.QUESTION.LIST);
-            const multipleChoiceQuestions = response.data.filter((question) => question.type === 0); //chỉ hiện thị câu hỏi trắc nghiệm.
+            const multipleChoiceQuestions = response.data.filter((question) => question.type === 1); //chỉ hiện thị câu hỏi trắc nghiệm.
             setQuestions(multipleChoiceQuestions);
             console.log(multipleChoiceQuestions);
         } catch (error) {}
@@ -132,11 +132,11 @@ function Question_List() {
                         <div className="student-group-form">
                             <div className="row">
                                 <ul class="list-links col-lg-5">
-                                    <li class="active">
-                                        <NavLink to="">Multiple Choice</NavLink>
-                                    </li>
                                     <li>
-                                        <NavLink to="/question-list-essay">Essay</NavLink>
+                                        <NavLink to="/question-list">Multiple Choice</NavLink>
+                                    </li>
+                                    <li class="active">
+                                        <NavLink to="">Essay</NavLink>
                                     </li>
                                 </ul>
                                 <div className="col-lg-5">
@@ -160,13 +160,13 @@ function Question_List() {
                                         <div className="page-header">
                                             <div className="row align-items-center">
                                                 <div className="col">
-                                                    <h3 className="page-title">List of multiple choice questions</h3>
+                                                    <h3 className="page-title">List of essay questions</h3>
                                                 </div>
                                                 <div className="col-auto text-end float-end ms-auto download-grp">
                                                     <a href="" className="btn btn-outline-gray me-2">
                                                         <i class="fa fa-trash" aria-hidden="true"></i>
                                                     </a>
-                                                    <NavLink to="/question-create-multiple" className="btn btn-primary">
+                                                    <NavLink to="/question-create-essay" className="btn btn-primary">
                                                         <i className="fas fa-plus"></i>
                                                     </NavLink>
                                                 </div>
@@ -179,10 +179,6 @@ function Question_List() {
                                                     <tr>
                                                         <th>Ordinal</th>
                                                         <th>Title</th>
-                                                        <th>Answer A</th>
-                                                        <th>Answer B</th>
-                                                        <th>Answer C</th>
-                                                        <th>Answer D</th>
                                                         <th className="text-end">Action</th>
                                                     </tr>
                                                 </thead>
@@ -191,12 +187,15 @@ function Question_List() {
                                                         return (
                                                             <tr>
                                                                 <td>{index + 1}</td>
-                                                                <td>{item.title}</td>
-                                                                <td>{item.answers.length > 0 ? item.answers[0].content : ""}</td>
-                                                                <td>{item.answers.length > 1 ? item.answers[1].content : ""}</td>
-                                                                <td>{item.answers.length > 2 ? item.answers[2].content : ""}</td>
-                                                                <td>{item.answers.length > 3 ? item.answers[3].content : ""}</td>
-
+                                                                <td>
+                                                                    {" "}
+                                                                    <p
+                                                                        key={index}
+                                                                        dangerouslySetInnerHTML={{
+                                                                            __html: item.title,
+                                                                        }}
+                                                                    ></p>
+                                                                </td>
                                                                 <td className="text-end">
                                                                     <div className="actions">
                                                                         <NavLink onClick={() => handleDeleteQuestion(item.id)} className="btn btn-sm bg-danger-light">
@@ -250,4 +249,4 @@ function Question_List() {
         </>
     );
 }
-export default Question_List;
+export default Question_List_Essay;

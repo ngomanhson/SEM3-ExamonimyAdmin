@@ -38,7 +38,10 @@ const url = {
     },
     QUESTION: {
         LIST: "/question",
+        DELETE: "/question",
         CREATE_MULTIPLE_QUESTION: "/question/multiple-choice",
+        CREATE_ESSAY_QUESTION: "/question/essay",
+        EDIT_MULTIPLE_QUESTION: "/question/multiple-choice",
     },
     ClassCourse: {
         LIST: "/ClassCourse",
